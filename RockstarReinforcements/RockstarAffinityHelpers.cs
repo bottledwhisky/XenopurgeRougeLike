@@ -3,6 +3,7 @@ using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.Commands;
 using SpaceCommander.Database;
+using SpaceCommander.EndGame;
 using SpaceCommander.Weapons;
 using System;
 using System.Collections.Generic;
@@ -197,7 +198,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public static void SetShootingCommand(UnitData ud)
         {
             CommandDataSO attackCommand;
-            if (RockstarAffinity4.Instance.IsActive)
+            if (RockstarAffinity4.Instance.IsActive || RockstarAffinity6.Instance.IsActive)
             {
                 attackCommand = UpgradedShootingCommands[UnityEngine.Random.Range(0, UpgradedShootingCommands.Count())];
             }
@@ -214,6 +215,35 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                     cmdList[i] = attackCommand;
                     break;
                 }
+            }
+        }
+    }
+
+
+    [HarmonyPatch(typeof(TestGame), "EndGame")]
+    public static class RockstarAffinity2FanCount_Patch
+    {
+        public static void Postfix(TestGame __instance, EndGameResultData data)
+        {
+            if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                return;
+            }
+            if (data.IsVictory)
+            {
+                var nDead = data.UnitsKilled.Count();
+                var nObjectives = data.ObjectivesStatuses.Count(obj => obj.Item3);
+                var baseNumber = UnityEngine.Random.Range(RockstarAffinityHelpers.fanGainLow, RockstarAffinityHelpers.fanGainHigh);
+
+                var fanDelta = baseNumber - nDead * RockstarAffinityHelpers.fanPenaltyDead + nObjectives * RockstarAffinityHelpers.fanBonusObjective;
+
+                if (Rockstar.StarPower.IsActive && Rockstar.StarPower.IsPerfectVictory(data))
+                {
+                    fanDelta = (int)(fanDelta * (1 + StarPower.FanBonusMultiplier));
+                }
+
+                RockstarAffinityHelpers.fanCount += fanDelta;
+                MelonLogger.Msg($"RockstarAffinity2FanCount_Patch: gained {fanDelta} fans to {RockstarAffinityHelpers.fanCount}");
             }
         }
     }

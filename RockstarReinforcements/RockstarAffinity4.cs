@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using XenopurgeRougeLike;
-using XenopurgeRougeLike.RockstarReinforcements;
-
-namespace XenopurgeRougeLike.RockstarReinforcements
+﻿namespace XenopurgeRougeLike.RockstarReinforcements
 {
     public class RockstarAffinity4 : CompanyAffinity
     {
-        public static int fanCount = 0;
         public RockstarAffinity4()
         {
             unlockLevel = 4;
@@ -19,5 +12,24 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public static RockstarAffinity4 _instance;
 
         public static RockstarAffinity4 Instance => _instance ??= new();
+
+        public override void OnActivate()
+        {
+            RockstarAffinityHelpers.fanMoney += 10;
+            RockstarAffinityHelpers.fanGainLow += 1000;
+            RockstarAffinityHelpers.fanGainHigh += 1000;
+        }
+
+        public override void OnDeactivate()
+        {
+            RockstarAffinityHelpers.fanMoney -= 10;
+            RockstarAffinityHelpers.fanGainLow -= 1000;
+            RockstarAffinityHelpers.fanGainHigh -= 1000;
+        }
+
+        public override string ToFullDescription()
+        {
+            return base.ToFullDescription() + $"\nCurrent Fan Count: {RockstarAffinityHelpers.fanCount}";
+        }
     }
 }

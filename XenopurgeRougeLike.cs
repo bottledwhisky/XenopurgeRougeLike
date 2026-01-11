@@ -3,6 +3,10 @@ using MelonLoader;
 using MelonLoader.Utils;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
+using SpaceCommander.BattleManagement;
+using SpaceCommander.BattleManagement.UI;
+using SpaceCommander.Database;
+using SpaceCommander.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -107,9 +111,8 @@ namespace XenopurgeRougeLike
 
         public override void OnUpdate()
         {
-            if (Input.GetKeyUp(KeyCode.F12))
+            if (Input.GetKeyUp(KeyCode.F11))
             {
-                ActionCardDumper.SaveToFile("D:\\projects\\xenopurge\\ActionCardSO.txt");
             }
         }
 

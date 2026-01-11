@@ -7,7 +7,6 @@ using SpaceCommander.Audio;
 using SpaceCommander.BattleManagement.UI;
 using SpaceCommander.Commands;
 using SpaceCommander.Database;
-using SpaceCommander.EndGame;
 using SpaceCommander.GameFlow;
 using SpaceCommander.Objectives;
 using System;
@@ -37,29 +36,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             return base.ToFullDescription() + $"\nCurrent Fan Count: {RockstarAffinityHelpers.fanCount}";
         }
 
-        public static bool IsAnyRockstarAffinityActive => Instance.IsActive || RockstarAffinity4.Instance.IsActive;
-    }
-
-    [HarmonyPatch(typeof(TestGame), "EndGame")]
-    public static class RockstarAffinity2FanCount_Patch
-    {
-        public static void Postfix(TestGame __instance, EndGameResultData data)
-        {
-            if (!RockstarAffinity2.Instance.IsActive)
-            {
-                return;
-            }
-            if (data.IsVictory)
-            {
-                var nDead = data.UnitsKilled.Count();
-                var nObjectives = data.ObjectivesStatuses.Where(obj => obj.Item3).Count();
-                var baseNumber = UnityEngine.Random.Range(RockstarAffinityHelpers.fanGainLow, RockstarAffinityHelpers.fanGainHigh);
-
-                var fanDelta = baseNumber - nDead * RockstarAffinityHelpers.fanPenaltyDead + nObjectives * RockstarAffinityHelpers.fanBonusObjective;
-                RockstarAffinityHelpers.fanCount += fanDelta;
-                MelonLogger.Msg($"RockstarAffinity2FanCount_Patch: gained {fanDelta} fans to {RockstarAffinityHelpers.fanCount}");
-            }
-        }
+        public static bool IsAnyRockstarAffinityActive => Instance.IsActive || RockstarAffinity4.Instance.IsActive || RockstarAffinity6.Instance.IsActive;
     }
 
     [HarmonyPatch(typeof(BattleUnitGO), "BindCharacter")]

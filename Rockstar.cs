@@ -1,22 +1,6 @@
-﻿using MelonLoader;
-using SpaceCommander.Area;
-using SpaceCommander.Commands;
-using SpaceCommander.UI;
-using System;
-using System.Buffers.Text;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Net.Sockets;
-using System.Text;
-using UnityEngine;
-using UnityEngine.Localization.Metadata;
 using XenopurgeRougeLike.RockstarReinforcements;
-using static IKSolver;
-using static SpaceCommander.Enumerations;
-using static UnityEngine.EventSystems.EventTrigger;
-using static UnityEngine.Random;
 
 namespace XenopurgeRougeLike
 {
@@ -43,6 +27,7 @@ namespace XenopurgeRougeLike
         public static List<CompanyAffinity> Affinities => _affinities ??= [
             RockstarAffinity2.Instance,
             RockstarAffinity4.Instance,
+            RockstarAffinity6.Instance,
         ];
 
         public static Dictionary<Type, Reinforcement> Reinforcements
@@ -51,15 +36,21 @@ namespace XenopurgeRougeLike
             {
                 return new Dictionary<Type, Reinforcement>()
                 {
-                    { typeof(ScreenUsed), new ScreenUsed() }
+                    { typeof(StarPower), new StarPower() },
+                    { typeof(StreamDonations), new StreamDonations() },
+                    { typeof(CelebrityAuction), new CelebrityAuction() }
                 };
             }
         }
 
-        public static ScreenUsed ScreenUsed => (ScreenUsed)Reinforcements[typeof(ScreenUsed)];
+        public static StarPower StarPower => (StarPower)Reinforcements[typeof(StarPower)];
+        public static StreamDonations StreamDonations => (StreamDonations)Reinforcements[typeof(StreamDonations)];
+
+        public static CelebrityAuction CelebrityAuction => (CelebrityAuction)Reinforcements[typeof(CelebrityAuction)];
+
         public static bool IsAvailable()
         {
-            return false;
+            return true;
         }
     }
 }
