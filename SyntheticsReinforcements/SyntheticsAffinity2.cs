@@ -2,6 +2,7 @@
 using SpaceCommander;
 using SpaceCommander.Area;
 using System;
+using UnityEngine;
 using static SpaceCommander.Enumerations;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
@@ -11,6 +12,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
         public SyntheticsAffinity2()
         {
             unlockLevel = 2;
+            company = Company.Synthetics;
             description = "速度+1，瞄准+10，近战伤害+1";
         }
 
@@ -18,7 +20,9 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
         public const float AccuracyBonus = .1f;
         public const float PowerBonus = 1f;
 
-        public static SyntheticsAffinity2 Instance => (SyntheticsAffinity2)Company.GetAffinity(CompanyType.Synthetics, 2);
+        public static SyntheticsAffinity2 _instance;
+
+        public static SyntheticsAffinity2 Instance => _instance ??= new();
 
 
         public override void OnActivate()

@@ -38,7 +38,12 @@ namespace XenopurgeRougeLike
 
         //其他术语
         //中文英文热情的粉丝Passionate Fan一哥Top Star粉丝数Fan Count完美胜利Perfect Victory数字收藏Digital Collectible
-        internal static List<CompanyAffinity> Affinities;
+
+        public static List<CompanyAffinity> _affinities;
+        public static List<CompanyAffinity> Affinities => _affinities ??= [
+            RockstarAffinity2.Instance,
+            RockstarAffinity4.Instance,
+        ];
 
         public static Dictionary<Type, Reinforcement> Reinforcements
         {

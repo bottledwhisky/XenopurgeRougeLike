@@ -11,6 +11,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
         public SyntheticsAffinity6()
         {
             unlockLevel = 6;
+            company = Company.Synthetics;
             description = "速度+3，瞄准+30，近战伤害+3，开局获得8点接入点数，更高概率获得同流派增援";
         }
 
@@ -37,7 +38,9 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             XenopurgeRougeLike.WeightModifiers.Remove(ModifyWeights);
         }
 
-        public static SyntheticsAffinity6 Instance => (SyntheticsAffinity6)Company.GetAffinity(CompanyType.Synthetics, 6);
+        public static SyntheticsAffinity6 _instance;
+
+        public static SyntheticsAffinity6 Instance => _instance ??= new();
 
         public static bool ShouldApply(BattleUnit unit, Team team)
         {
@@ -63,7 +66,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
     {
         public static void Postfix(GameManager __instance)
         {
-            CompanyAffinity companyAffinity = Company.GetAffinity(CompanyType.Synthetics, 6);
+            CompanyAffinity companyAffinity = SyntheticsAffinity6.Instance;
             if (!companyAffinity.IsActive)
                 return;
             var AccessPointsManager = __instance.AccessPointsManager;

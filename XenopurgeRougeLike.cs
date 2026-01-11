@@ -97,6 +97,12 @@ namespace XenopurgeRougeLike
             Company.LoadSprites();
             MelonLogger.Msg("XenopurgeRougeLike initialized!");
             _HarmonyInstance = HarmonyInstance;
+
+            Company.Synthetics.Affinities = Synthetics.Affinities;
+            Company.Rockstar.Affinities = Rockstar.Affinities;
+            Company.Xeno.Affinities = Xeno.Affinities;
+
+            RockstarReinforcements.RockstarAffinity4.Instance.IsActive = true;
         }
 
         public override void OnUpdate()

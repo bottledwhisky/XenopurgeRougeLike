@@ -7,6 +7,7 @@ using SpaceCommander.Audio;
 using SpaceCommander.BattleManagement.UI;
 using SpaceCommander.Commands;
 using SpaceCommander.Database;
+using SpaceCommander.EndGame;
 using SpaceCommander.GameFlow;
 using SpaceCommander.Objectives;
 using System;
@@ -16,16 +17,49 @@ using static SpaceCommander.Enumerations;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
+    // 战斗开始时自动部署一个“热情的粉丝”，他会自己找乐子。解锁粉丝数，每场战斗后，获得1k-2k粉丝。
+
     public class RockstarAffinity2 : CompanyAffinity
     {
-        public static int fanCount = 0;
         public RockstarAffinity2()
         {
             unlockLevel = 2;
+            company = Company.Rockstar;
             description = "A \"Passionate Fan\" is automatically deployed at the start of battle and will find their own fun. Unlock Fan Count; gain 1k-2k fans after each battle.";
         }
 
-        public static RockstarAffinity2 Instance => (RockstarAffinity2)Company.GetAffinity(CompanyType.Rockstar, 2);
+        public static RockstarAffinity2 _instance;
+
+        public static RockstarAffinity2 Instance => _instance ??= new();
+
+        public override string ToFullDescription()
+        {
+            return base.ToFullDescription() + $"\nCurrent Fan Count: {RockstarAffinityHelpers.fanCount}";
+        }
+
+        public static bool IsAnyRockstarAffinityActive => Instance.IsActive || RockstarAffinity4.Instance.IsActive;
+    }
+
+    [HarmonyPatch(typeof(TestGame), "EndGame")]
+    public static class RockstarAffinity2FanCount_Patch
+    {
+        public static void Postfix(TestGame __instance, EndGameResultData data)
+        {
+            if (!RockstarAffinity2.Instance.IsActive)
+            {
+                return;
+            }
+            if (data.IsVictory)
+            {
+                var nDead = data.UnitsKilled.Count();
+                var nObjectives = data.ObjectivesStatuses.Where(obj => obj.Item3).Count();
+                var baseNumber = UnityEngine.Random.Range(RockstarAffinityHelpers.fanGainLow, RockstarAffinityHelpers.fanGainHigh);
+
+                var fanDelta = baseNumber - nDead * RockstarAffinityHelpers.fanPenaltyDead + nObjectives * RockstarAffinityHelpers.fanBonusObjective;
+                RockstarAffinityHelpers.fanCount += fanDelta;
+                MelonLogger.Msg($"RockstarAffinity2FanCount_Patch: gained {fanDelta} fans to {RockstarAffinityHelpers.fanCount}");
+            }
+        }
     }
 
     [HarmonyPatch(typeof(BattleUnitGO), "BindCharacter")]
@@ -56,31 +90,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
     {
         static HuntCommandDataSO huntCommand;
 
-        public static HuntCommandDataSO FindHuntCommandDataSO()
-        {
-            if (huntCommand != null)
-            {
-                return huntCommand;
-            }
-
-            try
-            {
-                HuntCommandDataSO[] huntCommands = UnityEngine.Resources.FindObjectsOfTypeAll<HuntCommandDataSO>();
-                if (huntCommands != null && huntCommands.Length > 0)
-                {
-                    MelonLogger.Msg($"Found {huntCommands.Length} HuntCommandDataSO instances");
-                    return huntCommands[0];
-                }
-
-                MelonLogger.Warning("Could not find or create HuntCommandDataSO");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"Error finding HuntCommandDataSO: {ex}");
-                return null;
-            }
-        }
+        public static HuntCommandDataSO HuntCommandDataSO => (huntCommand ??= UnityEngine.Resources.FindObjectsOfTypeAll<HuntCommandDataSO>().FirstOrDefault());
 
         public static BattleUnit fan;
 
@@ -88,6 +98,10 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         [HarmonyPrefix]
         public static void AddNPCsPhase(GridManager gridManager, IEnumerable<BattleUnit> battleUnits)
         {
+            if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                return;
+            }
             MelonLogger.Msg("AddNPCsPhase: true");
             var gameManager = GameManager.Instance;
             BattleUnitsManager teamManager = gameManager.GetTeamManager(Team.Player);
@@ -108,17 +122,20 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             bool gender = UnityEngine.Random.Range(0, 2) == 0;
 
             ud.VoiceActorGUID = _voiceActingListSO.GetRandomVoiceActor(gender ? Gender.female : Gender.male).AssetGUID;
-            HuntCommandDataSO huntCommand = FindHuntCommandDataSO();
             MelonLogger.Msg($"AddNPCsPhase: 3");
+            RockstarAffinityHelpers.SetShootingCommand(ud);
             var cmdList = ud.CommandsDataSOList.ToList();
-            cmdList.Insert(2, huntCommand);
+            cmdList.Insert(2, HuntCommandDataSO);
             foreach (var cmd in cmdList)
             {
-                MelonLogger.Msg($"AddNPCsPhase: cmd {cmd.CommandName} {cmd.GetType()}");
+                MelonLogger.Msg($"AddNPCsPhase: cmd {cmd.GetType()} {cmd.CommandName} {cmd.GetType()}");
             }
             ud.CommandsDataSOList = cmdList.ToArray();
-            fan = new BattleUnit(ud, Team.Player, gridManager);
-            fan.DeploymentOrder = 5;
+            RockstarAffinityHelpers.SetFanUnitStats(ud);
+            fan = new(ud, Team.Player, gridManager)
+            {
+                DeploymentOrder = 5
+            };
             fan.AddCommands();
 
             teamManager.AddBattleUnit(fan);
@@ -164,6 +181,10 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         [HarmonyPrefix]
         public static bool CreateListPrefix(ref IEnumerable<BattleUnit> battleUnits)
         {
+            if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                return true;
+            }
             battleUnits = battleUnits.Where(bu => bu != UnitsPlacementPhasePatch.fan);
             return true;
         }
@@ -172,6 +193,10 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         [HarmonyPostfix]
         public static void CreateListPostfix(IEnumerable<BattleUnit> battleUnits)
         {
+            if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                return;
+            }
             UnitsPlacementPhasePatch.fan.DeploymentOrder = battleUnits.Count() + 1;
         }
     }
@@ -183,17 +208,42 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         [HarmonyPrefix]
         public static bool CreateList(ref IEnumerable<BattleUnit> battleUnits)
         {
+            if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                return true;
+            }
             battleUnits = battleUnits.Where(bu => bu != UnitsPlacementPhasePatch.fan);
             return true;
         }
     }
 
-    [HarmonyPatch(typeof(GameManager), "StartCommandsExecution")]
-    public class GameManager_StartCommandsExecution_Patch
+    [HarmonyPatch(typeof(GameManager))]
+    public class GameManager_Patch
     {
-        public static void Postfix()
+        [HarmonyPatch("StartCommandsExecution")]
+        [HarmonyPostfix]
+        public static void StartCommandsExecution()
         {
+            if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                return;
+            }
             AccessTools.Field(typeof(BattleUnit), "_unitTag").SetValue(UnitsPlacementPhasePatch.fan, UnitTag.None);
+        }
+
+        [HarmonyPatch("GiveEndGameRewards")]
+        [HarmonyPrefix]
+        public static bool GiveEndGameRewards(GameManager __instance, bool victory)
+        {
+            if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                return true;
+            }
+            var _teams = AccessTools.Field(typeof(GameManager), "_teams").GetValue(__instance) as Dictionary<Team, BattleUnitsManager>;
+            var bum = _teams[Team.Player];
+            var deadUnits = bum.DeadUnits as List<BattleUnit>;
+            deadUnits.Remove(UnitsPlacementPhasePatch.fan);
+            return true;
         }
     }
 
@@ -208,6 +258,11 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         public static bool Prefix(ChooseUnitForCard_BattleManagementDirectory __instance, out State __state)
         {
+            if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                __state = null;
+                return true;
+            }
             var _battleUnitsManager = AccessTools.Field(typeof(ChooseUnitForCard_BattleManagementDirectory), "_battleUnitsManager").GetValue(__instance) as BattleUnitsManager;
             var buList = _battleUnitsManager.BattleUnits as List<BattleUnit>;
             var fanOrder = buList.IndexOf(UnitsPlacementPhasePatch.fan);
@@ -247,6 +302,11 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         public static bool Prefix(ExtractSoldierObjective __instance, out State __state)
         {
+            if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                __state = null;
+                return true;
+            }
             var _battleUnitsManager = AccessTools.Field(typeof(ExtractSoldierObjective), "_battleUnitsManager").GetValue(__instance) as BattleUnitsManager;
             var buList = _battleUnitsManager.BattleUnits as List<BattleUnit>;
             var fanOrder = buList.IndexOf(UnitsPlacementPhasePatch.fan);

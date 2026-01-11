@@ -19,12 +19,31 @@ namespace XenopurgeRougeLike
 
         public DirectoryData Initialize()
         {
-            MelonLogger.Msg($"InspectReinforcementDirectory.Initialize");
-            _directoryTextData.Reset();
-            _directoryId = Guid.NewGuid();
-            DirectoryData directoryData = new(_directoryId)
+            try
             {
-                ButtonData = XenopurgeRougeLike.acquiredReinforcements.Select(x => new ButtonData()
+                MelonLogger.Msg($"InspectReinforcementDirectory.Initialize");
+                _directoryTextData.Reset();
+                _directoryId = Guid.NewGuid();
+                List<CompanyAffinity> enabledAffinities = [];
+                foreach (var company in Company.companies)
+                {
+                    if (company.Value.Affinities == null)
+                    {
+                        MelonLogger.Msg($"InspectReinforcementDirectory.Initialize: {company.Value.Name} has null affinities");
+                        continue;
+                    }
+                    enabledAffinities.AddRange(company.Value.Affinities.Where(aff => aff.IsActive));
+                }
+                DirectoryData directoryData = new(_directoryId)
+                {
+                    ButtonData = [..enabledAffinities.Select(aff => new ButtonData(){
+                    MainText = aff.ToMenuItem(),
+                    Tooltip = aff.ToString(),
+                    onSelectCallback = new Action(() =>
+                    {
+                        ShowDetails(aff);
+                    })
+                }), ..XenopurgeRougeLike.acquiredReinforcements.Select(x => new ButtonData()
                 {
                     MainText = x.ToMenuItem(),
                     Tooltip = x.ToString(),
@@ -32,12 +51,31 @@ namespace XenopurgeRougeLike
                     {
                         ShowDetails(x);
                     })
-                })
-            };
-            return directoryData;
+                })]
+                };
+                return directoryData;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error(ex);
+                MelonLogger.Error(ex.StackTrace);
+                throw ex;
+            }
         }
 
         private DetailsArea_SquadManagement _detailsArea_SquadManagement;
+
+        public void ShowDetails(CompanyAffinity x)
+        {
+            MelonLogger.Msg($"{x.ToMenuItem()} Selected");
+            if (_detailsArea_SquadManagement == null)
+            {
+                var _index_SquadManagementDirectory = AccessTools.Field(typeof(SquadManagementWindowController), "_index_SquadManagementDirectory").GetValue(SquadManagementWindowController_Patch.Instance) as Index_SquadManagementDirectory;
+                _detailsArea_SquadManagement = AccessTools.Field(typeof(Index_SquadManagementDirectory), "_detailsArea_SquadManagement").GetValue(_index_SquadManagementDirectory) as DetailsArea_SquadManagement;
+            }
+            _detailsArea_SquadManagement.gameObject.SetActive(true);
+            _detailsArea_SquadManagement.SetDetails(x.ToFullDescription());
+        }
 
         public void ShowDetails(Reinforcement x)
         {
