@@ -191,20 +191,20 @@ namespace XenopurgeRougeLike
                 CompanyAffinity affinityToEnable = null;
                 foreach (var affiny in reinforcement.company.Affinities)
                 {
-                    int requiredNReinforces = affiny.Key;
+                    int requiredNReinforces = affiny.unlockLevel;
                     if (requiredNReinforces > nExsitingCompanyReinforces)
                     {
                         break;
                     }
                     affinityToDisable = affinityToEnable;
-                    affinityToEnable = affiny.Value;
-                }
-                if (affinityToDisable != null)
-                {
-                    affinityToDisable.IsActive = false;
+                    affinityToEnable = affiny;
                 }
                 if (affinityToEnable != null)
                 {
+                    if (affinityToDisable != null)
+                    {
+                        affinityToDisable.IsActive = false;
+                    }
                     affinityToEnable.IsActive = true;
                 }
             }

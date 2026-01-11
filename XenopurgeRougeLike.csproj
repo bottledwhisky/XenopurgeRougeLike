@@ -20,6 +20,9 @@
 		<Reference Include="MelonLoader">
 		  <HintPath>..\..\..\SteamLibrary\steamapps\common\Xenopurge\MelonLoader\net35\MelonLoader.dll</HintPath>
 		</Reference>
+		<Reference Include="Unity.Addressables">
+		  <HintPath>..\..\..\SteamLibrary\steamapps\common\Xenopurge\Xenopurge_Data\Managed\Unity.Addressables.dll</HintPath>
+		</Reference>
 		<Reference Include="Unity.Localization">
 		  <HintPath>..\..\..\SteamLibrary\steamapps\common\Xenopurge\Xenopurge_Data\Managed\Unity.Localization.dll</HintPath>
 		</Reference>

@@ -23,7 +23,7 @@ namespace XenopurgeRougeLike
         public string IconPath { get; set; }
         public Sprite Sprite { get; set; }
         public Color BorderColor { get; set; } = Color.white;
-        public Dictionary<int, CompanyAffinity> Affinities { get; set; }
+        public List<CompanyAffinity> Affinities { get; set; }
         public static Dictionary<CompanyType, Company> companies;
         public static Dictionary<CompanyType, Company> Companies
         {
@@ -103,9 +103,11 @@ namespace XenopurgeRougeLike
         {
             if (Companies.TryGetValue(companyType, out Company company))
             {
-                if (company.Affinities != null && company.Affinities.TryGetValue(level, out CompanyAffinity affinity))
+                if (company.Affinities != null)
                 {
-                    return affinity;
+                    int idx = level / 2 - 1;
+                    if (idx >= 0 && idx < company.Affinities.Count)
+                        return company.Affinities[idx];
                 }
             }
             return null;
@@ -139,5 +141,10 @@ namespace XenopurgeRougeLike
     {
         public int unlockLevel;
         public string description;
+
+        public override string ToString()
+        {
+            return description;
+        }
     }
 }

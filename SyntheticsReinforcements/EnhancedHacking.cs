@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using TimeSystem;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
     {
         public static readonly float DoorHealthMultiplier = 3f; // 200% increase = 3x multiplier
         public static readonly float RigDamageMultiplier = 2f; // 100% increase = 2x multiplier
+        public static float StunDuration = 5f;
 
         public EnhancedHacking()
         {
@@ -103,49 +105,235 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
         }
     }
 
-    public class PatchUtils
+    /// <summary>
+    /// Lv2: Patch RevealSpaceship_Card to also reveal extraction tiles
+    /// </summary>
+    [HarmonyPatch(typeof(RevealSpaceship_Card), "ApplyCommand")]
+    public static class EnhancedHacking_RevealExtraction_Patch
     {
-        public void PatchAllImplementations(MethodInfo prefix, MethodInfo postfix, params Type[] interfaceTypes)
+        public static void Postfix()
         {
-            var harmony = XenopurgeRougeLike._HarmonyInstance;
+            if (EnhancedHacking.Instance.currentStacks < 2)
+                return;
 
-            // Get all types that inherit from B
+            var gameManager = GameManager.Instance;
+            var extractionTiles = gameManager.ObjectivesVisibilityManager?.GridExtractionTilesFinder?.SpecialTiles;
+
+            if (extractionTiles != null)
+            {
+                foreach (var tile in extractionTiles)
+                {
+                    tile.Tile.Room.SetExplored(Enumerations.Team.Player);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Lv2: Patch ExploreRooms_Card to grant vision in revealed rooms
+    /// Static storage for revealed room tiles
+    /// </summary>
+    public static class EnhancedHacking_VisionStorage
+    {
+        public static HashSet<Tile> RevealedRoomTiles = [];
+    }
+
+    [HarmonyPatch(typeof(ExploreRooms_Card), "ApplyCommand")]
+    public static class EnhancedHacking_GrantVision_Patch
+    {
+        public static void Prefix(out List<Room> __state)
+        {
+            var gameManager = GameManager.Instance;
+            var rooms = gameManager.GridManager.Rooms.Where(r => r.IsExploredByPlayer);
+            __state = [.. rooms];
+        }
+
+        public static void Postfix(List<Room> __state)
+        {
+            if (EnhancedHacking.Instance.currentStacks < 2)
+                return;
+
+            var gameManager = GameManager.Instance;
+            var rooms = gameManager.GridManager.Rooms.Where(r => r.IsExploredByPlayer);
+
+            var newRooms = rooms.Except(__state);
+
+            // Add all tiles from explored rooms to the vision list
+            foreach (var room in newRooms)
+            {
+                foreach (var tile in room.TilesOfRoom)
+                {
+                    EnhancedHacking_VisionStorage.RevealedRoomTiles.Add(tile);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Lv2: Grant vision for tiles in explored rooms by patching PlayerLineOfSightTiles
+    /// </summary>
+    [HarmonyPatch(typeof(PlayerLineOfSightTiles), "UpdateLineOfSightTiles")]
+    public static class EnhancedHacking_AddVisionTiles_Patch
+    {
+        public static void Postfix(ref IEnumerable<Tile> __result)
+        {
+            if (EnhancedHacking.Instance.currentStacks < 2)
+                return;
+
+            if (EnhancedHacking_VisionStorage.RevealedRoomTiles.Count == 0)
+                return;
+
+            // Combine the original line of sight with our revealed room tiles
+            var combinedTiles = __result.ToList();
+            combinedTiles.AddRange(EnhancedHacking_VisionStorage.RevealedRoomTiles);
+            __result = [.. combinedTiles.Distinct()];
+        }
+    }
+
+    /// <summary>
+    /// Lv2: Stun system for DelayEnemyWave_Card
+    /// Maintains a cache of stunned enemies
+    /// </summary>
+    public static class EnhancedHacking_StunSystem
+    {
+        private static Dictionary<BattleUnit, float> _stunnedEnemies = new Dictionary<BattleUnit, float>();
+
+        public static void StunAllEnemies()
+        {
+            var gameManager = GameManager.Instance;
+            var enemyTeam = gameManager.GetTeamManager(Enumerations.Team.EnemyAI);
+
+            if (enemyTeam != null)
+            {
+                foreach (var enemy in enemyTeam.BattleUnits)
+                {
+                    if (enemy.IsAlive)
+                    {
+                        _stunnedEnemies[enemy] = EnhancedHacking.StunDuration;
+                    }
+                }
+            }
+        }
+
+        public static float GetRemainingStunTime(BattleUnit unit)
+        {
+            if (_stunnedEnemies.TryGetValue(unit, out float remainingTime))
+            {
+                return remainingTime;
+            }
+            return 0f;
+        }
+
+        public static float UpdateStunTimers(BattleUnit unit, float deltaTime)
+        {
+            if (_stunnedEnemies.TryGetValue(unit, out var remainingTime))
+            {
+                remainingTime -= deltaTime;
+                if (remainingTime <= 0f)
+                {
+                    _stunnedEnemies.Remove(unit);
+                    return -remainingTime;
+                }
+                else
+                {
+                    _stunnedEnemies[unit] = remainingTime;
+                    return 0;
+                }
+            }
+            return 0f;
+        }
+
+        public static bool IsStunned(BattleUnit unit)
+        {
+            return _stunnedEnemies.ContainsKey(unit) && unit.Team == Enumerations.Team.EnemyAI;
+        }
+    }
+
+    /// <summary>
+    /// Lv2: Patch DelayEnemyWave_Card to stun all enemies
+    /// </summary>
+    [HarmonyPatch(typeof(DelayEnemyWave_Card), "ApplyCommand")]
+    public static class EnhancedHacking_StunEnemies_Patch
+    {
+        public static void Postfix()
+        {
+            if (EnhancedHacking.Instance.currentStacks < 2)
+                return;
+
+            EnhancedHacking_StunSystem.StunAllEnemies();
+        }
+    }
+
+    /// <summary>
+    /// Lv2: Patch ICommand and ITimeUpdatedListener implementations to handle stunning
+    /// We need to patch the UpdateTime method to prevent execution when stunned
+    /// </summary>
+    [HarmonyPatch]
+    public static class EnhancedHacking_StunUpdateTime_Patch
+    {
+        // Dynamically find all types that implement both ICommand and ITimeUpdatedListener
+        public static IEnumerable<MethodBase> TargetMethods()
+        {
+            var commandInterfaceType = typeof(SpaceCommander.Commands.ICommand);
+            var timeListenerType = typeof(TimeSystem.ITimeUpdatedListener);
+
             var implementers = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => t.IsClass && !t.IsAbstract && interfaceTypes.All(baseType => baseType.IsAssignableFrom(t)));
+                .SelectMany(a => {
+                    try { return a.GetTypes(); }
+                    catch { return Type.EmptyTypes; }
+                })
+                .Where(t => t.IsClass && !t.IsAbstract &&
+                           commandInterfaceType.IsAssignableFrom(t) &&
+                           timeListenerType.IsAssignableFrom(t));
 
             foreach (var implementer in implementers)
             {
-                // Option 1: Get the class's own implementation
-                var original = implementer.GetMethod("UpdateTime",
+                // Try to get the UpdateTime method
+                var method = implementer.GetMethod("UpdateTime",
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
                     null,
                     [typeof(float)],
                     null);
 
-                // Option 2: Handle explicit interface implementations
-                if (original == null)
+                if (method != null && method.DeclaringType == implementer)
                 {
-                    foreach (var type in interfaceTypes)
-                    {
-                        var map = implementer.GetInterfaceMap(type);
-                        for (int i = 0; i < map.InterfaceMethods.Length; i++)
-                        {
-                            if (map.InterfaceMethods[i].Name == "UpdateTime")
-                            {
-                                original = map.TargetMethods[i];
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (original != null)
-                {
-                    harmony.Patch(original, prefix: new HarmonyMethod(prefix));
-                    Console.WriteLine($"Patched {implementer.Name}.UpdateTime");
+                    yield return method;
                 }
             }
+        }
+
+        private static readonly ConditionalWeakTable<Type, FieldInfo> _fieldCache = [];
+
+        [HarmonyPrefix]
+        public static bool Prefix(object __instance, ref float __0)
+        {
+            if (EnhancedHacking.Instance.currentStacks < 2)
+                return true;
+
+            // Try to get the BattleUnit from the command
+            // Most commands have a _battleUnit field
+
+            var type = __instance.GetType();
+
+            if (!_fieldCache.TryGetValue(type, out var fieldInfo))
+            {
+                fieldInfo = type.GetField("_battleUnit", BindingFlags.Instance | BindingFlags.NonPublic);
+                _fieldCache.Add(type, fieldInfo);
+            }
+
+
+            if (fieldInfo != null)
+            {
+                var battleUnit = fieldInfo.GetValue(__instance) as BattleUnit;
+                if (battleUnit != null && EnhancedHacking_StunSystem.IsStunned(battleUnit))
+                {
+                    // Update the stun timer but don't execute the command
+                    var remainingTime = EnhancedHacking_StunSystem.UpdateStunTimers(battleUnit, __0);
+                    __0 = remainingTime;
+                    return true; // Skip the original method
+                }
+            }
+            return true; // Execute the original method
         }
     }
 }

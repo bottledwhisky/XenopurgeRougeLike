@@ -1,13 +1,44 @@
-﻿using System;
+﻿using MelonLoader;
+using SpaceCommander.Area;
+using SpaceCommander.Commands;
+using SpaceCommander.UI;
+using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.IO;
+using System.Net.Sockets;
 using System.Text;
+using UnityEngine;
+using UnityEngine.Localization.Metadata;
 using XenopurgeRougeLike.RockstarReinforcements;
+using static IKSolver;
+using static SpaceCommander.Enumerations;
+using static UnityEngine.EventSystems.EventTrigger;
+using static UnityEngine.Random;
 
 namespace XenopurgeRougeLike
 {
     public class Rockstar
     {
-        internal static Dictionary<int, CompanyAffinity> Affinities;
+        //Rockstar / Rock Star
+
+        //流派被动(Genre Passive)
+        //等级英文名效果翻译2-A "Passionate Fan" is automatically deployed at the start of battle and will find their own fun.Unlock Fan Count; gain 1k-2k fans after each battle.4-"Passionate Fan" combat AI upgrades to enhanced mode.Gain 2k-3k fans after each battle.6-"Passionate Fan" stats slightly increase.Gain 3k-4k fans after each battle.
+
+        //普通 (Common)
+        //中文名英文名效果翻译明星效应Star PowerGain +50% fans on perfect victory. Every 1,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage.明星效应IIStar Power IIUncollected digital collectibles no longer count against perfect victory.Gain 1 point after battle for every 1,000 fans.直播打赏Stream DonationsWhen eliminating enemies in battle, randomly gain consumable charges based on fan count.直播打赏IIStream Donations IIIncreases the chance of receiving donations.名人拍卖Celebrity AuctionYou can sell equipment.Sale price increases by 1 for each battle the equipment has been through.
+
+        //精锐 (Elite)
+        //中文名英文名效果翻译饭圈出征Fandom RalliesWhen a "Passionate Fan" dies, another "Passionate Fan" joins the battlefield.聚光灯下In the SpotlightThe first squad member becomes the "Top Star". Eliminating enemies has a higher chance to trigger Stream Donations. As long as they successfully extract, the mission counts as a perfect victory. "Passionate Fans" will follow and fight alongside them, locked to Run-and-Gun behavior.应援Fan CheerThe first squad member becomes the "Top Star". When the "Top Star" takes damage, "Passionate Fan" stats greatly increase (non-stackable). Effect duration +1 second for every 1,000 fans.
+
+        //专家(Expert)
+        //中文名英文名效果翻译粉丝头目SuperfanAn additional "Passionate Fan" is automatically deployed at the start of battle.构造人设Building the BrandDouble the amount of fans gained.榜一大哥Whale PatronAfter battle, gain a piece of equipment you don't have. If everyone already has a melee weapon, ranged weapon, and equipment, randomly sell a lower base-price item and gain one with a higher price.
+
+        //其他术语
+        //中文英文热情的粉丝Passionate Fan一哥Top Star粉丝数Fan Count完美胜利Perfect Victory数字收藏Digital Collectible
+        internal static List<CompanyAffinity> Affinities;
 
         public static Dictionary<Type, Reinforcement> Reinforcements
         {

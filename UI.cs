@@ -37,9 +37,33 @@ namespace XenopurgeRougeLike
                     MainText = nextLevelChoice.ToMenuItem(),
                     onSelectCallback = () =>
                     {
+                        var company = choice.company.Type;
+                        var nExsitingCompanyReinforces = XenopurgeRougeLike.acquiredReinforcements.Where(r => r.company.Type == company).Count() + 1;
+                        CompanyAffinity affinityToEnable = null;
+                        foreach (var affiny in choice.company.Affinities)
+                        {
+                            int requiredNReinforces = affiny.unlockLevel;
+                            if (requiredNReinforces >= nExsitingCompanyReinforces)
+                            {
+                                affinityToEnable = affiny;
+                                break;
+                            }
+                        }
+                        string nextUnlockAffinyText;
+                        if (affinityToEnable == null)
+                        {
+                            nextUnlockAffinyText = choice.company.Affinities.Last().ToString();
+                        }
+                        else
+                        {
+                            nextUnlockAffinyText = affinityToEnable.ToString();
+                        }
+
+                        string nextUnlockProgress = (affinityToEnable.unlockLevel > nExsitingCompanyReinforces ? "Max level reached" : "Next unlock") +  $": ({nExsitingCompanyReinforces}/{affinityToEnable.unlockLevel}) ";
+
                         EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = i;
                         // Update description text when selected
-                        EndGameWindowView_SetResultText_Patch._descriptionText.text = choice.company.ToString() + "\n" + nextLevelChoice.ToString();
+                        EndGameWindowView_SetResultText_Patch._descriptionText.text = nextLevelChoice.ToString() + "\n" + nextUnlockProgress + nextUnlockAffinyText;
 
                         // Update border highlights
                         for (int j = 0; j < EndGameWindowView_SetResultText_Patch._choiceOutlines.Length; j++)

@@ -7,7 +7,7 @@ namespace XenopurgeRougeLike
 {
     public class Xeno
     {
-        internal static Dictionary<int, CompanyAffinity> Affinities;
+        internal static List<CompanyAffinity> Affinities;
 
         public static Dictionary<Type, Reinforcement> Reinforcements
         {
