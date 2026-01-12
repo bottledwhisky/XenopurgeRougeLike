@@ -305,6 +305,11 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                     fanDelta = (int)(fanDelta * (1 + StarPower.FanBonusMultiplier));
                 }
 
+                if (BuildingTheBrand.Instance.IsActive)
+                {
+                    fanDelta = (int)(fanDelta * BuildingTheBrand.FanMultiplier);
+                }
+
                 RockstarAffinityHelpers.fanCount += fanDelta;
                 MelonLogger.Msg($"RockstarAffinity2FanCount_Patch: gained {fanDelta} fans to {RockstarAffinityHelpers.fanCount}");
             }
