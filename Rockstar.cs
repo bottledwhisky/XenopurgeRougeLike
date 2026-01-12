@@ -43,7 +43,8 @@ namespace XenopurgeRougeLike
                     { typeof(InTheSpotlight), new InTheSpotlight() },
                     { typeof(FanCheer), new FanCheer() },
                     { typeof(Superfan), new Superfan() },
-                    { typeof(BuildingTheBrand), new BuildingTheBrand() }
+                    { typeof(BuildingTheBrand), new BuildingTheBrand() },
+                    { typeof(WhalePatron), new WhalePatron() }
                 };
             }
         }
@@ -56,6 +57,7 @@ namespace XenopurgeRougeLike
         public static FanCheer FanCheer => (FanCheer)Reinforcements[typeof(FanCheer)];
         public static Superfan Superfan => (Superfan)Reinforcements[typeof(Superfan)];
         public static BuildingTheBrand BuildingTheBrand => (BuildingTheBrand)Reinforcements[typeof(BuildingTheBrand)];
+        public static WhalePatron WhalePatron => (WhalePatron)Reinforcements[typeof(WhalePatron)];
 
         public static bool IsAvailable()
         {
