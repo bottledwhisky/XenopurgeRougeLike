@@ -47,7 +47,17 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             var gameManager = GameManager.Instance;
             var _gridCollectiblesTilesFinder = AccessTools.Field(typeof(GameManager), "_gridCollectiblesTilesFinder").GetValue(gameManager) as GridCollectiblesTilesFinder;
             var uncollected = Instance.currentStacks == 2 ? 0 : _gridCollectiblesTilesFinder.SpecialTiles.Count(tile => !(tile as CollectibleItemTile).IsCollected);
-            return data.IsVictory && data.UnitsKilled.Count() == 0 && uncollected == 0;
+
+            // Check standard perfect victory conditions
+            bool standardPerfect = data.IsVictory && data.UnitsKilled.Count() == 0 && uncollected == 0;
+
+            // Check In the Spotlight condition: Top Star extracted = perfect victory
+            bool spotlightPerfect = InTheSpotlight.Instance.IsActive &&
+                                   data.IsVictory &&
+                                   InTheSpotlight.HasTopStarExtracted(data) &&
+                                   uncollected == 0;
+
+            return standardPerfect || spotlightPerfect;
         }
 
         public static bool ShouldApply(BattleUnit unit, Team team)

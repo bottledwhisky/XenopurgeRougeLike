@@ -106,6 +106,13 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             float normalizedFanCount = UnityEngine.Mathf.Clamp01(fanCount / MaxFanCountForDonations);
             float chance = UnityEngine.Mathf.Lerp(minChance, maxChance, normalizedFanCount);
 
+            // Apply In the Spotlight boost if active and enemy is near Top Star
+            if (InTheSpotlight.Instance.IsActive && InTheSpotlight.IsTopStarAttacking)
+            {
+                chance = UnityEngine.Mathf.Min(1.0f, chance * InTheSpotlight.TopStarDonationMultiplier);
+                MelonLogger.Msg($"StreamDonations: In the Spotlight boost applied! New chance: {chance:P}");
+            }
+
             MelonLogger.Msg($"StreamDonations: Enemy {enemy.UnitName} ({enemy.UnitTag}) died. Fan count: {fanCount}, Chance: {chance:P}");
 
             // Roll for donation

@@ -221,7 +221,20 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public static void SetShootingCommand(UnitData ud)
         {
             CommandDataSO attackCommand;
-            if (RockstarAffinity4.Instance.IsActive || RockstarAffinity6.Instance.IsActive)
+
+            // If In the Spotlight is active, fans use Run-and-Gun
+            if (InTheSpotlight.Instance.IsActive)
+            {
+                if (RockstarAffinity4.Instance.IsActive || RockstarAffinity6.Instance.IsActive)
+                {
+                    attackCommand = RunAndGunCommandDataSO;
+                }
+                else
+                {
+                    attackCommand = AssaultCommandDataSO;
+                }
+            }
+            else if (RockstarAffinity4.Instance.IsActive || RockstarAffinity6.Instance.IsActive)
             {
                 attackCommand = UpgradedShootingCommands[UnityEngine.Random.Range(0, UpgradedShootingCommands.Count())];
             }
@@ -229,6 +242,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             {
                 attackCommand = ShootingCommands[UnityEngine.Random.Range(0, ShootingCommands.Count())];
             }
+
             var cmdList = ud.CommandsDataSOList;
             for (int i = 0; i < cmdList.Length; i++)
             {
