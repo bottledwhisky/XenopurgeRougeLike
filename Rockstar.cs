@@ -41,7 +41,8 @@ namespace XenopurgeRougeLike
                     { typeof(CelebrityAuction), new CelebrityAuction() },
                     { typeof(FandomRallies), new FandomRallies() },
                     { typeof(InTheSpotlight), new InTheSpotlight() },
-                    { typeof(FanCheer), new FanCheer() }
+                    { typeof(FanCheer), new FanCheer() },
+                    { typeof(Superfan), new Superfan() }
                 };
             }
         }
@@ -52,6 +53,7 @@ namespace XenopurgeRougeLike
         public static FandomRallies FandomRallies => (FandomRallies)Reinforcements[typeof(FandomRallies)];
         public static InTheSpotlight InTheSpotlight => (InTheSpotlight)Reinforcements[typeof(InTheSpotlight)];
         public static FanCheer FanCheer => (FanCheer)Reinforcements[typeof(FanCheer)];
+        public static Superfan Superfan => (Superfan)Reinforcements[typeof(Superfan)];
 
         public static bool IsAvailable()
         {

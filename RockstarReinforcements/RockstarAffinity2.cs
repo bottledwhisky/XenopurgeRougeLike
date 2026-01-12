@@ -44,32 +44,68 @@ namespace XenopurgeRougeLike.RockstarReinforcements
     {
         public static bool Prefix(BattleUnit battleUnit)
         {
-            if (battleUnit != UnitsPlacementPhasePatch.fan)
+            if (!UnitsPlacementPhasePatch.IsFan(battleUnit))
             {
                 return true;
             }
-            AccessTools.Field(typeof(BattleUnit), "_unitTag").SetValue(UnitsPlacementPhasePatch.fan, UnitTag.None);
+            AccessTools.Field(typeof(BattleUnit), "_unitTag").SetValue(battleUnit, UnitTag.None);
             return true;
         }
 
         public static void Postfix(BattleUnit battleUnit)
         {
-            if (battleUnit != UnitsPlacementPhasePatch.fan)
+            if (!UnitsPlacementPhasePatch.IsFan(battleUnit))
             {
                 return;
             }
-            AccessTools.Field(typeof(BattleUnit), "_unitTag").SetValue(UnitsPlacementPhasePatch.fan, UnitTag.NPC);
+            AccessTools.Field(typeof(BattleUnit), "_unitTag").SetValue(battleUnit, UnitTag.NPC);
+        }
+    }
+
+    // Helper class for temporarily removing and restoring fans from a list
+    public class FanListHelper
+    {
+        public List<BattleUnit> buList;
+        public List<int> fanIndexes = new();
+
+        public static FanListHelper RemoveFans(List<BattleUnit> list)
+        {
+            var helper = new FanListHelper { buList = list };
+
+            // Remove fans in reverse order to maintain correct indexes
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (UnitsPlacementPhasePatch.IsFan(list[i]))
+                {
+                    helper.fanIndexes.Insert(0, i); // Insert at beginning to maintain order
+                    list.RemoveAt(i);
+                }
+            }
+
+            return helper;
+        }
+
+        public void RestoreFans()
+        {
+            for (int i = 0; i < fanIndexes.Count; i++)
+            {
+                buList.Insert(fanIndexes[i], UnitsPlacementPhasePatch.fans[i]);
+            }
         }
     }
 
     [HarmonyPatch(typeof(UnitsPlacementPhase))]
     public class UnitsPlacementPhasePatch
     {
+        public static event Action<BattleUnit> OnFanCreated;
+
         static HuntCommandDataSO huntCommand;
 
         public static HuntCommandDataSO HuntCommandDataSO => (huntCommand ??= UnityEngine.Resources.FindObjectsOfTypeAll<HuntCommandDataSO>().FirstOrDefault());
 
-        public static BattleUnit fan;
+        public static List<BattleUnit> fans = [];
+
+        public static bool IsFan(BattleUnit unit) => fans.Contains(unit);
 
         [HarmonyPatch("AddNPCsPhase")]
         [HarmonyPrefix]
@@ -80,22 +116,39 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                 return;
             }
             MelonLogger.Msg("AddNPCsPhase: true");
+
+            // Clear fans list from previous battle
+            fans.Clear();
+
             var gameManager = GameManager.Instance;
             BattleUnitsManager teamManager = gameManager.GetTeamManager(Team.Player);
 
-            // Create fan unit data using shared helper method
-            var ud = RockstarAffinityHelpers.CreateFanUnitData();
-            // Assign NPC tag to reuse the NPC deployment logic, will be changed back to None later
-            // to avoid being a mission objective
-            ud.UnitTag = UnitTag.NPC;
+            // Determine how many fans to spawn
+            int fanCount = Superfan.Instance.IsActive ? 2 : 1;
 
-            fan = new(ud, Team.Player, gridManager)
+            for (int i = 0; i < fanCount; i++)
             {
-                DeploymentOrder = 5
-            };
-            fan.AddCommands();
+                // Create fan unit
+                var ud = RockstarAffinityHelpers.CreateFanUnitData();
+                // Assign NPC tag to reuse the NPC deployment logic, will be changed back to None later
+                // to avoid being a mission objective
+                ud.UnitTag = UnitTag.NPC;
 
-            teamManager.AddBattleUnit(fan);
+                var fan = new BattleUnit(ud, Team.Player, gridManager)
+                {
+                    DeploymentOrder = 5 + i
+                };
+                fan.AddCommands();
+                OnFanCreated?.Invoke(fan);
+
+                fans.Add(fan);
+                teamManager.AddBattleUnit(fan);
+            }
+
+            if (fanCount > 1)
+            {
+                MelonLogger.Msg($"Superfan: Spawning {fanCount} Passionate Fans!");
+            }
         }
     }
 
@@ -142,7 +195,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             {
                 return true;
             }
-            battleUnits = battleUnits.Where(bu => bu != UnitsPlacementPhasePatch.fan);
+            battleUnits = battleUnits.Where(bu => !UnitsPlacementPhasePatch.IsFan(bu));
             return true;
         }
 
@@ -154,7 +207,11 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             {
                 return;
             }
-            UnitsPlacementPhasePatch.fan.DeploymentOrder = battleUnits.Count() + 1;
+            int baseOrder = battleUnits.Count();
+            for (int i = 0; i < UnitsPlacementPhasePatch.fans.Count; i++)
+            {
+                UnitsPlacementPhasePatch.fans[i].DeploymentOrder = baseOrder + i + 1;
+            }
         }
     }
 
@@ -169,7 +226,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             {
                 return true;
             }
-            battleUnits = battleUnits.Where(bu => bu != UnitsPlacementPhasePatch.fan);
+            battleUnits = battleUnits.Where(bu => !UnitsPlacementPhasePatch.IsFan(bu));
             return true;
         }
     }
@@ -185,7 +242,11 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             {
                 return;
             }
-            AccessTools.Field(typeof(BattleUnit), "_unitTag").SetValue(UnitsPlacementPhasePatch.fan, UnitTag.None);
+            var unitTagField = AccessTools.Field(typeof(BattleUnit), "_unitTag");
+            foreach (var fan in UnitsPlacementPhasePatch.fans)
+            {
+                unitTagField.SetValue(fan, UnitTag.None);
+            }
         }
 
         [HarmonyPatch("GiveEndGameRewards")]
@@ -199,7 +260,10 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             var _teams = AccessTools.Field(typeof(GameManager), "_teams").GetValue(__instance) as Dictionary<Team, BattleUnitsManager>;
             var bum = _teams[Team.Player];
             var deadUnits = bum.DeadUnits as List<BattleUnit>;
-            deadUnits.Remove(UnitsPlacementPhasePatch.fan);
+            foreach (var fan in UnitsPlacementPhasePatch.fans)
+            {
+                deadUnits.Remove(fan);
+            }
             return true;
         }
     }
@@ -207,13 +271,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
     [HarmonyPatch(typeof(ChooseUnitForCard_BattleManagementDirectory), "Initialize")]
     public class ChooseUnitForCard_BattleManagementDirectoryPatch
     {
-        public class State
-        {
-            public List<BattleUnit> buList;
-            public int fanOrder;
-        }
-
-        public static bool Prefix(ChooseUnitForCard_BattleManagementDirectory __instance, out State __state)
+        public static bool Prefix(ChooseUnitForCard_BattleManagementDirectory __instance, out FanListHelper __state)
         {
             if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
             {
@@ -222,28 +280,13 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             }
             var _battleUnitsManager = AccessTools.Field(typeof(ChooseUnitForCard_BattleManagementDirectory), "_battleUnitsManager").GetValue(__instance) as BattleUnitsManager;
             var buList = _battleUnitsManager.BattleUnits as List<BattleUnit>;
-            var fanOrder = buList.IndexOf(UnitsPlacementPhasePatch.fan);
-            if (fanOrder == -1)
-            {
-                __state = null;
-                return true;
-            }
-            buList.RemoveAt(fanOrder);
-            __state = new State()
-            {
-                buList = buList,
-                fanOrder = fanOrder,
-            };
+            __state = FanListHelper.RemoveFans(buList);
             return true;
         }
 
-        public static void Postfix(State __state)
+        public static void Postfix(FanListHelper __state)
         {
-            if (__state == null)
-            {
-                return;
-            }
-            __state.buList.Insert(__state.fanOrder, UnitsPlacementPhasePatch.fan);
+            __state?.RestoreFans();
         }
     }
 
@@ -251,13 +294,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
     [HarmonyPatch(typeof(ExtractSoldierObjective), "AddProgress")]
     public class ExtractSoldierObjectivePatch
     {
-        public class State
-        {
-            public List<BattleUnit> buList;
-            public int fanOrder;
-        }
-
-        public static bool Prefix(ExtractSoldierObjective __instance, out State __state)
+        public static bool Prefix(ExtractSoldierObjective __instance, out FanListHelper __state)
         {
             if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
             {
@@ -266,28 +303,13 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             }
             var _battleUnitsManager = AccessTools.Field(typeof(ExtractSoldierObjective), "_battleUnitsManager").GetValue(__instance) as BattleUnitsManager;
             var buList = _battleUnitsManager.BattleUnits as List<BattleUnit>;
-            var fanOrder = buList.IndexOf(UnitsPlacementPhasePatch.fan);
-            if (fanOrder == -1)
-            {
-                __state = null;
-                return true;
-            }
-            buList.RemoveAt(fanOrder);
-            __state = new State()
-            {
-                buList = buList,
-                fanOrder = fanOrder,
-            };
+            __state = FanListHelper.RemoveFans(buList);
             return true;
         }
 
-        public static void Postfix(State __state)
+        public static void Postfix(FanListHelper __state)
         {
-            if (__state == null)
-            {
-                return;
-            }
-            __state.buList.Insert(__state.fanOrder, UnitsPlacementPhasePatch.fan);
+            __state?.RestoreFans();
         }
     }
 
@@ -300,22 +322,14 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         [HarmonyPrefix]
         public static bool ClearPath(BattleUnit battleUnit)
         {
-            if (battleUnit == UnitsPlacementPhasePatch.fan)
-            {
-                return false;
-            }
-            return true;
+            return !UnitsPlacementPhasePatch.IsFan(battleUnit);
         }
 
         [HarmonyPatch("DrawLine")]
         [HarmonyPrefix]
         public static bool DrawLine(int lineIndex, List<Tile> lineTiles, BattleUnit battleUnit)
         {
-            if (battleUnit == UnitsPlacementPhasePatch.fan)
-            {
-                return false;
-            }
-            return true;
+            return !UnitsPlacementPhasePatch.IsFan(battleUnit);
         }
     }
 }

@@ -20,6 +20,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
     {
         public FandomRallies()
         {
+            rarity = Rarity.Elite;
             company = Company.Rockstar;
             name = "Fandom Rallies";
             description = "When a \"Passionate Fan\" dies, another \"Passionate Fan\" joins the battlefield.";
@@ -27,24 +28,24 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         private static FandomRallies _instance;
         public static FandomRallies Instance => _instance ??= new FandomRallies();
-    }
 
-    [HarmonyPatch(typeof(BattleUnit), "Die")]
-    public class FandomRallies_BattleUnit_Die_Patch
-    {
-        public static void Postfix(BattleUnit __instance)
+        override public void OnActivate()
         {
-            if (!FandomRallies.Instance.IsActive)
-            {
-                return;
-            }
+            UnitsPlacementPhasePatch.OnFanCreated += HandleFanCreated;
+        }
 
-            // Check if the dead unit is a "Passionate Fan"
-            if (__instance.UnitNameNoNumber != RockstarAffinityHelpers.FAN_NAME || __instance.Team != Team.Player)
-            {
-                return;
-            }
+        override public void OnDeactivate()
+        {
+            UnitsPlacementPhasePatch.OnFanCreated -= HandleFanCreated;
+        }
 
+        public static void HandleFanCreated(BattleUnit fanUnit)
+        {
+            fanUnit.OnDeath += SpawnNewFan;
+        }
+
+        public static void SpawnNewFan()
+        {
             MelonLogger.Msg("FandomRallies: A Passionate Fan has died! Spawning a new one...");
 
             // Find TestGame instance to spawn the new fan
