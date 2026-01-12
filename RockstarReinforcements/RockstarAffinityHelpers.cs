@@ -1,9 +1,11 @@
 ﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
+using SpaceCommander.Audio;
 using SpaceCommander.Commands;
 using SpaceCommander.Database;
 using SpaceCommander.EndGame;
+using SpaceCommander.PartyCustomization;
 using SpaceCommander.Weapons;
 using System;
 using System.Collections.Generic;
@@ -12,8 +14,29 @@ using static SpaceCommander.Enumerations;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
+    /// <summary>
+    /// A fake UnitDataSO that wraps a prepared UnitData for spawning purposes
+    /// </summary>
+    public class FanUnitDataSO : UnitDataSO
+    {
+        private UnitData _preparedUnitData;
+
+        public static FanUnitDataSO Create(UnitData unitData)
+        {
+            var instance = UnityEngine.ScriptableObject.CreateInstance<FanUnitDataSO>();
+            instance._preparedUnitData = unitData;
+            return instance;
+        }
+
+        public new UnitData CreateUnitInstance()
+        {
+            return _preparedUnitData;
+        }
+    }
+
     internal static class RockstarAffinityHelpers
     {
+        public const string FAN_NAME = "Fan";
         public static int fanCount = 0;
         public static int fanGainLow = 500;
         public static int fanGainHigh = 1500;
@@ -217,8 +240,34 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                 }
             }
         }
-    }
 
+        /// <summary>
+        /// Creates a new Fan UnitData with randomized stats, equipment, and voice
+        /// </summary>
+        public static UnitData CreateFanUnitData()
+        {
+            var playerData = Singleton<Player>.Instance.PlayerData;
+            var ud = playerData.Squad.SquadUnits.First().GetCopyOfUnitData();
+            ud.UnitId = Guid.NewGuid().ToString();
+            ud.UnitName = FAN_NAME;
+            ud.UnitTag = UnitTag.None;
+            ud.UnitNameLocalizedStringIndex = -5;
+
+            var hug = Singleton<AssetsDatabase>.Instance.HireUnitGeneratorSettingsSO;
+            var _voiceActingListSO = AccessTools.Field(typeof(HireUnitGeneratorSettingsSO), "_voiceActingListSO").GetValue(hug) as VoiceActingListSO;
+
+            bool gender = UnityEngine.Random.Range(0, 2) == 0;
+            ud.VoiceActorGUID = _voiceActingListSO.GetRandomVoiceActor(gender ? Gender.female : Gender.male).AssetGUID;
+
+            SetShootingCommand(ud);
+            var cmdList = ud.CommandsDataSOList.ToList();
+            cmdList.Insert(2, UnitsPlacementPhasePatch.HuntCommandDataSO);
+            ud.CommandsDataSOList = cmdList.ToArray();
+            SetFanUnitStats(ud);
+
+            return ud;
+        }
+    }
 
     [HarmonyPatch(typeof(TestGame), "EndGame")]
     public static class RockstarAffinity2FanCount_Patch

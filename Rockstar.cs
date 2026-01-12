@@ -38,15 +38,16 @@ namespace XenopurgeRougeLike
                 {
                     { typeof(StarPower), new StarPower() },
                     { typeof(StreamDonations), new StreamDonations() },
-                    { typeof(CelebrityAuction), new CelebrityAuction() }
+                    { typeof(CelebrityAuction), new CelebrityAuction() },
+                    { typeof(FandomRallies), new FandomRallies() }
                 };
             }
         }
 
         public static StarPower StarPower => (StarPower)Reinforcements[typeof(StarPower)];
         public static StreamDonations StreamDonations => (StreamDonations)Reinforcements[typeof(StreamDonations)];
-
         public static CelebrityAuction CelebrityAuction => (CelebrityAuction)Reinforcements[typeof(CelebrityAuction)];
+        public static FandomRallies FandomRallies => (FandomRallies)Reinforcements[typeof(FandomRallies)];
 
         public static bool IsAvailable()
         {

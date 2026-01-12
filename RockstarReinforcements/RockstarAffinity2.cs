@@ -82,33 +82,13 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             MelonLogger.Msg("AddNPCsPhase: true");
             var gameManager = GameManager.Instance;
             BattleUnitsManager teamManager = gameManager.GetTeamManager(Team.Player);
-            var _playerData = Singleton<Player>.Instance.PlayerData;
-            MelonLogger.Msg($"AddNPCsPhase: 2");
-            var ud = _playerData.Squad.SquadUnits.First().GetCopyOfUnitData();
-            ud.UnitId = Guid.NewGuid().ToString();
-            ud.UnitName = "Fan";
+
+            // Create fan unit data using shared helper method
+            var ud = RockstarAffinityHelpers.CreateFanUnitData();
+            // Assign NPC tag to reuse the NPC deployment logic, will be changed back to None later
+            // to avoid being a mission objective
             ud.UnitTag = UnitTag.NPC;
-            ud.UnitNameLocalizedStringIndex = -5;
 
-            var hug = Singleton<AssetsDatabase>.Instance.HireUnitGeneratorSettingsSO;
-
-
-            var _voiceActingListSO = AccessTools.Field(typeof(HireUnitGeneratorSettingsSO), "_voiceActingListSO").GetValue(hug) as VoiceActingListSO;
-            MelonLogger.Msg($"AddNPCsPhase: _voiceActingListSO={_voiceActingListSO}");
-
-            bool gender = UnityEngine.Random.Range(0, 2) == 0;
-
-            ud.VoiceActorGUID = _voiceActingListSO.GetRandomVoiceActor(gender ? Gender.female : Gender.male).AssetGUID;
-            MelonLogger.Msg($"AddNPCsPhase: 3");
-            RockstarAffinityHelpers.SetShootingCommand(ud);
-            var cmdList = ud.CommandsDataSOList.ToList();
-            cmdList.Insert(2, HuntCommandDataSO);
-            foreach (var cmd in cmdList)
-            {
-                MelonLogger.Msg($"AddNPCsPhase: cmd {cmd.GetType()} {cmd.CommandName} {cmd.GetType()}");
-            }
-            ud.CommandsDataSOList = cmdList.ToArray();
-            RockstarAffinityHelpers.SetFanUnitStats(ud);
             fan = new(ud, Team.Player, gridManager)
             {
                 DeploymentOrder = 5
@@ -130,7 +110,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         {
             if (index == FanIndex)
             {
-                __result = "Fan";
+                __result = RockstarAffinityHelpers.FAN_NAME;
                 return false;
             }
             __result = "";
@@ -141,7 +121,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         [HarmonyPrefix]
         public static bool GetUnitIndexByName(string unitName, out int __result)
         {
-            if (unitName == "Fan")
+            if (unitName == RockstarAffinityHelpers.FAN_NAME)
             {
                 __result = FanIndex;
                 return false;

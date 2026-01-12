@@ -8,7 +8,7 @@ About this mod:
 This mod adds a rouge-like system to the game, allowing players to call for reinforcements after each mission. The reinforcements have unique attributes and abilities, making each playthrough different.
 
 About the original game:
-The original game is called "XenoPurge". It is a tactical RPG where players control a squad of soldiers fighting against aliens(xenoes). During battle, the game allows the player to use "ActionCards" to perform actions.
+The original game is called "Xenopurge". It is a tactical RTS where players control a squad of soldiers fighting against aliens(xenoes). During battle, the game allows the player to use "ActionCards" to perform actions, not direct control.
 
 D:\projects\xenopurge\old> dir
     Directory: D:\projects\xenopurge\old
