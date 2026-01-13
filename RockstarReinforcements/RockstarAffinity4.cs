@@ -1,7 +1,12 @@
-﻿namespace XenopurgeRougeLike.RockstarReinforcements
+﻿using System;
+using System.Collections.Generic;
+
+namespace XenopurgeRougeLike.RockstarReinforcements
 {
     public class RockstarAffinity4 : CompanyAffinity
     {
+        public const float ReinforcementChanceBonus = 2f;
+
         public RockstarAffinity4()
         {
             unlockLevel = 4;
@@ -18,6 +23,7 @@
             RockstarAffinityHelpers.fanMoney += 10;
             RockstarAffinityHelpers.fanGainLow += 1000;
             RockstarAffinityHelpers.fanGainHigh += 1000;
+            XenopurgeRougeLike.WeightModifiers.Add(ModifyWeights);
         }
 
         public override void OnDeactivate()
@@ -25,6 +31,20 @@
             RockstarAffinityHelpers.fanMoney -= 10;
             RockstarAffinityHelpers.fanGainLow -= 1000;
             RockstarAffinityHelpers.fanGainHigh -= 1000;
+            XenopurgeRougeLike.WeightModifiers.Remove(ModifyWeights);
+        }
+
+        private void ModifyWeights(List<Tuple<int, Reinforcement>> choices)
+        {
+            for (int i = 0; i < choices.Count; i++)
+            {
+                // Check if this reinforcement belongs to Rockstar company
+                if (choices[i].Item2.company.Type == CompanyType.Rockstar)
+                {
+                    int newWeight = (int)(choices[i].Item1 * ReinforcementChanceBonus);
+                    choices[i] = new Tuple<int, Reinforcement>(newWeight, choices[i].Item2);
+                }
+            }
         }
 
         public override string ToFullDescription()
