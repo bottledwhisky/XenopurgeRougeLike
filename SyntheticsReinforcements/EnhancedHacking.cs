@@ -138,6 +138,16 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
         public static HashSet<Tile> RevealedRoomTiles = [];
     }
 
+        // Patch to clear buffs when mission ends
+    [HarmonyPatch(typeof(TestGame), "EndGame")]
+    public class EnhancedHacking_TestGame_EndGame_Patch
+    {
+        public static void Postfix()
+        {
+            EnhancedHacking_VisionStorage.RevealedRoomTiles.Clear();
+        }
+    }
+
     [HarmonyPatch(typeof(ExploreRooms_Card), "ApplyCommand")]
     public static class EnhancedHacking_GrantVision_Patch
     {

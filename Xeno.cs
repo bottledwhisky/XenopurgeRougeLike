@@ -24,12 +24,14 @@ namespace XenopurgeRougeLike
             {
                 return new Dictionary<Type, Reinforcement>()
                 {
-                    { typeof(NeuralLinks), new NeuralLinks() }
+                    { typeof(NeuralLinks), new NeuralLinks() },
+                    { typeof(SensoryAssimilation), new SensoryAssimilation() }
                 };
             }
         }
 
         public static NeuralLinks NeuralLinks => (NeuralLinks)Reinforcements[typeof(NeuralLinks)];
+        public static SensoryAssimilation SensoryAssimilation => (SensoryAssimilation)Reinforcements[typeof(SensoryAssimilation)];
         public static bool IsAvailable()
         {
             return false;
