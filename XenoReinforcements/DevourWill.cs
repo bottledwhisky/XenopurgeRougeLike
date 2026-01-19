@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.Area;
@@ -53,25 +53,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
                 action = () =>
                 {
                     // Check if the unit was stunned when it died
-                    if (XenoStunTracker.IsStunned(__instance))
+                    if (XenoStunTracker.IsStunned(__instance) || XenoStunTracker.IsMindControlled(__instance))
                     {
                         MelonLogger.Msg($"DevourWill: Stunned xeno {__instance.UnitNameNoNumber} died, healing all player units");
-                        UnitStatsTools.HealAllPlayerUnits(DevourWill.HealAmount);
-                    }
-                    __instance.OnDeath -= action;
-                };
-                __instance.OnDeath += action;
-            }
-            // For player units: check if they were mind-controlled when they die
-            else if (team == Team.Player)
-            {
-                Action action = null;
-                action = () =>
-                {
-                    // Check if the unit was mind-controlled (converted xeno)
-                    if (XenoStunTracker.IsMindControlled(__instance))
-                    {
-                        MelonLogger.Msg($"DevourWill: Mind-controlled unit {__instance.UnitNameNoNumber} died, healing all player units");
                         UnitStatsTools.HealAllPlayerUnits(DevourWill.HealAmount);
                     }
                     __instance.OnDeath -= action;
