@@ -28,7 +28,8 @@ namespace XenopurgeRougeLike
                     { typeof(PsionicScream), new PsionicScream() },
                     { typeof(ScentCamouflage), new ScentCamouflage() },
                     { typeof(MindControl), new MindControl() },
-                    { typeof(DevourWill), new DevourWill() }
+                    { typeof(DevourWill), new DevourWill() },
+                    { typeof(FearInstinct), new FearInstinct() }
                 };
             }
         }
@@ -38,6 +39,7 @@ namespace XenopurgeRougeLike
         public static ScentCamouflage ScentCamouflage => (ScentCamouflage)Reinforcements[typeof(ScentCamouflage)];
         public static MindControl MindControl => (MindControl)Reinforcements[typeof(MindControl)];
         public static DevourWill DevourWill => (DevourWill)Reinforcements[typeof(DevourWill)];
+        public static FearInstinct FearInstinct => (FearInstinct)Reinforcements[typeof(FearInstinct)];
         public static bool IsAvailable()
         {
             return false;
