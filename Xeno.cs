@@ -31,6 +31,7 @@ namespace XenopurgeRougeLike
                     { typeof(DevourWill), new DevourWill() },
                     { typeof(FearInstinct), new FearInstinct() },
                     { typeof(Intimidation), new Intimidation() },
+                    { typeof(Submission), new Submission() },
                 };
             }
         }
@@ -42,6 +43,7 @@ namespace XenopurgeRougeLike
         public static DevourWill DevourWill => (DevourWill)Reinforcements[typeof(DevourWill)];
         public static FearInstinct FearInstinct => (FearInstinct)Reinforcements[typeof(FearInstinct)];
         public static Intimidation Intimidation => (Intimidation)Reinforcements[typeof(Intimidation)];
+        public static Submission Submission => (Submission)Reinforcements[typeof(Submission)];
 
         public static bool IsAvailable()
         {
