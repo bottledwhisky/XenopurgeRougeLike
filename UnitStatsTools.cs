@@ -15,6 +15,13 @@ namespace XenopurgeRougeLike
         public Enumerations.UnitStats Stat = stat;
         public float Amount = amount;
         public Func<BattleUnit, Enumerations.Team, bool> Condition = condition;
+        public Enumerations.Team TargetTeam = Enumerations.Team.Player;
+
+        public UnitStatChange(Enumerations.UnitStats stat, float amount, Enumerations.Team targetTeam, Func<BattleUnit, Enumerations.Team, bool> condition = null)
+            : this(stat, amount, condition)
+        {
+            TargetTeam = targetTeam;
+        }
     }
 
     public static class UnitStatsTools
@@ -86,16 +93,15 @@ namespace XenopurgeRougeLike
     {
         public static void Postfix(BattleUnit __instance, Enumerations.Team team)
         {
-            if (team != Enumerations.Team.Player)
-                return;
-            MelonLogger.Msg($"UnitStatsChangeConstructor: Applying {UnitStatsTools.InBattleUnitStatChanges.Count} unit stat changes for team {team}");
             foreach (var statChangePair in UnitStatsTools.InBattleUnitStatChanges)
             {
                 var id = statChangePair.Key;
                 var statChange = statChangePair.Value;
+                if (statChange.TargetTeam != team)
+                    continue;
                 if (statChange.Condition != null && !statChange.Condition(__instance, team))
                     continue;
-                MelonLogger.Msg($"UnitStatsChangeConstructor: Applying stat change {statChange.Stat} with amount {statChange.Amount} and id {id} to unit {__instance.UnitName}");
+                MelonLogger.Msg($"UnitStatsChangeConstructor: Applying stat change {statChange.Stat} with amount {statChange.Amount} and id {id} to unit {__instance.UnitName} (team: {team})");
                 switch (statChange.Stat)
                 {
                     case Enumerations.UnitStats.Speed:
