@@ -13,14 +13,13 @@ namespace XenopurgeRougeLike.XenoReinforcements
         {
             unlockLevel = 2;
             company = Company.Xeno;
-            description = "对异形伤害+30%，控制/发狂持续时间+50%";
+            description = "对异形伤害+30%，控制类效果持续时间增加";
         }
 
         // Damage bonus constants
         public const float XenoDamageBonus = 0.30f; // +30% damage to xenos
 
-        // Control/Madness duration bonus - to be used later
-        public const float ControlDurationBonus = 0.50f; // +50% duration
+        public const int ControlDurationBonusLevel = 1;
 
         public static XenoAffinity2 _instance;
 

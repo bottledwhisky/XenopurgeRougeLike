@@ -26,7 +26,8 @@ namespace XenopurgeRougeLike
                 {
                     { typeof(NeuralLinks), new NeuralLinks() },
                     { typeof(SensoryAssimilation), new SensoryAssimilation() },
-                    { typeof(PsionicScream), new PsionicScream() }
+                    { typeof(PsionicScream), new PsionicScream() },
+                    { typeof(ScentCamouflage), new ScentCamouflage() }
                 };
             }
         }
@@ -34,9 +35,26 @@ namespace XenopurgeRougeLike
         public static NeuralLinks NeuralLinks => (NeuralLinks)Reinforcements[typeof(NeuralLinks)];
         public static SensoryAssimilation SensoryAssimilation => (SensoryAssimilation)Reinforcements[typeof(SensoryAssimilation)];
         public static PsionicScream PsionicScream => (PsionicScream)Reinforcements[typeof(PsionicScream)];
+        public static ScentCamouflage ScentCamouflage => (ScentCamouflage)Reinforcements[typeof(ScentCamouflage)];
         public static bool IsAvailable()
         {
             return false;
+        }
+
+        /// <summary>
+        /// Gets the ControlDurationBonusLevel from the highest active XenoAffinity.
+        /// Returns 0 if no XenoAffinity is active.
+        /// </summary>
+        public static int GetControlDurationBonusLevel()
+        {
+            // Check from highest to lowest affinity level
+            if (XenoAffinity6.Instance.IsActive)
+                return XenoAffinity6.ControlDurationBonusLevel;
+            if (XenoAffinity4.Instance.IsActive)
+                return XenoAffinity4.ControlDurationBonusLevel;
+            if (XenoAffinity2.Instance.IsActive)
+                return XenoAffinity2.ControlDurationBonusLevel;
+            return 0;
         }
     }
 }

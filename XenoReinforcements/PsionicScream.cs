@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using System.Collections.Generic;
@@ -85,11 +85,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
                 return;
 
             // Find all enemy units on the battlefield
-            var allUnits = gameManager.AllBattleUnits;
-            if (allUnits == null)
-                return;
+            var pm = gameManager.GetTeamManager(Team.EnemyAI);
 
-            var enemies = allUnits.Where(u => u.Team == Team.EnemyAI && u.IsAlive).ToList();
+            var enemies = pm.BattleUnits.Where(u => u.IsAlive).ToList();
 
             // Stun all enemies using the existing stun system from XenoAffinity6
             foreach (var enemy in enemies)
@@ -105,6 +103,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
             // Only available if PsionicScream reinforcement is active
             if (!PsionicScream.Instance.IsActive)
             {
+                reasons.Add(CommandsAvailabilityChecker.CardUnavailableReason.ObjectiveNotFoundYet);
                 return reasons;
             }
 
@@ -112,10 +111,12 @@ namespace XenopurgeRougeLike.XenoReinforcements
             var gameManager = GameManager.Instance;
             if (gameManager != null)
             {
-                var allUnits = gameManager.AllBattleUnits;
-                if (allUnits == null || !allUnits.Any(u => u.Team == Team.EnemyAI && u.IsAlive))
+                var pm = gameManager.GetTeamManager(Team.EnemyAI);
+
+                var enemies = pm.BattleUnits.Where(u => u.IsAlive).ToList();
+                if (!enemies.Any(u => u.IsAlive))
                 {
-                    reasons.Add(CommandsAvailabilityChecker.CardUnavailableReason.NoEnemiesToTarget);
+                    reasons.Add(CommandsAvailabilityChecker.CardUnavailableReason.ObjectiveNotFoundYet);
                 }
             }
 
@@ -293,7 +294,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
     /// <summary>
     /// Clear stuns when game ends
     /// </summary>
-    [HarmonyPatch(typeof(SpaceCommander.GameFlow.TestGame), "EndGame")]
+    [HarmonyPatch(typeof(TestGame), "EndGame")]
     public static class PsionicScream_ClearStuns_Patch
     {
         public static void Postfix()

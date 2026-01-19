@@ -15,14 +15,13 @@ namespace XenopurgeRougeLike.XenoReinforcements
         {
             unlockLevel = 6;
             company = Company.Xeno;
-            description = "对异形伤害+60%，控制/发狂持续时间+100%，更高概率获得同流派增援，异形死亡时会眩晕附近的异形";
+            description = "对异形伤害+60%，控制类效果持续时间更进一步增加，更高概率获得同流派增援，异形死亡时会眩晕附近的异形";
         }
 
         // Damage bonus constants
         public const float XenoDamageBonus = 0.60f; // +60% damage to xenos
 
-        // Control/Madness duration bonus - to be used later
-        public const float ControlDurationBonus = 1.0f; // +100% duration
+        public const int ControlDurationBonusLevel = 3;
 
         // Reinforcement chance multiplier
         public const float ReinforcementChanceBonus = 2f;
