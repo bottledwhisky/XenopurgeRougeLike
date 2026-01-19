@@ -193,6 +193,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
             {
                 _stunnedEnemies[unit] = duration;
             }
+
+            // Register with the unified tracker
+            XenoStunTracker.MarkAsStunned(unit);
         }
 
         public static bool IsStunned(BattleUnit unit)
@@ -208,6 +211,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
                 if (remainingTime <= 0f)
                 {
                     _stunnedEnemies.Remove(unit);
+                    XenoStunTracker.MarkAsNotStunned(unit);
                     return -remainingTime;
                 }
                 else
@@ -300,6 +304,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         public static void Postfix()
         {
             PsionicScream_StunSystem.ClearAllStuns();
+            XenoStunTracker.ClearAll();
         }
     }
 }

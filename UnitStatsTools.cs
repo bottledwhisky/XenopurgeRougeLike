@@ -29,6 +29,47 @@ namespace XenopurgeRougeLike
         {
             float currentArmor = (float)ArmorField.GetValue(unit);
             ArmorField.SetValue(unit, currentArmor + armorAmount);
+            RefreshUnitUI(unit);
+        }
+
+        /// <summary>
+        /// Heal a BattleUnit using the built-in Heal method
+        /// </summary>
+        public static void HealUnit(BattleUnit unit, float healAmount)
+        {
+            if (unit == null || !unit.IsAlive)
+                return;
+            unit.Heal(healAmount);
+            RefreshUnitUI(unit);
+        }
+
+        /// <summary>
+        /// Heal all player units
+        /// </summary>
+        public static void HealAllPlayerUnits(float healAmount)
+        {
+            var gameManager = GameManager.Instance;
+            if (gameManager == null)
+                return;
+
+            var playerManager = gameManager.GetTeamManager(Enumerations.Team.Player);
+            if (playerManager == null)
+                return;
+
+            foreach (var unit in playerManager.BattleUnits)
+            {
+                if (unit.IsAlive)
+                {
+                    HealUnit(unit, healAmount);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Refresh the UI for a unit after stat changes
+        /// </summary>
+        private static void RefreshUnitUI(BattleUnit unit)
+        {
             var unitsListView_BattleManagement = global::UnityEngine.Object.FindAnyObjectByType<UnitsListView_BattleManagement>();
             var UnitDataChanged = AccessTools.Method(typeof(UnitsListView_BattleManagement), "UnitDataChanged");
             UnitDataChanged.Invoke(unitsListView_BattleManagement, [unit]);

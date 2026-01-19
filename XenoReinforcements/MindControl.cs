@@ -255,6 +255,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
             // Step 6: Create visual representation
             CreateVisualRepresentation(playerUnit, gameManager);
 
+            // Track this unit as mind-controlled for DevourWill
+            XenoStunTracker.MarkAsMindControlled(playerUnit);
+
             MelonLogger.Msg($"MindControl: Successfully converted {capturedState.UnitName} to player team");
         }
 

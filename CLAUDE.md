@@ -65,4 +65,4 @@ Common confusions:
 
     This error can be ignored: 所生成项目的处理器架构“MSIL”与引用“MelonLoader”的处理器架构“AMD64”不匹配。
 
-    All reinforcements should be registered in its corresponding "Path" class. For example, SyntheticsReinforcements\SmartWeaponModule.cs is registered in Synthetics.cs.
+    All reinforcements should be registered in its corresponding "Path" class. For example, SyntheticsReinforcements\SmartWeaponModule.cs is registered in Synthetics.cs. Same for other paths like Xeno or Rockstar.

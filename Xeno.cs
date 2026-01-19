@@ -24,20 +24,20 @@ namespace XenopurgeRougeLike
             {
                 return new Dictionary<Type, Reinforcement>()
                 {
-                    { typeof(NeuralLinks), new NeuralLinks() },
                     { typeof(SensoryAssimilation), new SensoryAssimilation() },
                     { typeof(PsionicScream), new PsionicScream() },
                     { typeof(ScentCamouflage), new ScentCamouflage() },
-                    { typeof(MindControl), new MindControl() }
+                    { typeof(MindControl), new MindControl() },
+                    { typeof(DevourWill), new DevourWill() }
                 };
             }
         }
 
-        public static NeuralLinks NeuralLinks => (NeuralLinks)Reinforcements[typeof(NeuralLinks)];
         public static SensoryAssimilation SensoryAssimilation => (SensoryAssimilation)Reinforcements[typeof(SensoryAssimilation)];
         public static PsionicScream PsionicScream => (PsionicScream)Reinforcements[typeof(PsionicScream)];
         public static ScentCamouflage ScentCamouflage => (ScentCamouflage)Reinforcements[typeof(ScentCamouflage)];
         public static MindControl MindControl => (MindControl)Reinforcements[typeof(MindControl)];
+        public static DevourWill DevourWill => (DevourWill)Reinforcements[typeof(DevourWill)];
         public static bool IsAvailable()
         {
             return false;

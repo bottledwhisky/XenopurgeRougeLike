@@ -123,10 +123,32 @@ namespace XenopurgeRougeLike.XenoReinforcements
                     // Don't stun the dead xeno itself
                     if (unit != deadXeno && unit.IsAlive)
                     {
-                        _stunnedEnemies[unit] = XenoAffinity6.StunDuration;
+                        StunUnit(unit, XenoAffinity6.StunDuration);
                     }
                 }
             }
+        }
+
+        public static void StunUnit(BattleUnit unit, float duration)
+        {
+            if (unit == null || !unit.IsAlive || unit.Team != Team.EnemyAI)
+                return;
+
+            // If already stunned, extend the duration if the new one is longer
+            if (_stunnedEnemies.TryGetValue(unit, out var existingDuration))
+            {
+                if (duration > existingDuration)
+                {
+                    _stunnedEnemies[unit] = duration;
+                }
+            }
+            else
+            {
+                _stunnedEnemies[unit] = duration;
+            }
+
+            // Register with the unified tracker
+            XenoStunTracker.MarkAsStunned(unit);
         }
 
         public static bool IsStunned(BattleUnit unit)
@@ -142,6 +164,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
                 if (remainingTime <= 0f)
                 {
                     _stunnedEnemies.Remove(unit);
+                    XenoStunTracker.MarkAsNotStunned(unit);
                     return -remainingTime;
                 }
                 else
