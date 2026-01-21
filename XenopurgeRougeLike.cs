@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using MelonLoader;
 using MelonLoader.Utils;
+using SaveSystem;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.BattleManagement;
@@ -20,74 +21,6 @@ using UnityEngine;
 
 namespace XenopurgeRougeLike
 {
-    public static class ActionCardDumper
-    {
-        public static string DumpAllActionCards()
-        {
-            // Find all ActionCardSO assets in the project
-            ActionCardSO[] allCards = Resources.FindObjectsOfTypeAll<ActionCardSO>();
-
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"=== Action Cards Dump ({allCards.Length} cards found) ===\n");
-
-            foreach (ActionCardSO card in allCards)
-            {
-                sb.AppendLine(DumpActionCard(card));
-                sb.AppendLine(new string('-', 50));
-            }
-
-            return sb.ToString();
-        }
-
-        public static string DumpActionCard(ActionCardSO card)
-        {
-            if (card == null) return "null";
-
-            ActionCardInfo info = card.Info;
-            StringBuilder sb = new StringBuilder();
-
-            sb.AppendLine($"Asset Name: {card.name}");
-            sb.AppendLine($"Type: {card.GetType().Name}");
-            sb.AppendLine($"Id: {info.Id}");
-            sb.AppendLine($"Card Name: {info.CardName}");
-            sb.AppendLine($"Description: {info.CardDescription}");
-            sb.AppendLine($"Group: {info.Group}");
-            sb.AppendLine($"Sorting Order: {info.SortingOrder}");
-            sb.AppendLine($"Buying Cost: {info.BuyingCost}");
-            sb.AppendLine($"Access Points Cost: {info.AccessPointsCost}");
-            sb.AppendLine($"Bioweave Points Cost: {info.BioweavePointsCost}");
-            sb.AppendLine($"Uses: {(info.Uses == 0 ? "Unlimited" : info.Uses.ToString())}");
-            sb.AppendLine($"Available On Deployment Phase: {info.AvailableOnDeploymentPhase}");
-
-            if (info.AvailableOnDeploymentPhase)
-            {
-                sb.AppendLine($"  - Access Points Cost (Deployment): {info.AccessPointsCostOnDeploymentPhase}");
-                sb.AppendLine($"  - Bioweave Points Cost (Deployment): {info.BioweavePointsCostOnDeploymentPhase}");
-            }
-
-            if (info.SquadIdsThatCannotUseCommand != null && info.SquadIdsThatCannotUseCommand.Count > 0)
-            {
-                sb.AppendLine($"Excluded Squad IDs: {string.Join(", ", info.SquadIdsThatCannotUseCommand)}");
-            }
-
-            return sb.ToString();
-        }
-
-        // Optional: Log to console
-        public static void LogAllActionCards()
-        {
-            Debug.Log(DumpAllActionCards());
-        }
-
-        // Optional: Save to file
-        public static void SaveToFile(string path = "ActionCardsDump.txt")
-        {
-            string dump = DumpAllActionCards();
-            System.IO.File.WriteAllText(path, dump);
-            Debug.Log($"Action cards dumped to: {path}");
-        }
-    }
-
     public class XenopurgeRougeLike : MelonMod
     {
         public static HarmonyLib.Harmony _HarmonyInstance;
@@ -132,7 +65,7 @@ namespace XenopurgeRougeLike
                 MelonLogger.Msg($"Company {company.Name} is available. Retrieving reinforcements.");
 
                 var reinforcements = company.ClassType
-                    .GetField("Reinforcements")
+                    .GetProperty("Reinforcements")
                     .GetValue(null) as Dictionary<Type, Reinforcement>;
                 MelonLogger.Msg($"Found {reinforcements.Count} reinforcements for company {company.Name}.");
                 foreach (var reinforcement in reinforcements.Values)
@@ -217,6 +150,11 @@ namespace XenopurgeRougeLike
                     affinityToEnable.IsActive = true;
                 }
             }
+
+            if (SaveFile_Patch.lastSaveName != null)
+            {
+                SaveFile_Patch.Postfix(SaveFile_Patch.lastSaveName);
+            }
         }
 
         public static Sprite LoadCustomSpriteAsset(string path)
@@ -291,6 +229,125 @@ namespace XenopurgeRougeLike
             {
                 MelonLogger.Error($"Error in GameManager_GiveEndGameRewards_Patch: {ex}");
                 MelonLogger.Error(ex.StackTrace);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(SaveLoadManager))]
+    [HarmonyPatch("SaveFile")]
+    public class SaveFile_Patch
+    {
+        public static string lastSaveName;
+
+        [HarmonyPostfix]
+        public static void Postfix(string saveName)
+        {
+            MelonLogger.Msg("[SaveFile_Patch] Postfix called - Saving reinforcements");
+            lastSaveName = saveName;
+
+            try
+            {
+                // Serialize the reinforcements list
+                List<string> reinforcementData = new List<string>();
+                foreach (Reinforcement reinforcement in XenopurgeRougeLike.acquiredReinforcements)
+                {
+                    if (reinforcement != null)
+                    {
+                        string serialized = reinforcement.GetType().FullName;
+                        reinforcementData.Add(serialized);
+                        MelonLogger.Msg($"[SaveFile_Patch] Serialized reinforcement: {serialized}");
+                    }
+                }
+
+                // Save to a separate file in the save folder
+                string saveFolderPath = Path.Combine(Application.persistentDataPath, saveName);
+                string reinforcementsFilePath = Path.Combine(saveFolderPath, "reinforcements.json");
+
+                if (!Directory.Exists(saveFolderPath))
+                {
+                    Directory.CreateDirectory(saveFolderPath);
+                }
+
+                string json = SaveLoadUtils.Serialize(reinforcementData);
+                File.WriteAllText(reinforcementsFilePath, json);
+
+                MelonLogger.Msg($"[SaveFile_Patch] Successfully saved {reinforcementData.Count} reinforcements to {reinforcementsFilePath}");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"[SaveFile_Patch] Error saving reinforcements: {ex.Message}");
+                MelonLogger.Error($"Stack trace: {ex.StackTrace}");
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(SaveLoadManager))]
+    [HarmonyPatch("LoadFile")]
+    public class LoadFile_Patch
+    {
+        [HarmonyPostfix]
+        public static void Postfix(string saveName)
+        {
+            MelonLogger.Msg("[LoadFile_Patch] Postfix called - Loading reinforcements");
+
+            try
+            {
+                // Clear existing reinforcements
+                XenopurgeRougeLike.acquiredReinforcements.Clear();
+
+                // Load from the reinforcements file
+                string saveFolderPath = Path.Combine(Application.persistentDataPath, saveName);
+                string reinforcementsFilePath = Path.Combine(saveFolderPath, "reinforcements.json");
+
+                if (!File.Exists(reinforcementsFilePath))
+                {
+                    MelonLogger.Msg("[LoadFile_Patch] No reinforcements file found - starting fresh");
+                    return;
+                }
+
+                string json = File.ReadAllText(reinforcementsFilePath);
+                List<string> reinforcementData = SaveLoadUtils.Deserialize<List<string>>(json);
+
+                foreach (string serialized in reinforcementData)
+                {
+                    Type type = Type.GetType(serialized);
+                    if (type == null)
+                    {
+                        MelonLogger.Warning($"[LoadFile_Patch] Could not find type: {serialized}");
+                        continue;
+                    }
+
+                    // Get the singleton instance of the reinforcement
+                    var instanceProperty = type.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                    if (instanceProperty != null)
+                    {
+                        Reinforcement reinforcement = (Reinforcement)instanceProperty.GetValue(null);
+                        if (reinforcement != null)
+                        {
+                            XenopurgeRougeLike.acquiredReinforcements.Add(reinforcement);
+                            reinforcement.IsActive = true; // Activate the reinforcement
+                            MelonLogger.Msg($"[LoadFile_Patch] Loaded and activated reinforcement: {reinforcement.GetType().Name}");
+                        }
+                    }
+                    else
+                    {
+                        MelonLogger.Warning($"[LoadFile_Patch] Type {serialized} does not have an Instance property");
+                    }
+                }
+
+                MelonLogger.Msg($"[LoadFile_Patch] Successfully loaded {XenopurgeRougeLike.acquiredReinforcements.Count} reinforcements");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"[LoadFile_Patch] Error loading reinforcements: {ex.Message}");
+                MelonLogger.Error($"Stack trace: {ex.StackTrace}");
+
+                // On error, clear reinforcements to prevent issues
+                foreach (var reinforcement in XenopurgeRougeLike.acquiredReinforcements)
+                {
+                    reinforcement.IsActive = false;
+                }
+                XenopurgeRougeLike.acquiredReinforcements.Clear();
             }
         }
     }

@@ -13,24 +13,19 @@ namespace XenopurgeRougeLike
             RockstarAffinity6.Instance,
         ];
 
-        public static Dictionary<Type, Reinforcement> Reinforcements
+        public static Dictionary<Type, Reinforcement> _reinforcements;
+        public static Dictionary<Type, Reinforcement> Reinforcements => _reinforcements ??= new()
         {
-            get
-            {
-                return new Dictionary<Type, Reinforcement>()
-                {
-                    { typeof(StarPower), new StarPower() },
-                    { typeof(StreamDonations), new StreamDonations() },
-                    { typeof(CelebrityAuction), new CelebrityAuction() },
-                    { typeof(FandomRallies), new FandomRallies() },
-                    { typeof(InTheSpotlight), new InTheSpotlight() },
-                    { typeof(FanCheer), new FanCheer() },
-                    { typeof(Superfan), new Superfan() },
-                    { typeof(BuildingTheBrand), new BuildingTheBrand() },
-                    { typeof(WhalePatron), new WhalePatron() }
-                };
-            }
-        }
+            { typeof(StarPower), new StarPower() },
+            { typeof(StreamDonations), new StreamDonations() },
+            { typeof(CelebrityAuction), new CelebrityAuction() },
+            { typeof(FandomRallies), new FandomRallies() },
+            { typeof(InTheSpotlight), new InTheSpotlight() },
+            { typeof(FanCheer), new FanCheer() },
+            { typeof(Superfan), new Superfan() },
+            { typeof(BuildingTheBrand), new BuildingTheBrand() },
+            { typeof(WhalePatron), new WhalePatron() }
+        };
 
         public static StarPower StarPower => (StarPower)Reinforcements[typeof(StarPower)];
         public static StreamDonations StreamDonations => (StreamDonations)Reinforcements[typeof(StreamDonations)];

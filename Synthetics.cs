@@ -19,7 +19,8 @@ namespace XenopurgeRougeLike
             SyntheticsAffinity6.Instance,
         ];
 
-        public static Dictionary<Type, Reinforcement> Reinforcements = new()
+        public static Dictionary<Type, Reinforcement> _reinforcements;
+        public static Dictionary<Type, Reinforcement> Reinforcements => _reinforcements ??= new()
         {
             { typeof(BioSteel), new BioSteel() },
             { typeof(HighPerformanceCluster), new HighPerformanceCluster() },

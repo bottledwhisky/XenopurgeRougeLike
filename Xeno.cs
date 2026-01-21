@@ -18,24 +18,19 @@ namespace XenopurgeRougeLike
             XenoAffinity6.Instance,
         ];
 
-        public static Dictionary<Type, Reinforcement> Reinforcements
+        public static Dictionary<Type, Reinforcement> _reinforcements;
+        public static Dictionary<Type, Reinforcement> Reinforcements => _reinforcements ??= new()
         {
-            get
-            {
-                return new Dictionary<Type, Reinforcement>()
-                {
-                    { typeof(SensoryAssimilation), new SensoryAssimilation() },
-                    { typeof(PsionicScream), new PsionicScream() },
-                    { typeof(ScentCamouflage), new ScentCamouflage() },
-                    { typeof(MindControl), new MindControl() },
-                    { typeof(DevourWill), new DevourWill() },
-                    { typeof(FearInstinct), new FearInstinct() },
-                    { typeof(Intimidation), new Intimidation() },
-                    { typeof(Submission), new Submission() },
-                    { typeof(Domination), new Domination() },
-                };
-            }
-        }
+            { typeof(SensoryAssimilation), new SensoryAssimilation() },
+            { typeof(PsionicScream), new PsionicScream() },
+            { typeof(ScentCamouflage), new ScentCamouflage() },
+            { typeof(MindControl), new MindControl() },
+            { typeof(DevourWill), new DevourWill() },
+            { typeof(FearInstinct), new FearInstinct() },
+            { typeof(Intimidation), new Intimidation() },
+            { typeof(Submission), new Submission() },
+            { typeof(Domination), new Domination() },
+        };
 
         public static SensoryAssimilation SensoryAssimilation => (SensoryAssimilation)Reinforcements[typeof(SensoryAssimilation)];
         public static PsionicScream PsionicScream => (PsionicScream)Reinforcements[typeof(PsionicScream)];

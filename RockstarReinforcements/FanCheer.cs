@@ -154,7 +154,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
     }
 
     // Patch to detect when the Top Star takes damage
-    [HarmonyPatch(typeof(BattleUnit), "TakeDamage")]
+    [HarmonyPatch(typeof(BattleUnit), "Damage")]
     public class FanCheer_BattleUnit_TakeDamage_Patch
     {
         public static void Postfix(BattleUnit __instance, float damage)

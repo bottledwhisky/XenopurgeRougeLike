@@ -57,7 +57,7 @@ namespace XenopurgeRougeLike
                             }
                             string nextUnlockAffinyText = affinityToEnable.ToString();
 
-                            string nextUnlockProgress = (affinityToEnable.unlockLevel > nExsitingCompanyReinforces ? "Max level reached" : "Next unlock") + $": ({nExsitingCompanyReinforces}/{affinityToEnable.unlockLevel}) ";
+                            string nextUnlockProgress = (affinityToEnable.unlockLevel < nExsitingCompanyReinforces ? "Max level reached" : "Next unlock") + $": ({nExsitingCompanyReinforces}/{affinityToEnable.unlockLevel}) ";
 
                             EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = i;
                             // Update description text when selected
