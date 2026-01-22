@@ -139,10 +139,11 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                     DeploymentOrder = 5 + i
                 };
                 fan.AddCommands();
-                OnFanCreated?.Invoke(fan);
 
                 fans.Add(fan);
                 teamManager.AddBattleUnit(fan);
+
+                OnFanCreated?.Invoke(fan);
             }
 
             if (fanCount > 1)

@@ -6,6 +6,14 @@
 		<Platforms>AnyCPU</Platforms>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DebugType>embedded</DebugType>
+	</PropertyGroup>
+
 	<ItemGroup>
 	  <None Remove="nul" />
 	</ItemGroup>
@@ -60,5 +68,9 @@
 			<HintPath>..\..\..\SteamLibrary\steamapps\common\Xenopurge\Xenopurge_Data\Managed\UnityEngine.UIModule.dll</HintPath>
 		</Reference>
 	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="xcopy /y &quot;$(ProjectDir)$(OutDir)XenopurgeRougeLike.dll&quot;  &quot;D:\SteamLibrary\steamapps\common\Xenopurge\Mods&quot;" />
+	</Target>
 
 </Project>

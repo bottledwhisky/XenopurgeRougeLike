@@ -28,9 +28,26 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             return instance;
         }
 
-        public new UnitData CreateUnitInstance()
+        public UnitData GetPreparedUnitData()
         {
             return _preparedUnitData;
+        }
+    }
+
+    /// <summary>
+    /// Patch to handle FanUnitDataSO.CreateUnitInstance() calls
+    /// </summary>
+    [HarmonyPatch(typeof(UnitDataSO), "CreateUnitInstance")]
+    public static class FanUnitDataSO_CreateUnitInstance_Patch
+    {
+        public static bool Prefix(UnitDataSO __instance, ref UnitData __result)
+        {
+            if (__instance is FanUnitDataSO fanUnitDataSO)
+            {
+                __result = fanUnitDataSO.GetPreparedUnitData();
+                return false; // Skip original method
+            }
+            return true; // Run original method for other UnitDataSO types
         }
     }
 
@@ -215,7 +232,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                 var action = actions[UnityEngine.Random.Range(0, actions.Count)];
                 action();
             }
-            MelonLogger.Msg($"Assigned stats: {ud.Health}, {ud.Accuracy}, {ud.Power}, {ud.Speed}");
+            MelonLogger.Msg($"Assigned stats: Health:{ud.Health}, Accuracy:{ud.Accuracy}, Power:{ud.Power}, Speed:{ud.Speed}");
         }
 
         public static void SetShootingCommand(UnitData ud)

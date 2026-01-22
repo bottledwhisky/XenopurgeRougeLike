@@ -21,115 +21,123 @@ namespace XenopurgeRougeLike
         [HarmonyPostfix]
         public static void Postfix(EndGameWindowButtons_BattleManagementDirectory __instance, ref DirectoryData __result)
         {
-            MelonLogger.Msg("Patching EndGameWindowButtons_BattleManagementDirectory.Initialize to add reinforcement choices.");
-            if (!EndGameWindowView_SetResultText_Patch.isGameContinue) return;
-            MelonLogger.Msg("Game is continuing, adding reinforcement choice buttons.");
-            var ProceedClicked = AccessTools.Method(typeof(EndGameWindowButtons_BattleManagementDirectory), "ProceedClicked");
-            List<ButtonData> buttonDataList = [];
-            // Add reinforcement choices as buttons
-            for (int i = 0; i < XenopurgeRougeLike.choices.Count; i++)
+            try
             {
-                MelonLogger.Msg($"Adding reinforcement choice button for index {i}");
-                var choice = XenopurgeRougeLike.choices[i];
-                var nextLevelChoice = choice.NextLevel();
-                ButtonData buttonData = new()
+                MelonLogger.Msg("Patching EndGameWindowButtons_BattleManagementDirectory.Initialize to add reinforcement choices.");
+                if (!EndGameWindowView_SetResultText_Patch.isGameContinue) return;
+                MelonLogger.Msg("Game is continuing, adding reinforcement choice buttons.");
+                var ProceedClicked = AccessTools.Method(typeof(EndGameWindowButtons_BattleManagementDirectory), "ProceedClicked");
+                List<ButtonData> buttonDataList = [];
+                // Add reinforcement choices as buttons
+                for (int i = 0; i < XenopurgeRougeLike.choices.Count; i++)
                 {
-                    MainText = nextLevelChoice.ToMenuItem(),
-                    onSelectCallback = () =>
+                    MelonLogger.Msg($"Adding reinforcement choice button for index {i}");
+                    var choice = XenopurgeRougeLike.choices[i];
+                    var nextLevelChoice = choice.NextLevel();
+                    ButtonData buttonData = new()
                     {
-                        try
+                        MainText = nextLevelChoice.ToMenuItem(),
+                        onSelectCallback = () =>
                         {
-                            var company = choice.company.Type;
-                            var nExsitingCompanyReinforces = XenopurgeRougeLike.acquiredReinforcements.Where(r => r.company.Type == company).Count() + 1;
-                            CompanyAffinity affinityToEnable = null;
-                            foreach (var affiny in choice.company.Affinities)
+                            try
                             {
-                                int requiredNReinforces = affiny.unlockLevel;
-                                if (requiredNReinforces >= nExsitingCompanyReinforces)
+                                var company = choice.company.Type;
+                                var nExsitingCompanyReinforces = XenopurgeRougeLike.acquiredReinforcements.Where(r => r.company.Type == company).Count() + 1;
+                                CompanyAffinity affinityToEnable = null;
+                                foreach (var affiny in choice.company.Affinities)
                                 {
-                                    affinityToEnable = affiny;
-                                    break;
+                                    int requiredNReinforces = affiny.unlockLevel;
+                                    if (requiredNReinforces >= nExsitingCompanyReinforces)
+                                    {
+                                        affinityToEnable = affiny;
+                                        break;
+                                    }
+                                }
+                                if (affinityToEnable == null)
+                                {
+                                    affinityToEnable = choice.company.Affinities.Last();
+                                }
+                                string nextUnlockAffinyText = affinityToEnable.ToString();
+
+                                string nextUnlockProgress = (affinityToEnable.unlockLevel < nExsitingCompanyReinforces ? "Max level reached" : "Next unlock") + $": ({nExsitingCompanyReinforces}/{affinityToEnable.unlockLevel}) ";
+
+                                EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = i;
+                                // Update description text when selected
+                                EndGameWindowView_SetResultText_Patch._descriptionText.text = nextLevelChoice.ToString() + "\n" + nextUnlockProgress + nextUnlockAffinyText;
+
+                                // Update border highlights
+                                for (int j = 0; j < EndGameWindowView_SetResultText_Patch._choiceOutlines.Length; j++)
+                                {
+                                    var outline = EndGameWindowView_SetResultText_Patch._choiceOutlines[j];
+                                    if (j == i)
+                                    {
+                                        outline.effectColor = Color.yellow;
+                                    }
+                                    else
+                                    {
+                                        outline.effectColor = Color.gray;
+                                    }
+                                    var graphic = outline.GetComponent<Graphic>();
+                                    if (graphic != null)
+                                    {
+                                        graphic.SetVerticesDirty();
+                                    }
                                 }
                             }
-                            if (affinityToEnable == null)
+                            catch (Exception ex)
                             {
-                                affinityToEnable = choice.company.Affinities.Last();
+                                MelonLogger.Error(ex);
+                                MelonLogger.Error(ex.StackTrace);
                             }
-                            string nextUnlockAffinyText = affinityToEnable.ToString();
-
-                            string nextUnlockProgress = (affinityToEnable.unlockLevel < nExsitingCompanyReinforces ? "Max level reached" : "Next unlock") + $": ({nExsitingCompanyReinforces}/{affinityToEnable.unlockLevel}) ";
-
-                            EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = i;
-                            // Update description text when selected
-                            EndGameWindowView_SetResultText_Patch._descriptionText.text = nextLevelChoice.ToString() + "\n" + nextUnlockProgress + nextUnlockAffinyText;
-
-                            // Update border highlights
-                            for (int j = 0; j < EndGameWindowView_SetResultText_Patch._choiceOutlines.Length; j++)
-                            {
-                                var outline = EndGameWindowView_SetResultText_Patch._choiceOutlines[j];
-                                if (j == i)
-                                {
-                                    outline.effectColor = Color.yellow;
-                                }
-                                else
-                                {
-                                    outline.effectColor = Color.gray;
-                                }
-                                var graphic = outline.GetComponent<Graphic>();
-                                if (graphic != null)
-                                {
-                                    graphic.SetVerticesDirty();
-                                }
-                            }
-                        }
-                        catch (Exception ex)
+                        },
+                        onClickCallback = () =>
                         {
-                            MelonLogger.Error(ex);
-                            MelonLogger.Error(ex.StackTrace);
+                            // Logic to add the reinforcement to the player's roster
+                            MelonLogger.Msg($"Player selected reinforcement from {choice.ToMenuItem()}");
+                            // Add reinforcement logic here
+                            XenopurgeRougeLike.AcquireReinforcement(choice);
+                            ProceedClicked.Invoke(__instance, null);
                         }
-                    },
+                    };
+                    buttonDataList.Add(buttonData);
+                }
+                MelonLogger.Msg("Finished adding reinforcement choice buttons.");
+                // Add a "Reroll" button
+                ButtonData rerollButtonData = new ButtonData
+                {
+                    MainText = "Reroll",
+                    IsDisabled = true,
                     onClickCallback = () =>
                     {
-                        // Logic to add the reinforcement to the player's roster
-                        MelonLogger.Msg($"Player selected reinforcement from {choice.ToMenuItem()}");
-                        // Add reinforcement logic here
-                        XenopurgeRougeLike.AcquireReinforcement(choice);
+                        MelonLoader.MelonLogger.Msg("Player chose to reroll reinforcement choices.");
+                        // Logic to reroll choices
+                        GameManager_GiveEndGameRewards_Patch.Prefix(true);
+                        EndGameWindowView_SetResultText_Patch.PopulateChoices(XenopurgeRougeLike.choices);
+                    }
+                };
+                // Add a "Skip" button
+                ButtonData skipButtonData = new ButtonData
+                {
+                    MainText = "Skip",
+                    onClickCallback = () =>
+                    {
+                        MelonLoader.MelonLogger.Msg("Player chose to skip reinforcement selection.");
+                        // Logic to skip selection
                         ProceedClicked.Invoke(__instance, null);
                     }
                 };
-                buttonDataList.Add(buttonData);
-            }
-            MelonLogger.Msg("Finished adding reinforcement choice buttons.");
-            // Add a "Reroll" button
-            ButtonData rerollButtonData = new ButtonData
-            {
-                MainText = "Reroll",
-                IsDisabled = true,
-                onClickCallback = () =>
-                {
-                    MelonLoader.MelonLogger.Msg("Player chose to reroll reinforcement choices.");
-                    // Logic to reroll choices
-                    GameManager_GiveEndGameRewards_Patch.Prefix(true);
-                    EndGameWindowView_SetResultText_Patch.PopulateChoices(XenopurgeRougeLike.choices);
-                }
-            };
-            // Add a "Skip" button
-            ButtonData skipButtonData = new ButtonData
-            {
-                MainText = "Skip",
-                onClickCallback = () =>
-                {
-                    MelonLoader.MelonLogger.Msg("Player chose to skip reinforcement selection.");
-                    // Logic to skip selection
-                    ProceedClicked.Invoke(__instance, null);
-                }
-            };
-            MelonLogger.Msg("Adding Reroll and Skip buttons.");
-            __result.ButtonData = [.. buttonDataList,
+                MelonLogger.Msg("Adding Reroll and Skip buttons.");
+                __result.ButtonData = [.. buttonDataList,
                 rerollButtonData,
                 skipButtonData,
             ];
-            MelonLogger.Msg("Finished patching EndGameWindowButtons_BattleManagementDirectory.Initialize.");
+                MelonLogger.Msg("Finished patching EndGameWindowButtons_BattleManagementDirectory.Initialize.");
+            }
+            catch (Exception e)
+            {
+                MelonLogger.Error(e);
+                MelonLogger.Error(e.StackTrace);
+            }
         }
     }
 

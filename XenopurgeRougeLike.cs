@@ -4,6 +4,7 @@ using MelonLoader.Utils;
 using SaveSystem;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
+using SpaceCommander.Area;
 using SpaceCommander.BattleManagement;
 using SpaceCommander.BattleManagement.UI;
 using SpaceCommander.Database;
@@ -13,7 +14,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using TimeSystem;
 using UnityEngine;
+using XenopurgeRougeLike.RockstarReinforcements;
+using static SpaceCommander.Enumerations;
 
 
 [assembly: MelonInfo(typeof(XenopurgeRougeLike.XenopurgeRougeLike), "Xenopurge RougeLike", "1.0.0", "Felix Hao")]
@@ -46,6 +50,44 @@ namespace XenopurgeRougeLike
         {
             if (Input.GetKeyUp(KeyCode.F11))
             {
+                var bu = FandomRallies.LastSpawnedFan;
+                if (bu == null)
+                {
+                    MelonLogger.Msg("LastSpawnedFan is null");
+                    return;
+                }
+                var los = bu.LineOfSight;
+                var mm = bu.MovementManager;
+
+                // Movement Manager's current coords
+                Vector2Int currentCoords = mm.CurrentTileCoords;      // Current tile coords
+                Vector2Int nextCoords = mm.NextTileCoords;            // Next tile coords (if moving)
+                Vector3 currentPosition = mm.CurrentTilePosition;     // World position
+                Tile currentTile = mm.CurrentTile;                    // Current Tile object
+
+                // Visible tiles from LineOfSight
+                IEnumerable<Tile> visibleTiles = los.Tiles;
+
+                // Example dump:
+                MelonLogger.Msg($"=== LineOfSight Debug for {bu.UnitName} {bu.UnitId} ===");
+                MelonLogger.Msg($"Current Coords: {currentCoords}");
+                MelonLogger.Msg($"Next Coords: {nextCoords}");
+                MelonLogger.Msg($"World Position: {currentPosition}");
+                MelonLogger.Msg($"Current Tile: {currentTile?.Coords}");
+                MelonLogger.Msg($"Visible Tiles Count: {visibleTiles.Count()}");
+
+                foreach (var tile in visibleTiles)
+                {
+                    MelonLogger.Msg($"  - Tile at {tile.Coords}");
+                }
+
+                var gameManager = GameManager.Instance;
+                BattleUnitsManager teamManager = gameManager.GetTeamManager(Team.Player);
+
+                foreach(var bu2 in teamManager.BattleUnits)
+                {
+                    MelonLogger.Msg($"=== Player has {bu2.UnitName} {bu2.UnitId} ===");
+                }
             }
         }
 
@@ -306,6 +348,7 @@ namespace XenopurgeRougeLike
                 }
 
                 string json = File.ReadAllText(reinforcementsFilePath);
+                MelonLogger.Msg($"[LoadFile_Patch] Loaded from {reinforcementsFilePath}");
                 List<string> reinforcementData = SaveLoadUtils.Deserialize<List<string>>(json);
 
                 foreach (string serialized in reinforcementData)
