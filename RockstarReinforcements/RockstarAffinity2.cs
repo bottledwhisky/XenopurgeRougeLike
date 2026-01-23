@@ -37,6 +37,23 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         }
 
         public static bool IsAnyRockstarAffinityActive => Instance.IsActive || RockstarAffinity4.Instance.IsActive || RockstarAffinity6.Instance.IsActive;
+
+        public override Dictionary<string, object> SaveState()
+        {
+            return new Dictionary<string, object>
+            {
+                { "fanCount", RockstarAffinityHelpers.fanCount }
+            };
+        }
+
+        public override void LoadState(Dictionary<string, object> state)
+        {
+            if (state.ContainsKey("fanCount"))
+            {
+                RockstarAffinityHelpers.fanCount = Convert.ToInt32(state["fanCount"]);
+                MelonLogger.Msg($"[RockstarAffinity2] Loaded fan count: {RockstarAffinityHelpers.fanCount}");
+            }
+        }
     }
 
     [HarmonyPatch(typeof(BattleUnitGO), "BindCharacter")]

@@ -161,11 +161,7 @@ namespace XenopurgeRougeLike
         public static void AcquireReinforcement(Reinforcement reinforcement)
         {
             reinforcement.currentStacks += 1;
-            if (acquiredReinforcements.Contains(reinforcement))
-            {
-                reinforcement.currentStacks += 1;
-            }
-            else
+            if (!acquiredReinforcements.Contains(reinforcement))
             {
                 reinforcement.IsActive = true;
                 acquiredReinforcements.Add(reinforcement);
@@ -289,31 +285,76 @@ namespace XenopurgeRougeLike
 
             try
             {
-                // Serialize the reinforcements list
-                List<string> reinforcementData = new List<string>();
-                foreach (Reinforcement reinforcement in XenopurgeRougeLike.acquiredReinforcements)
-                {
-                    if (reinforcement != null)
-                    {
-                        string serialized = reinforcement.GetType().FullName;
-                        reinforcementData.Add(serialized);
-                        MelonLogger.Msg($"[SaveFile_Patch] Serialized reinforcement: {serialized}");
-                    }
-                }
-
-                // Save to a separate file in the save folder
                 string saveFolderPath = Path.Combine(Application.persistentDataPath, saveName);
-                string reinforcementsFilePath = Path.Combine(saveFolderPath, "reinforcements.json");
-
                 if (!Directory.Exists(saveFolderPath))
                 {
                     Directory.CreateDirectory(saveFolderPath);
                 }
 
+                // Serialize the reinforcements list with stacks and custom state
+                List<Dictionary<string, object>> reinforcementData = new List<Dictionary<string, object>>();
+                foreach (Reinforcement reinforcement in XenopurgeRougeLike.acquiredReinforcements)
+                {
+                    if (reinforcement != null)
+                    {
+                        var data = new Dictionary<string, object>
+                        {
+                            { "type", reinforcement.GetType().FullName },
+                            { "stacks", reinforcement.currentStacks }
+                        };
+
+                        // Save custom state if available
+                        var customState = reinforcement.SaveState();
+                        if (customState != null && customState.Count > 0)
+                        {
+                            data["customState"] = customState;
+                            MelonLogger.Msg($"[SaveFile_Patch] Saving custom state for {reinforcement.GetType().Name}: {customState.Count} entries");
+                        }
+
+                        reinforcementData.Add(data);
+                        MelonLogger.Msg($"[SaveFile_Patch] Serialized reinforcement: {reinforcement.GetType().Name} with {reinforcement.currentStacks} stacks");
+                    }
+                }
+
+                string reinforcementsFilePath = Path.Combine(saveFolderPath, "reinforcements.json");
                 string json = SaveLoadUtils.Serialize(reinforcementData);
                 File.WriteAllText(reinforcementsFilePath, json);
 
                 MelonLogger.Msg($"[SaveFile_Patch] Successfully saved {reinforcementData.Count} reinforcements to {reinforcementsFilePath}");
+
+                // Save affinity states
+                List<Dictionary<string, object>> affinityData = new List<Dictionary<string, object>>();
+                foreach (var company in Company.Companies.Values)
+                {
+                    if (company.Affinities != null)
+                    {
+                        foreach (var affinity in company.Affinities)
+                        {
+                            if (affinity.IsActive)
+                            {
+                                var customState = affinity.SaveState();
+                                if (customState != null && customState.Count > 0)
+                                {
+                                    var data = new Dictionary<string, object>
+                                    {
+                                        { "type", affinity.GetType().FullName },
+                                        { "customState", customState }
+                                    };
+                                    affinityData.Add(data);
+                                    MelonLogger.Msg($"[SaveFile_Patch] Saving custom state for affinity {affinity.GetType().Name}: {customState.Count} entries");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (affinityData.Count > 0)
+                {
+                    string affinityFilePath = Path.Combine(saveFolderPath, "affinities.json");
+                    string affinityJson = SaveLoadUtils.Serialize(affinityData);
+                    File.WriteAllText(affinityFilePath, affinityJson);
+                    MelonLogger.Msg($"[SaveFile_Patch] Successfully saved {affinityData.Count} affinity states to {affinityFilePath}");
+                }
             }
             catch (System.Exception ex)
             {
@@ -349,36 +390,83 @@ namespace XenopurgeRougeLike
 
                 string json = File.ReadAllText(reinforcementsFilePath);
                 MelonLogger.Msg($"[LoadFile_Patch] Loaded from {reinforcementsFilePath}");
-                List<string> reinforcementData = SaveLoadUtils.Deserialize<List<string>>(json);
 
-                foreach (string serialized in reinforcementData)
+                var reinforcementDataList = SaveLoadUtils.Deserialize<List<Dictionary<string, object>>>(json);
+                foreach (var data in reinforcementDataList)
                 {
-                    Type type = Type.GetType(serialized);
+                    string typeName = data["type"] as string;
+                    int stacks = data.ContainsKey("stacks") ? Convert.ToInt32(data["stacks"]) : 1;
+
+                    Type type = Type.GetType(typeName);
                     if (type == null)
                     {
-                        MelonLogger.Warning($"[LoadFile_Patch] Could not find type: {serialized}");
+                        MelonLogger.Warning($"[LoadFile_Patch] Could not find type: {typeName}");
                         continue;
                     }
 
-                    // Get the singleton instance of the reinforcement
                     var instanceProperty = type.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
                     if (instanceProperty != null)
                     {
                         Reinforcement reinforcement = (Reinforcement)instanceProperty.GetValue(null);
                         if (reinforcement != null)
                         {
+                            reinforcement.currentStacks = stacks;
                             XenopurgeRougeLike.acquiredReinforcements.Add(reinforcement);
-                            reinforcement.IsActive = true; // Activate the reinforcement
-                            MelonLogger.Msg($"[LoadFile_Patch] Loaded and activated reinforcement: {reinforcement.GetType().Name}");
+                            reinforcement.IsActive = true;
+
+                            // Load custom state if present
+                            if (data.ContainsKey("customState") && data["customState"] is Dictionary<string, object> customState)
+                            {
+                                reinforcement.LoadState(customState);
+                                MelonLogger.Msg($"[LoadFile_Patch] Loaded custom state for {reinforcement.GetType().Name}: {customState.Count} entries");
+                            }
+
+                            MelonLogger.Msg($"[LoadFile_Patch] Loaded and activated reinforcement: {reinforcement.GetType().Name} with {stacks} stacks");
                         }
                     }
                     else
                     {
-                        MelonLogger.Warning($"[LoadFile_Patch] Type {serialized} does not have an Instance property");
+                        MelonLogger.Warning($"[LoadFile_Patch] Type {typeName} does not have an Instance property");
                     }
                 }
 
                 MelonLogger.Msg($"[LoadFile_Patch] Successfully loaded {XenopurgeRougeLike.acquiredReinforcements.Count} reinforcements");
+
+                // Load affinity states
+                string affinityFilePath = Path.Combine(saveFolderPath, "affinities.json");
+                if (File.Exists(affinityFilePath))
+                {
+                    string affinityJson = File.ReadAllText(affinityFilePath);
+                    var affinityDataList = SaveLoadUtils.Deserialize<List<Dictionary<string, object>>>(affinityJson);
+
+                    foreach (var data in affinityDataList)
+                    {
+                        string typeName = data["type"] as string;
+                        Type type = Type.GetType(typeName);
+                        if (type == null)
+                        {
+                            MelonLogger.Warning($"[LoadFile_Patch] Could not find affinity type: {typeName}");
+                            continue;
+                        }
+
+                        var instanceProperty = type.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        if (instanceProperty != null)
+                        {
+                            CompanyAffinity affinity = (CompanyAffinity)instanceProperty.GetValue(null);
+                            if (affinity != null && affinity.IsActive && data.ContainsKey("customState"))
+                            {
+                                var customState = data["customState"] as Dictionary<string, object>;
+                                if (customState != null)
+                                {
+                                    affinity.LoadState(customState);
+                                    MelonLogger.Msg($"[LoadFile_Patch] Loaded custom state for affinity {affinity.GetType().Name}: {customState.Count} entries");
+                                }
+                            }
+                        }
+                    }
+
+                    MelonLogger.Msg($"[LoadFile_Patch] Successfully loaded {affinityDataList.Count} affinity states");
+                }
             }
             catch (System.Exception ex)
             {

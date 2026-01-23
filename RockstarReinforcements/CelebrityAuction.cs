@@ -47,6 +47,32 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             EquipmentBattleCounts.Clear();
         }
 
+        public override Dictionary<string, object> SaveState()
+        {
+            if (EquipmentBattleCounts.Count == 0)
+            {
+                return null;
+            }
+
+            // Convert Dictionary<string, int> to Dictionary<string, object> for serialization
+            var state = new Dictionary<string, object>();
+            foreach (var kvp in EquipmentBattleCounts)
+            {
+                state[kvp.Key] = kvp.Value;
+            }
+            return state;
+        }
+
+        public override void LoadState(Dictionary<string, object> state)
+        {
+            EquipmentBattleCounts.Clear();
+            foreach (var kvp in state)
+            {
+                EquipmentBattleCounts[kvp.Key] = Convert.ToInt32(kvp.Value);
+            }
+            MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Loaded {EquipmentBattleCounts.Count} equipment battle counts");
+        }
+
         // Get the list of initial equipment that cannot be sold
         public static HashSet<string> GetInitialEquipmentIds()
         {

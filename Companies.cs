@@ -129,6 +129,18 @@ namespace XenopurgeRougeLike
 
         public virtual void OnActivate() { }
         public virtual void OnDeactivate() { }
+
+        /// <summary>
+        /// Override this method to save custom state to a dictionary.
+        /// Return null if there is no state to save.
+        /// </summary>
+        public virtual Dictionary<string, object> SaveState() { return null; }
+
+        /// <summary>
+        /// Override this method to load custom state from a dictionary.
+        /// This is called after the object is activated.
+        /// </summary>
+        public virtual void LoadState(Dictionary<string, object> state) { }
     }
 
     public class CompanyAffinity : Activatable
