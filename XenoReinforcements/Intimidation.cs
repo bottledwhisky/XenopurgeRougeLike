@@ -21,9 +21,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
             flavourText = "Your mere presence fills them with dread, slowing their movements as fear grips their primitive minds.";
         }
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get { return string.Format(description, SpeedReduction); }
+            return string.Format(description, SpeedReduction);
         }
 
         public static Intimidation Instance => (Intimidation)Xeno.Reinforcements[typeof(Intimidation)];

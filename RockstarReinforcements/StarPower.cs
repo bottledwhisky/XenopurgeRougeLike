@@ -23,18 +23,15 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             description = "Gain +50% fans on perfect victory. Every 1,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage. Star Power II: Uncollected digital collectibles no longer count against perfect victory.Gain 1 point after battle for every 1,000 fans.";
         }
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get
+            if (stacks == 1)
             {
-                if (currentStacks == 1)
-                {
-                    return "Gain +50% fans on perfect victory. Every 1,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage.";
-                }
-                else
-                {
-                    return "Gain +50% fans on perfect victory. Every 1,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage. Uncollected digital collectibles no longer count against perfect victory. Gain 1 point after battle for every 1,000 fans.";
-                }
+                return "Gain +50% fans on perfect victory. Every 1,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage.";
+            }
+            else
+            {
+                return "Gain +50% fans on perfect victory. Every 1,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage. Uncollected digital collectibles no longer count against perfect victory. Gain 1 point after battle for every 1,000 fans.";
             }
         }
 

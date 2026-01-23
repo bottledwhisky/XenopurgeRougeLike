@@ -63,18 +63,15 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         }
 
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get
+            if (stacks == 1)
             {
-                if (currentStacks == 1)
-                {
-                    return "When eliminating enemies in battle, randomly gain consumable charges based on fan count.";
-                }
-                else
-                {
-                    return "When eliminating enemies in battle, randomly gain consumable charges based on fan count. Increases the chance of receiving donations.";
-                }
+                return "When eliminating enemies in battle, randomly gain consumable charges based on fan count.";
+            }
+            else
+            {
+                return "When eliminating enemies in battle, randomly gain consumable charges based on fan count. Increases the chance of receiving donations.";
             }
         }
 

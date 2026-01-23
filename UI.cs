@@ -33,10 +33,10 @@ namespace XenopurgeRougeLike
                 {
                     MelonLogger.Msg($"Adding reinforcement choice button for index {i}");
                     var choice = XenopurgeRougeLike.choices[i];
-                    var nextLevelChoice = choice.NextLevel();
+                    var preview = choice.GetNextLevelPreview();
                     ButtonData buttonData = new()
                     {
-                        MainText = nextLevelChoice.ToMenuItem(),
+                        MainText = preview.MenuItem,
                         onSelectCallback = () =>
                         {
                             try
@@ -63,7 +63,7 @@ namespace XenopurgeRougeLike
 
                                 EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = i;
                                 // Update description text when selected
-                                EndGameWindowView_SetResultText_Patch._descriptionText.text = nextLevelChoice.ToString() + "\n" + nextUnlockProgress + nextUnlockAffinyText;
+                                EndGameWindowView_SetResultText_Patch._descriptionText.text = preview.FullString + "\n" + nextUnlockProgress + nextUnlockAffinyText;
 
                                 // Update border highlights
                                 for (int j = 0; j < EndGameWindowView_SetResultText_Patch._choiceOutlines.Length; j++)
@@ -369,18 +369,18 @@ namespace XenopurgeRougeLike
             for (int i = 0; i < 3 && i < choices.Count; i++)
             {
                 MelonLogger.Msg($"Populating choice {i}");
-                var choice = choices[i].NextLevel();
+                var preview = choices[i].GetNextLevelPreview();
 
-                MelonLogger.Msg($" - Choice: {choice.Name}");
+                MelonLogger.Msg($" - Choice: {preview.Name}");
                 // Set title
-                _choiceTitles[i].text = choice.Name;
+                _choiceTitles[i].text = preview.Name;
 
                 MelonLogger.Msg($" - Title set to: {_choiceTitles[i].text}");
                 // Set icon if available, otherwise use colored placeholder
-                if (choice.company.Sprite != null)
+                if (preview.Company.Sprite != null)
                 {
                     MelonLogger.Msg($" - Setting sprite for choice {i}");
-                    _choiceImages[i].sprite = choice.company.Sprite;
+                    _choiceImages[i].sprite = preview.Company.Sprite;
                     _choiceImages[i].color = Color.white;
                     _choiceImages[i].type = Image.Type.Simple;
                     _choiceImages[i].preserveAspect = true;
@@ -389,7 +389,7 @@ namespace XenopurgeRougeLike
                 {
                     MelonLogger.Msg($" - No sprite found for choice {i}, using placeholder color");
                     _choiceImages[i].sprite = null;
-                    _choiceImages[i].color = choice.company.BorderColor;
+                    _choiceImages[i].color = preview.Company.BorderColor;
                 }
 
                 MelonLogger.Msg($" - Image color set to: {_choiceImages[i].color}");
@@ -398,11 +398,11 @@ namespace XenopurgeRougeLike
                 if (outline != null)
                 {
                     MelonLogger.Msg($" - Setting outline color for choice {i}");
-                    outline.effectColor = choice.company.BorderColor;
+                    outline.effectColor = preview.Company.BorderColor;
                 }
             }
 
-            _descriptionText.text = choices[selectedChoiceIndex].ToString();
+            _descriptionText.text = choices[selectedChoiceIndex].GetNextLevelPreview().FullString;
             MelonLogger.Msg(" - description text set: " + _descriptionText.text);
             _choiceOutlines[selectedChoiceIndex].effectColor = Color.yellow;
         }

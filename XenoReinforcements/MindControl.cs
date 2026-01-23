@@ -30,9 +30,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
             flavourText = "By tapping into the hive mind, you can sever an alien's connection and bend it to your will.";
         }
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get { return string.Format(description, UsesPerStack[currentStacks - 1]); }
+            return string.Format(description, UsesPerStack[stacks - 1]);
         }
 
         public static MindControl Instance => (MindControl)Xeno.Reinforcements[typeof(MindControl)];

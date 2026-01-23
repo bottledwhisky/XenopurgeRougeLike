@@ -12,6 +12,17 @@ namespace XenopurgeRougeLike
         Expert
     }
 
+    public struct ReinforcementPreview
+    {
+        public string Name;
+        public string MenuItem;
+        public string Description;
+        public string FullString;
+        public Company Company;
+        public Rarity Rarity;
+        public int Stacks;
+    }
+
     public class Reinforcement: Activatable
     {
         public static Dictionary<Rarity, Color> RarityColors = new()
@@ -66,19 +77,28 @@ namespace XenopurgeRougeLike
             protected set { description = value; }
         }
 
+        public virtual string GetDescriptionForStacks(int stacks)
+        {
+            return description;
+        }
+
         public override string ToString()
         {
-            string colorHex = ColorUtility.ToHtmlStringRGB(company.BorderColor);
-            string rarityColorHex = ColorUtility.ToHtmlStringRGB(RarityColors[rarity]);
-            return $"<color=#{rarityColorHex}>{RarityNames[rarity]}</color> <color=#{colorHex}>{Name}</color>: {Description}";
+            return ToFullString(Name, Description);
         }
 
         public string ToMenuItem()
         {
+            return ToMenuItem(Name);
+        }
+
+        protected string ToMenuItem(string displayName)
+        {
             string colorHex = ColorUtility.ToHtmlStringRGB(company.BorderColor);
             string rarityColorHex = ColorUtility.ToHtmlStringRGB(RarityColors[rarity]);
-            return $"<color=#{rarityColorHex}>{RarityNamesShort[rarity]}</color> <color=#{colorHex}>{Name}</color>";
+            return $"<color=#{rarityColorHex}>{RarityNamesShort[rarity]}</color> <color=#{colorHex}>{displayName}</color>";
         }
+
         public string ToFullDescription()
         {
             string colorHex = ColorUtility.ToHtmlStringRGB(company.BorderColor);
@@ -90,23 +110,29 @@ Effects: {Description}
 <i>{flavourText}</i>";
         }
 
-        public Reinforcement NextLevel()
+        protected string ToFullString(string displayName, string displayDescription)
         {
-            if (stackable && currentStacks < maxStacks)
+            string colorHex = ColorUtility.ToHtmlStringRGB(company.BorderColor);
+            string rarityColorHex = ColorUtility.ToHtmlStringRGB(RarityColors[rarity]);
+            return $"<color=#{rarityColorHex}>{RarityNames[rarity]}</color> <color=#{colorHex}>{displayName}</color>: {displayDescription}";
+        }
+
+        public ReinforcementPreview GetNextLevelPreview()
+        {
+            int nextStacks = stackable ? Math.Min(currentStacks + 1, maxStacks) : currentStacks;
+            string nextName = stackable ? $"{name} ({nextStacks}/{maxStacks})" : name;
+            string nextDescription = GetDescriptionForStacks(nextStacks);
+
+            return new ReinforcementPreview
             {
-                return new()
-                {
-                    company = company,
-                    rarity = rarity,
-                    stackable = stackable,
-                    maxStacks = maxStacks,
-                    currentStacks = currentStacks + 1,
-                    name = name,
-                    description = description,
-                    flavourText = flavourText,
-                };
-            }
-            return this;
+                Name = nextName,
+                MenuItem = ToMenuItem(nextName),
+                Description = nextDescription,
+                FullString = ToFullString(nextName, nextDescription),
+                Company = company,
+                Rarity = rarity,
+                Stacks = nextStacks,
+            };
         }
     }
 }

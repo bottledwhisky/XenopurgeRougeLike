@@ -25,9 +25,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
             flavourText = "The death of their kin sends ripples of terror through the hive mind, causing them to hesitate.";
         }
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get { return string.Format(description, DelayPerKill); }
+            return string.Format(description, DelayPerKill);
         }
 
         public static FearInstinct Instance => (FearInstinct)Xeno.Reinforcements[typeof(FearInstinct)];

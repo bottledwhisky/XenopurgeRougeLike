@@ -25,9 +25,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
             flavourText = "The hive mind's suffering becomes your squad's sustenance.";
         }
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get { return string.Format(description, HealAmount); }
+            return string.Format(description, HealAmount);
         }
 
         public static DevourWill Instance => (DevourWill)Xeno.Reinforcements[typeof(DevourWill)];

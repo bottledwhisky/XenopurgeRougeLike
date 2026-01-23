@@ -25,17 +25,14 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             flavourText = "Additional processing nodes enable continuous background calculation of system vulnerabilities in the local environment.";
         }
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get
-            {
-                if (currentStacks == 1)
-                    return "Access points regenerate over time (1 point every 10 seconds).";
-                else if (currentStacks == 2)
-                    return "Access points regenerate over time (1 point every 5 seconds).";
-                else
-                    return "Access points regenerate over time (2 points every 5 seconds).";
-            }
+            if (stacks == 1)
+                return "Access points regenerate over time (1 point every 10 seconds).";
+            else if (stacks == 2)
+                return "Access points regenerate over time (1 point every 5 seconds).";
+            else
+                return "Access points regenerate over time (2 points every 5 seconds).";
         }
 
         public static HighPerformanceCluster Instance => (HighPerformanceCluster)Synthetics.Reinforcements[typeof(HighPerformanceCluster)];

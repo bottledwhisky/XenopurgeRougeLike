@@ -27,9 +27,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
             flavourText = "The xeno pheromones mask your squad's scent, making them invisible to the hive's targeting instincts.";
         }
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get { return string.Format(description, GetDuration()); }
+            return string.Format(description, GetDuration());
         }
 
         public static float GetDuration()

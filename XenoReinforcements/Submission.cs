@@ -27,9 +27,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
             flavourText = "Your presence bends the hive mind to your will.";
         }
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get { return string.Format(description, (int)(ConversionChance * 100)); }
+            return string.Format(description, (int)(ConversionChance * 100));
         }
 
         public static Submission Instance => (Submission)Xeno.Reinforcements[typeof(Submission)];

@@ -23,9 +23,9 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
         }
 
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get { return string.Format(description, HealthRestored * currentStacks); }
+            return string.Format(description, HealthRestored * stacks);
         }
 
         public static BioSteel Instance => (BioSteel)Synthetics.Reinforcements[typeof(BioSteel)];

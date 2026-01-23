@@ -26,9 +26,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
             flavourText = "A psychic shriek that reverberates through the hive mind, temporarily paralyzing all xenos in range.";
         }
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get { return string.Format(description, StunDuration, UsesPerStack[currentStacks - 1]); }
+            return string.Format(description, StunDuration, UsesPerStack[stacks - 1]);
         }
 
         public static PsionicScream Instance => (PsionicScream)Xeno.Reinforcements[typeof(PsionicScream)];

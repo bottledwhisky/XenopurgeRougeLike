@@ -19,9 +19,9 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             flavourText = "Weyland-Yutani synthetics can consume patented nano robots to accelerate tissue regeneration during combat operations.";
         }
 
-        public override string Description
+        public override string GetDescriptionForStacks(int stacks)
         {
-            get { return string.Format(description, HealPerPoint[currentStacks - 1]); }
+            return string.Format(description, HealPerPoint[stacks - 1]);
         }
 
         public static BattlefieldRepair Instance => (BattlefieldRepair)Synthetics.Reinforcements[typeof(BattlefieldRepair)];
