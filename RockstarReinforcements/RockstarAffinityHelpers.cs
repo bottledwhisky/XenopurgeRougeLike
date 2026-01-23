@@ -260,14 +260,21 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                 attackCommand = ShootingCommands[UnityEngine.Random.Range(0, ShootingCommands.Count())];
             }
 
+            // Replace Shooting command
+            // CommandsDataSOList is shallow-copied, so we need to make a new array
             var cmdList = ud.CommandsDataSOList;
+            var newCmdList = new CommandDataSO[cmdList.Length];
             for (int i = 0; i < cmdList.Length; i++)
             {
                 var cmd = cmdList[i];
                 if (cmd.CommandCategory == CommandCategories.Shooting)
                 {
-                    cmdList[i] = attackCommand;
+                    newCmdList[i] = attackCommand;
                     break;
+                }
+                else
+                {
+                    newCmdList[i] = cmd;
                 }
             }
         }
