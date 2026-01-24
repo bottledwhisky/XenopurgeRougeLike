@@ -23,7 +23,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         }
 
         private static FandomRallies _instance;
-        public static FandomRallies Instance => _instance ??= new FandomRallies();
+        public static FandomRallies Instance => _instance ??= new();
 
         override public void OnActivate()
         {

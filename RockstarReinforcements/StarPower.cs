@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using HarmonyLib;
+using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.EndGame;
 using SpaceCommander.GameFlow;
@@ -37,7 +38,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         // Implementation of the Star Power reinforcement effect would go:
         // RockstarAffinity2FanCount_Patch
-        public static StarPower Instance => Rockstar.StarPower;
+        protected static StarPower _instance;
+        public static StarPower Instance =>  _instance ??= new();
 
         public bool IsPerfectVictory(EndGameResultData data)
         {
@@ -57,27 +59,66 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             return standardPerfect || spotlightPerfect;
         }
 
-        public static bool ShouldApply(BattleUnit unit, Team team)
+        /// <summary>
+        /// Apply stat buffs to the first deployed unit based on fan count.
+        /// Called from TestGame.StartGame postfix when DeploymentOrder is properly set.
+        /// </summary>
+        public static void ApplyStatBuffs()
         {
-            return Instance.IsActive && team == Team.Player && unit.DeploymentOrder == 1;
-        }
+            if (!Instance.IsActive)
+                return;
 
-        public override void OnActivate()
-        {
-            UnitStatsTools.InBattleUnitStatChanges["StarPower_HP"] = new UnitStatChange(UnitStats.Health, HPBonus, ShouldApply);
-            UnitStatsTools.InBattleUnitStatChanges["StarPower_Speed"] = new UnitStatChange(UnitStats.Speed, SpeedBonus, ShouldApply);
-            UnitStatsTools.InBattleUnitStatChanges["StarPower_Accuracy"] = new UnitStatChange(UnitStats.Accuracy, AccuracyBonus, ShouldApply);
-            UnitStatsTools.InBattleUnitStatChanges["StarPower_Power"] = new UnitStatChange(UnitStats.Power, PowerBonus, ShouldApply);
-        }
+            int bonusCount = RockstarAffinityHelpers.fanCount / 1000;
+            if (bonusCount <= 0)
+                return;
 
-        public override void OnDeactivate()
-        {
-            UnitStatsTools.InBattleUnitStatChanges.Remove("StarPower_HP");
-            UnitStatsTools.InBattleUnitStatChanges.Remove("StarPower_Speed");
-            UnitStatsTools.InBattleUnitStatChanges.Remove("StarPower_Accuracy");
-            UnitStatsTools.InBattleUnitStatChanges.Remove("StarPower_Power");
+            var gameManager = GameManager.Instance;
+            var tm = gameManager.GetTeamManager(Team.Player);
+
+            // Find the first deployed unit (DeploymentOrder == 1)
+            var firstUnit = tm.BattleUnits.FirstOrDefault(u => u.DeploymentOrder == 1);
+            if (firstUnit == null)
+                return;
+
+            MelonLogger.Msg($"StarPower: Applying {bonusCount} stat bonuses to {firstUnit.UnitName} (DeploymentOrder: {firstUnit.DeploymentOrder})");
+
+            // Apply random stat bonuses based on fan count
+            var random = new System.Random();
+            for (int i = 0; i < bonusCount; i++)
+            {
+                int statChoice = random.Next(4);
+                switch (statChoice)
+                {
+                    case 0:
+                        firstUnit.ChangeStat(UnitStats.Health, HPBonus, $"StarPower_HP_{i}");
+                        MelonLogger.Msg($"StarPower: +{HPBonus} HP");
+                        break;
+                    case 1:
+                        firstUnit.ChangeStat(UnitStats.Accuracy, AccuracyBonus, $"StarPower_Accuracy_{i}");
+                        MelonLogger.Msg($"StarPower: +{AccuracyBonus * 100}% Accuracy");
+                        break;
+                    case 2:
+                        firstUnit.ChangeStat(UnitStats.Speed, SpeedBonus, $"StarPower_Speed_{i}");
+                        MelonLogger.Msg($"StarPower: +{SpeedBonus} Speed");
+                        break;
+                    case 3:
+                        firstUnit.ChangeStat(UnitStats.Power, PowerBonus, $"StarPower_Power_{i}");
+                        MelonLogger.Msg($"StarPower: +{PowerBonus} Power");
+                        break;
+                }
+            }
         }
     }
+
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
+    public static class StarPower_StartGame_Patch
+    {
+        public static void Postfix()
+        {
+            StarPower.ApplyStatBuffs();
+        }
+    }
+
     [HarmonyPatch(typeof(TestGame), "EndGame")]
     public static class StarPower_EndGame_Patch
     {

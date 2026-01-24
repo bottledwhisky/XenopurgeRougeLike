@@ -37,7 +37,8 @@ namespace XenopurgeRougeLike.XenoReinforcements
             return BaseDuration + BonusDurationPerLevel * Xeno.GetControlDurationBonusLevel();
         }
 
-        public static ScentCamouflage Instance => (ScentCamouflage)Xeno.Reinforcements[typeof(ScentCamouflage)];
+        protected static ScentCamouflage instance;
+public static ScentCamouflage Instance => instance ??= new();
     }
 
     /// <summary>

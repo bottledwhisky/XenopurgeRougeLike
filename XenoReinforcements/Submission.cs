@@ -32,7 +32,8 @@ namespace XenopurgeRougeLike.XenoReinforcements
             return string.Format(description, (int)(ConversionChance * 100));
         }
 
-        public static Submission Instance => (Submission)Xeno.Reinforcements[typeof(Submission)];
+        protected static Submission instance;
+public static Submission Instance => instance ??= new();
     }
 
     /// <summary>

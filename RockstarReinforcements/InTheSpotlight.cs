@@ -30,7 +30,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         }
 
         private static InTheSpotlight _instance;
-        public static InTheSpotlight Instance => _instance ??= new InTheSpotlight();
+        public static InTheSpotlight Instance => _instance ??= new();
 
         public static BattleUnit GetTopStar()
         {

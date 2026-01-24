@@ -23,7 +23,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             flavourText = "Combat data is analyzed in real-time, allowing the synthetic to achieve peak weapon synchronization from the moment of deployment.";
         }
 
-        public static ReinforcementLearning Instance => (ReinforcementLearning)Synthetics.Reinforcements[typeof(ReinforcementLearning)];
+        protected static ReinforcementLearning instance;
+        public static ReinforcementLearning Instance => instance ??= new();
 
         /// <summary>
         /// Equip all three smart weapons

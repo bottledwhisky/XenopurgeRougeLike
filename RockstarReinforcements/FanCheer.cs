@@ -39,7 +39,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         }
 
         private static FanCheer _instance;
-        public static FanCheer Instance => _instance ??= new FanCheer();
+        public static FanCheer Instance => _instance ??= new();
 
         public override void OnActivate()
         {

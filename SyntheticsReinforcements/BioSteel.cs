@@ -28,7 +28,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             return string.Format(description, HealthRestored * stacks);
         }
 
-        public static BioSteel Instance => (BioSteel)Synthetics.Reinforcements[typeof(BioSteel)];
+        protected static BioSteel instance;
+        public static BioSteel Instance => instance ??= new();
     }
 
     [HarmonyPatch(typeof(TestGame), "EndGame")]

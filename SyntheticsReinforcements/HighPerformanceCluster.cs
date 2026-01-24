@@ -35,7 +35,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
                 return "Access points regenerate over time (2 points every 5 seconds).";
         }
 
-        public static HighPerformanceCluster Instance => (HighPerformanceCluster)Synthetics.Reinforcements[typeof(HighPerformanceCluster)];
+        protected static HighPerformanceCluster instance;
+        public static HighPerformanceCluster Instance => instance ??= new();
 
         public void UpdateTime(float timePassed)
         {

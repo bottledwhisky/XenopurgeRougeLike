@@ -23,7 +23,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             description = "After battle, gain a piece of equipment you don't have. If everyone already has a melee weapon, ranged weapon, and equipment, randomly sell a lower base-price item and gain one with a higher price.";
         }
 
-        public static WhalePatron Instance => Rockstar.WhalePatron;
+        protected static WhalePatron _instance;
+        public static WhalePatron Instance =>  _instance ??= new();
 
         internal static void GiveEquipmentReward()
         {

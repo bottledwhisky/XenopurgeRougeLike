@@ -35,7 +35,8 @@ namespace XenopurgeRougeLike.XenoReinforcements
             return string.Format(description, UsesPerStack[stacks - 1]);
         }
 
-        public static MindControl Instance => (MindControl)Xeno.Reinforcements[typeof(MindControl)];
+        protected static MindControl instance;
+public static MindControl Instance => instance ??= new();
     }
 
     /// <summary>

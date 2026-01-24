@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
-    public class RockstarAffinity4 : CompanyAffinity
+    public class RockstarAffinity4 : RockstarAffinityBase
     {
         public const float ReinforcementChanceBonus = 2f;
 

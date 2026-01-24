@@ -1,6 +1,6 @@
-namespace XenopurgeRougeLike.RockstarReinforcements
+﻿namespace XenopurgeRougeLike.RockstarReinforcements
 {
-    public class RockstarAffinity6 : CompanyAffinity
+    public class RockstarAffinity6 : RockstarAffinityBase
     {
         public RockstarAffinity6()
         {

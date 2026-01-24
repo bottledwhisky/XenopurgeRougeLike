@@ -19,7 +19,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             flavourText = "Optimized bypass routines reduce the processing cycles required to breach security protocols.";
         }
 
-        public static FastHacking Instance => (FastHacking)Synthetics.Reinforcements[typeof(FastHacking)];
+        protected static FastHacking instance;
+        public static FastHacking Instance => instance ??= new();
     }
 
     /// <summary>

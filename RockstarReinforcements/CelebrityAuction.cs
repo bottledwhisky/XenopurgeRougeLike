@@ -29,7 +29,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             description = "You can sell equipment. Sale price increases by 1 for each battle the equipment has been through.";
         }
 
-        public static CelebrityAuction Instance => Rockstar.CelebrityAuction;
+        protected static CelebrityAuction _instance;
+        public static CelebrityAuction Instance => _instance ??= new();
 
         public override void OnActivate()
         {

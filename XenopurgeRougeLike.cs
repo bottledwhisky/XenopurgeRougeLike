@@ -3,18 +3,11 @@ using MelonLoader;
 using MelonLoader.Utils;
 using SaveSystem;
 using SpaceCommander;
-using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
-using SpaceCommander.BattleManagement;
-using SpaceCommander.BattleManagement.UI;
-using SpaceCommander.Database;
-using SpaceCommander.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using TimeSystem;
 using UnityEngine;
 using XenopurgeRougeLike.RockstarReinforcements;
 using static SpaceCommander.Enumerations;
@@ -42,8 +35,6 @@ namespace XenopurgeRougeLike
             Company.Synthetics.Affinities = Synthetics.Affinities;
             Company.Rockstar.Affinities = Rockstar.Affinities;
             Company.Xeno.Affinities = Xeno.Affinities;
-
-            RockstarReinforcements.RockstarAffinity4.Instance.IsActive = true;
         }
 
         public override void OnUpdate()
@@ -110,13 +101,17 @@ namespace XenopurgeRougeLike
                     .GetProperty("Reinforcements")
                     .GetValue(null) as Dictionary<Type, Reinforcement>;
                 MelonLogger.Msg($"Found {reinforcements.Count} reinforcements for company {company.Name}.");
+                MelonLogger.Msg($"Acquired reinforcements: {acquiredReinforcements.Select(r => r.Name).Join(delimiter: " ")}");
                 foreach (var reinforcement in reinforcements.Values)
                 {
+                    MelonLogger.Msg($"  - Reinforcement: {reinforcement.Name}");
                     // Skip already got reinforcements
                     if (acquiredReinforcements.Contains(reinforcement) && (!reinforcement.stackable || reinforcement.currentStacks == reinforcement.maxStacks))
                     {
+                        MelonLogger.Msg($"    - Skipped: already acquired {reinforcement.Name} stackable={reinforcement.stackable} {reinforcement.currentStacks}/{reinforcement.maxStacks}");
                         continue;
                     }
+                    MelonLogger.Msg($"    - Added: {reinforcement.Name} stackable={reinforcement.stackable} {reinforcement.currentStacks}/{reinforcement.maxStacks}");
                     int weight = Reinforcement.RarityWeights[reinforcement.rarity];
                     weightedChoices.Add(new Tuple<int, Reinforcement>(weight, reinforcement));
                 }
@@ -165,33 +160,37 @@ namespace XenopurgeRougeLike
             {
                 reinforcement.IsActive = true;
                 acquiredReinforcements.Add(reinforcement);
-                var company = reinforcement.company.Type;
-                var nExsitingCompanyReinforces = acquiredReinforcements.Where(r => r.company.Type == company).Count();
-                CompanyAffinity affinityToDisable = null;
-                CompanyAffinity affinityToEnable = null;
-                foreach (var affiny in reinforcement.company.Affinities)
-                {
-                    int requiredNReinforces = affiny.unlockLevel;
-                    if (requiredNReinforces > nExsitingCompanyReinforces)
-                    {
-                        break;
-                    }
-                    affinityToDisable = affinityToEnable;
-                    affinityToEnable = affiny;
-                }
-                if (affinityToEnable != null)
-                {
-                    if (affinityToDisable != null)
-                    {
-                        affinityToDisable.IsActive = false;
-                    }
-                    affinityToEnable.IsActive = true;
-                }
+                CalculateAffinity(reinforcement.company);
             }
 
             if (SaveFile_Patch.lastSaveName != null)
             {
                 SaveFile_Patch.Postfix(SaveFile_Patch.lastSaveName);
+            }
+        }
+
+        public static void CalculateAffinity(Company company)
+        {
+            var nExsitingCompanyReinforces = acquiredReinforcements.Where(r => r.company.Type == company.Type).Count();
+            CompanyAffinity affinityToDisable = null;
+            CompanyAffinity affinityToEnable = null;
+            foreach (var affiny in company.Affinities)
+            {
+                int requiredNReinforces = affiny.unlockLevel;
+                if (requiredNReinforces > nExsitingCompanyReinforces)
+                {
+                    break;
+                }
+                affinityToDisable = affinityToEnable;
+                affinityToEnable = affiny;
+            }
+            if (affinityToEnable != null)
+            {
+                if (affinityToDisable != null)
+                {
+                    affinityToDisable.IsActive = false;
+                }
+                affinityToEnable.IsActive = true;
             }
         }
 
@@ -391,6 +390,8 @@ namespace XenopurgeRougeLike
                 string json = File.ReadAllText(reinforcementsFilePath);
                 MelonLogger.Msg($"[LoadFile_Patch] Loaded from {reinforcementsFilePath}");
 
+                HashSet<Company> companies = [];
+
                 var reinforcementDataList = SaveLoadUtils.Deserialize<List<Dictionary<string, object>>>(json);
                 foreach (var data in reinforcementDataList)
                 {
@@ -412,6 +413,7 @@ namespace XenopurgeRougeLike
                         {
                             reinforcement.currentStacks = stacks;
                             XenopurgeRougeLike.acquiredReinforcements.Add(reinforcement);
+                            companies.Add(reinforcement.company);
                             reinforcement.IsActive = true;
 
                             // Load custom state if present
@@ -431,6 +433,11 @@ namespace XenopurgeRougeLike
                 }
 
                 MelonLogger.Msg($"[LoadFile_Patch] Successfully loaded {XenopurgeRougeLike.acquiredReinforcements.Count} reinforcements");
+
+                foreach (Company company in companies)
+                {
+                    XenopurgeRougeLike.CalculateAffinity(company);
+                }
 
                 // Load affinity states
                 string affinityFilePath = Path.Combine(saveFolderPath, "affinities.json");

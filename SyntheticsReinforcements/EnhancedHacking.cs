@@ -43,7 +43,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             }
         }
 
-        public static EnhancedHacking Instance => (EnhancedHacking)Synthetics.Reinforcements[typeof(EnhancedHacking)];
+        protected static EnhancedHacking instance;
+        public static EnhancedHacking Instance => instance ??= new();
     }
 
     /// <summary>
@@ -135,7 +136,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
         public static HashSet<Tile> RevealedRoomTiles = [];
     }
 
-        // Patch to clear buffs when mission ends
+    // Patch to clear buffs when mission ends
     [HarmonyPatch(typeof(TestGame), "EndGame")]
     public class EnhancedHacking_TestGame_EndGame_Patch
     {
@@ -285,7 +286,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             var timeListenerType = typeof(TimeSystem.ITimeUpdatedListener);
 
             var implementers = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => {
+                .SelectMany(a =>
+                {
                     try { return a.GetTypes(); }
                     catch { return Type.EmptyTypes; }
                 })

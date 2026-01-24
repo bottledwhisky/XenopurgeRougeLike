@@ -30,7 +30,8 @@ namespace XenopurgeRougeLike.XenoReinforcements
             return string.Format(description, DelayPerKill);
         }
 
-        public static FearInstinct Instance => (FearInstinct)Xeno.Reinforcements[typeof(FearInstinct)];
+        protected static FearInstinct instance;
+public static FearInstinct Instance => instance ??= new();
     }
 
     /// <summary>

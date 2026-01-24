@@ -270,13 +270,13 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                 if (cmd.CommandCategory == CommandCategories.Shooting)
                 {
                     newCmdList[i] = attackCommand;
-                    break;
                 }
                 else
                 {
                     newCmdList[i] = cmd;
                 }
             }
+            ud.CommandsDataSOList = newCmdList;
         }
 
         /// <summary>

@@ -23,7 +23,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             flavourText = "The synthetic body is Weyland-Yutani's answer to life itself. In pristine condition, it performs exactly as designed: flawless.";
         }
 
-        public static PerfectBeing Instance => (PerfectBeing)Synthetics.Reinforcements[typeof(PerfectBeing)];
+        protected static PerfectBeing instance;
+        public static PerfectBeing Instance => instance ??= new();
     }
 
 

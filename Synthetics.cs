@@ -22,15 +22,15 @@ namespace XenopurgeRougeLike
         public static Dictionary<Type, Reinforcement> _reinforcements;
         public static Dictionary<Type, Reinforcement> Reinforcements => _reinforcements ??= new()
         {
-            { typeof(BioSteel), new BioSteel() },
-            { typeof(HighPerformanceCluster), new HighPerformanceCluster() },
-            { typeof(BattlefieldRepair), new BattlefieldRepair() },
-            { typeof(SmartWeaponModule), new SmartWeaponModule() },
-            { typeof(SmartWeaponBus), new SmartWeaponBus() },
-            { typeof(ReinforcementLearning), new ReinforcementLearning() },
-            { typeof(EnhancedHacking), new EnhancedHacking() },
-            { typeof(FastHacking), new FastHacking() },
-            { typeof(PerfectBeing), new PerfectBeing() },
+            { typeof(BioSteel), BioSteel.Instance },
+            { typeof(HighPerformanceCluster), HighPerformanceCluster.Instance },
+            { typeof(BattlefieldRepair), BattlefieldRepair.Instance },
+            { typeof(SmartWeaponModule), SmartWeaponModule.Instance },
+            { typeof(SmartWeaponBus), SmartWeaponBus.Instance },
+            { typeof(ReinforcementLearning), ReinforcementLearning.Instance },
+            { typeof(EnhancedHacking), EnhancedHacking.Instance },
+            { typeof(FastHacking), FastHacking.Instance },
+            { typeof(PerfectBeing), PerfectBeing.Instance },
         };
 
         public static bool IsAvailable()

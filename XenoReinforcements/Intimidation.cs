@@ -26,7 +26,8 @@ namespace XenopurgeRougeLike.XenoReinforcements
             return string.Format(description, SpeedReduction);
         }
 
-        public static Intimidation Instance => (Intimidation)Xeno.Reinforcements[typeof(Intimidation)];
+        protected static Intimidation instance;
+public static Intimidation Instance => instance ??= new();
 
         public override void OnActivate()
         {

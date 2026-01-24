@@ -31,7 +31,8 @@ namespace XenopurgeRougeLike.XenoReinforcements
             return string.Format(description, StunDuration, UsesPerStack[stacks - 1]);
         }
 
-        public static PsionicScream Instance => (PsionicScream)Xeno.Reinforcements[typeof(PsionicScream)];
+        protected static PsionicScream instance;
+public static PsionicScream Instance => instance ??= new();
     }
 
     /// <summary>

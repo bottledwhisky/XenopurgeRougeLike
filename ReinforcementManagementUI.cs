@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using XenopurgeRougeLike.RockstarReinforcements;
 
 namespace XenopurgeRougeLike
 {
@@ -119,6 +120,18 @@ namespace XenopurgeRougeLike
                 Tooltip = "Inspect the acquired reinforcements and company affinities.",
                 onClickCallback = new Action(InspectClicked)
             });
+
+            if (RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                // Add fan count display
+                buttonData.Add(new()
+                {
+                    MainText = "Fan Count",
+                    Tooltip = $"Current fan count: {RockstarAffinityHelpers.fanCount}",
+                    IsDisabled = true
+                });
+            }
+
             __result.ButtonData = buttonData;
             MelonLogger.Msg($"ReinforcementManagementUI.Postfix: end");
         }

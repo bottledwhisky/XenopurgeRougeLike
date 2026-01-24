@@ -23,7 +23,8 @@ namespace XenopurgeRougeLike.XenoReinforcements
             flavourText = "The hive mind bows before your absolute will.";
         }
 
-        public static Domination Instance => (Domination)Xeno.Reinforcements[typeof(Domination)];
+        protected static Domination instance;
+public static Domination Instance => instance ??= new();
     }
 
     /// <summary>

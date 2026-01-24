@@ -16,15 +16,15 @@ namespace XenopurgeRougeLike
         public static Dictionary<Type, Reinforcement> _reinforcements;
         public static Dictionary<Type, Reinforcement> Reinforcements => _reinforcements ??= new()
         {
-            { typeof(StarPower), new StarPower() },
-            { typeof(StreamDonations), new StreamDonations() },
-            { typeof(CelebrityAuction), new CelebrityAuction() },
-            { typeof(FandomRallies), new FandomRallies() },
-            { typeof(InTheSpotlight), new InTheSpotlight() },
-            { typeof(FanCheer), new FanCheer() },
-            { typeof(Superfan), new Superfan() },
-            { typeof(BuildingTheBrand), new BuildingTheBrand() },
-            { typeof(WhalePatron), new WhalePatron() }
+            { typeof(StarPower), StarPower.Instance },
+            { typeof(StreamDonations), StreamDonations.Instance },
+            { typeof(CelebrityAuction), CelebrityAuction.Instance },
+            { typeof(FandomRallies), FandomRallies.Instance },
+            { typeof(InTheSpotlight), InTheSpotlight.Instance },
+            { typeof(FanCheer), FanCheer.Instance },
+            { typeof(Superfan), Superfan.Instance },
+            { typeof(BuildingTheBrand), BuildingTheBrand.Instance },
+            { typeof(WhalePatron), WhalePatron.Instance }
         };
 
         public static StarPower StarPower => (StarPower)Reinforcements[typeof(StarPower)];

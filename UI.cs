@@ -106,13 +106,24 @@ namespace XenopurgeRougeLike
                 ButtonData rerollButtonData = new ButtonData
                 {
                     MainText = "Reroll",
-                    IsDisabled = true,
+                    IsDisabled = false,
+                    IgnoreClickCount = true,
                     onClickCallback = () =>
                     {
                         MelonLoader.MelonLogger.Msg("Player chose to reroll reinforcement choices.");
-                        // Logic to reroll choices
-                        GameManager_GiveEndGameRewards_Patch.Prefix(true);
-                        EndGameWindowView_SetResultText_Patch.PopulateChoices(XenopurgeRougeLike.choices);
+                        try
+                        {
+                            // Logic to reroll choices
+                            GameManager_GiveEndGameRewards_Patch.Prefix(true);
+                            EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = 0;
+                            EndGameWindowView_SetResultText_Patch.PopulateChoices(XenopurgeRougeLike.choices, buttonDataList);
+                        }
+                        catch (Exception ex)
+                        {
+                            MelonLogger.Error(ex);
+                            MelonLogger.Error(ex.StackTrace);
+                            throw ex;
+                        }
                     }
                 };
                 // Add a "Skip" button
@@ -363,7 +374,7 @@ namespace XenopurgeRougeLike
             titleLayout.preferredWidth = 110f;
         }
 
-        public static void PopulateChoices(List<Reinforcement> choices)
+        public static void PopulateChoices(List<Reinforcement> choices, List<ButtonData> buttonDataList = null)
         {
             MelonLogger.Msg($"Populating reinforcement choices UI with {choices.Count} choices.");
             for (int i = 0; i < 3 && i < choices.Count; i++)
@@ -400,11 +411,34 @@ namespace XenopurgeRougeLike
                     MelonLogger.Msg($" - Setting outline color for choice {i}");
                     outline.effectColor = preview.Company.BorderColor;
                 }
+
+                // Update the button text in the menu list
+                if (buttonDataList != null && i < buttonDataList.Count)
+                {
+                    MelonLogger.Msg($" - Updating ButtonData MainText for choice {i}");
+                    buttonDataList[i].MainText = preview.MenuItem;
+                    // Trigger UI refresh by invoking the OnInteractionStateChanged event
+                    buttonDataList[i].ChangeInteractionState(buttonDataList[i].IsDisabled);
+                }
             }
 
-            _descriptionText.text = choices[selectedChoiceIndex].GetNextLevelPreview().FullString;
-            MelonLogger.Msg(" - description text set: " + _descriptionText.text);
-            _choiceOutlines[selectedChoiceIndex].effectColor = Color.yellow;
+            // Reset selectedChoiceIndex if it's out of bounds
+            if (selectedChoiceIndex >= choices.Count)
+            {
+                MelonLogger.Warning($"selectedChoiceIndex {selectedChoiceIndex} is out of bounds for {choices.Count} choices. Resetting to 0.");
+                selectedChoiceIndex = 0;
+            }
+
+            if (choices.Count > 0)
+            {
+                _descriptionText.text = choices[selectedChoiceIndex].GetNextLevelPreview().FullString;
+                MelonLogger.Msg(" - description text set: " + _descriptionText.text);
+                _choiceOutlines[selectedChoiceIndex].effectColor = Color.yellow;
+            }
+            else
+            {
+                MelonLogger.Warning("No choices available to populate.");
+            }
         }
     }
 }

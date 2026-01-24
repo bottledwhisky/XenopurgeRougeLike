@@ -18,6 +18,6 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         }
 
         private static BuildingTheBrand _instance;
-        public static BuildingTheBrand Instance => _instance ??= new BuildingTheBrand();
+        public static BuildingTheBrand Instance => _instance ??= new();
     }
 }

@@ -18,7 +18,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             flavourText = "An expanded data bus permits higher throughput between synthetic cognition and linked weapon targeting systems.";
         }
 
-        public static SmartWeaponBus Instance => (SmartWeaponBus)Synthetics.Reinforcements[typeof(SmartWeaponBus)];
+        protected static SmartWeaponBus instance;
+        public static SmartWeaponBus Instance => instance ??= new();
 
         public override void OnActivate()
         {

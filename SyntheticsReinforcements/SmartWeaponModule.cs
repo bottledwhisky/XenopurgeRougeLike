@@ -21,7 +21,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             flavourText = "Factory-installed interface ports allow direct neural integration with Weyland-Yutani smart weapon systems.";
         }
 
-        public static SmartWeaponModule Instance => (SmartWeaponModule)Synthetics.Reinforcements[typeof(SmartWeaponModule)];
+        protected static SmartWeaponModule instance;
+        public static SmartWeaponModule Instance => instance ??= new();
         public override void OnActivate()
         {
             Instance.EquipWeapon();

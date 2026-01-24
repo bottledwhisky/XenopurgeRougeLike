@@ -21,15 +21,15 @@ namespace XenopurgeRougeLike
         public static Dictionary<Type, Reinforcement> _reinforcements;
         public static Dictionary<Type, Reinforcement> Reinforcements => _reinforcements ??= new()
         {
-            { typeof(SensoryAssimilation), new SensoryAssimilation() },
-            { typeof(PsionicScream), new PsionicScream() },
-            { typeof(ScentCamouflage), new ScentCamouflage() },
-            { typeof(MindControl), new MindControl() },
-            { typeof(DevourWill), new DevourWill() },
-            { typeof(FearInstinct), new FearInstinct() },
-            { typeof(Intimidation), new Intimidation() },
-            { typeof(Submission), new Submission() },
-            { typeof(Domination), new Domination() },
+            { typeof(SensoryAssimilation), SensoryAssimilation.Instance },
+            { typeof(PsionicScream), PsionicScream.Instance },
+            { typeof(ScentCamouflage), ScentCamouflage.Instance },
+            { typeof(MindControl), MindControl.Instance },
+            { typeof(DevourWill), DevourWill.Instance },
+            { typeof(FearInstinct), FearInstinct.Instance },
+            { typeof(Intimidation), Intimidation.Instance },
+            { typeof(Submission), Submission.Instance },
+            { typeof(Domination), Domination.Instance },
         };
 
         public static SensoryAssimilation SensoryAssimilation => (SensoryAssimilation)Reinforcements[typeof(SensoryAssimilation)];

@@ -17,26 +17,12 @@ using static SpaceCommander.Enumerations;
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
     // 战斗开始时自动部署一个“热情的粉丝”，他会自己找乐子。解锁粉丝数，每场战斗后，获得1k-2k粉丝。
-
-    public class RockstarAffinity2 : CompanyAffinity
+    public class RockstarAffinityBase: CompanyAffinity
     {
-        public RockstarAffinity2()
+        public RockstarAffinityBase()
         {
-            unlockLevel = 2;
             company = Company.Rockstar;
-            description = "A \"Passionate Fan\" is automatically deployed at the start of battle and will find their own fun. Unlock Fan Count; gain 1k-2k fans after each battle.";
         }
-
-        public static RockstarAffinity2 _instance;
-
-        public static RockstarAffinity2 Instance => _instance ??= new();
-
-        public override string ToFullDescription()
-        {
-            return base.ToFullDescription() + $"\nCurrent Fan Count: {RockstarAffinityHelpers.fanCount}";
-        }
-
-        public static bool IsAnyRockstarAffinityActive => Instance.IsActive || RockstarAffinity4.Instance.IsActive || RockstarAffinity6.Instance.IsActive;
 
         public override Dictionary<string, object> SaveState()
         {
@@ -54,6 +40,26 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                 MelonLogger.Msg($"[RockstarAffinity2] Loaded fan count: {RockstarAffinityHelpers.fanCount}");
             }
         }
+    }
+
+    public class RockstarAffinity2 : RockstarAffinityBase
+    {
+        public RockstarAffinity2()
+        {
+            unlockLevel = 2;
+            description = "A \"Passionate Fan\" is automatically deployed at the start of battle and will find their own fun. Unlock Fan Count; gain 1k-2k fans after each battle.";
+        }
+
+        public static RockstarAffinity2 _instance;
+
+        public static RockstarAffinity2 Instance => _instance ??= new();
+
+        public override string ToFullDescription()
+        {
+            return base.ToFullDescription() + $"\nCurrent Fan Count: {RockstarAffinityHelpers.fanCount}";
+        }
+
+        public static bool IsAnyRockstarAffinityActive => Instance.IsActive || RockstarAffinity4.Instance.IsActive || RockstarAffinity6.Instance.IsActive;
     }
 
     [HarmonyPatch(typeof(BattleUnitGO), "BindCharacter")]

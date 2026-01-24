@@ -20,7 +20,8 @@ namespace XenopurgeRougeLike.XenoReinforcements
             flavourText = "Tapping into the hive mind allows you to sense where the swarm will be.";
         }
 
-        public static SensoryAssimilation Instance => (SensoryAssimilation)Xeno.Reinforcements[typeof(SensoryAssimilation)];
+        protected static SensoryAssimilation instance;
+public static SensoryAssimilation Instance => instance ??= new();
     }
 
     /// <summary>

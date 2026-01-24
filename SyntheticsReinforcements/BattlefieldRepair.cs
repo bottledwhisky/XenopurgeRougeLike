@@ -24,7 +24,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             return string.Format(description, HealPerPoint[stacks - 1]);
         }
 
-        public static BattlefieldRepair Instance => (BattlefieldRepair)Synthetics.Reinforcements[typeof(BattlefieldRepair)];
+        protected static BattlefieldRepair instance;
+        public static BattlefieldRepair Instance => instance ??= new();
     }
 
     /// <summary>

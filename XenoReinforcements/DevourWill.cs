@@ -30,7 +30,8 @@ namespace XenopurgeRougeLike.XenoReinforcements
             return string.Format(description, HealAmount);
         }
 
-        public static DevourWill Instance => (DevourWill)Xeno.Reinforcements[typeof(DevourWill)];
+        protected static DevourWill instance;
+public static DevourWill Instance => instance ??= new();
     }
 
     /// <summary>
