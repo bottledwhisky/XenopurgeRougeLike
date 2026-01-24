@@ -31,6 +31,7 @@ namespace XenopurgeRougeLike
                 // Add reinforcement choices as buttons
                 for (int i = 0; i < XenopurgeRougeLike.choices.Count; i++)
                 {
+                    int capturedIndex = i; // Capture loop variable for closure
                     MelonLogger.Msg($"Adding reinforcement choice button for index {i}");
                     var choice = XenopurgeRougeLike.choices[i];
                     var preview = choice.GetNextLevelPreview();
@@ -41,6 +42,8 @@ namespace XenopurgeRougeLike
                         {
                             try
                             {
+                                var choice = XenopurgeRougeLike.choices[capturedIndex];
+                                var preview = choice.GetNextLevelPreview();
                                 var company = choice.company.Type;
                                 var nExsitingCompanyReinforces = XenopurgeRougeLike.acquiredReinforcements.Where(r => r.company.Type == company).Count() + 1;
                                 CompanyAffinity affinityToEnable = null;
@@ -61,7 +64,7 @@ namespace XenopurgeRougeLike
 
                                 string nextUnlockProgress = (affinityToEnable.unlockLevel < nExsitingCompanyReinforces ? "Max level reached" : "Next unlock") + $": ({nExsitingCompanyReinforces}/{affinityToEnable.unlockLevel}) ";
 
-                                EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = i;
+                                EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = capturedIndex;
                                 // Update description text when selected
                                 EndGameWindowView_SetResultText_Patch._descriptionText.text = preview.FullString + "\n" + nextUnlockProgress + nextUnlockAffinyText;
 
@@ -69,7 +72,7 @@ namespace XenopurgeRougeLike
                                 for (int j = 0; j < EndGameWindowView_SetResultText_Patch._choiceOutlines.Length; j++)
                                 {
                                     var outline = EndGameWindowView_SetResultText_Patch._choiceOutlines[j];
-                                    if (j == i)
+                                    if (j == capturedIndex)
                                     {
                                         outline.effectColor = Color.yellow;
                                     }
@@ -92,6 +95,8 @@ namespace XenopurgeRougeLike
                         },
                         onClickCallback = () =>
                         {
+                            var choice = XenopurgeRougeLike.choices[capturedIndex];
+                            var preview = choice.GetNextLevelPreview();
                             // Logic to add the reinforcement to the player's roster
                             MelonLogger.Msg($"Player selected reinforcement from {choice.ToMenuItem()}");
                             // Add reinforcement logic here

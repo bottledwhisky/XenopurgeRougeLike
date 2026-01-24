@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
@@ -24,12 +24,16 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         }
 
         protected static WhalePatron _instance;
-        public static WhalePatron Instance =>  _instance ??= new();
+        public static WhalePatron Instance => _instance ??= new();
 
         internal static void GiveEquipmentReward()
         {
+            Debug.Log("WhalePatron: GiveEquipmentReward called");
+
             var playerData = Singleton<Player>.Instance.PlayerData;
             var squadUnits = playerData.Squad.SquadUnits.ToList();
+
+            Debug.Log($"WhalePatron: Found {squadUnits.Count} squad units");
 
             // Get all purchasable equipment (not enemy-only equipment)
             var upgradeDataSO = Singleton<AssetsDatabase>.Instance.UpgradeDataSO;
@@ -38,83 +42,110 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             allPurchasableEquipment.AddRange(upgradeDataSO.UpgradeMeleeWeaponsList);
             allPurchasableEquipment.AddRange(upgradeDataSO.UpgradeGearsList);
 
+            Debug.Log($"WhalePatron: Found {allPurchasableEquipment.Count} total purchasable equipment pieces");
+
             // Get initial/default equipment IDs that should be considered as "not owned"
             var initialEquipmentIds = CelebrityAuction.GetInitialEquipmentIds();
+            Debug.Log($"WhalePatron: Initial equipment IDs count: {initialEquipmentIds.Count}");
 
             // Get all equipment currently owned by squad members (excluding default equipment)
-            var ownedEquipmentIds = new HashSet<string>();
+            List<EquipmentType> missingEquipmentSlots = [];
+
             foreach (var unit in squadUnits)
             {
                 var ranged = unit.GetCurrentEquipmentOfUnit(EquipmentType.Ranged);
                 var melee = unit.GetCurrentEquipmentOfUnit(EquipmentType.Melee);
                 var gear = unit.GetCurrentEquipmentOfUnit(EquipmentType.Gear);
 
+                Debug.Log($"WhalePatron: Unit has - Ranged: {ranged?.EquipmentName ?? "null"}, Melee: {melee?.EquipmentName ?? "null"}, Gear: {gear?.EquipmentName ?? "null"}");
+
                 // Only count as owned if it's not default equipment
-                if (ranged != null && !initialEquipmentIds.Contains(ranged.Id))
-                    ownedEquipmentIds.Add(ranged.Id);
-                if (melee != null && !initialEquipmentIds.Contains(melee.Id))
-                    ownedEquipmentIds.Add(melee.Id);
-                if (gear != null && !initialEquipmentIds.Contains(gear.Id))
-                    ownedEquipmentIds.Add(gear.Id);
+                if (ranged == null || initialEquipmentIds.Contains(ranged.Id))
+                {
+                    missingEquipmentSlots.Add(EquipmentType.Ranged);
+                    Debug.Log($"WhalePatron: Unit missing ranged weapon (or has default)");
+                }
+                if (melee == null || initialEquipmentIds.Contains(melee.Id))
+                {
+                    missingEquipmentSlots.Add(EquipmentType.Melee);
+                    Debug.Log($"WhalePatron: Unit missing melee weapon (or has default)");
+                }
+                if (gear == null || initialEquipmentIds.Contains(gear.Id))
+                {
+                    missingEquipmentSlots.Add(EquipmentType.Gear);
+                    Debug.Log($"WhalePatron: Unit missing gear (or has default)");
+                }
             }
 
-            // Find equipment we don't have (excluding default equipment)
-            var unownedEquipment = allPurchasableEquipment.Where(e => !ownedEquipmentIds.Contains(e.Id)).ToList();
+            Debug.Log($"WhalePatron: Total missing equipment slots: {missingEquipmentSlots.Count}");
 
-            if (unownedEquipment.Count > 0)
+            if (missingEquipmentSlots.Count == 0)
             {
-                // Give a random piece of equipment we don't have
-                var newEquipment = unownedEquipment[UnityEngine.Random.Range(0, unownedEquipment.Count)];
-                TryEquipToSuitableUnit(newEquipment, squadUnits, playerData);
-                Debug.Log($"WhalePatron: Gave new equipment {newEquipment.EquipmentName}");
-            }
-            else
-            {
+                Debug.Log("WhalePatron: Everyone has all equipment types, upgrading equipment");
                 // Everyone has all equipment types, so upgrade by selling cheaper and buying more expensive
                 UpgradeEquipment(squadUnits, allPurchasableEquipment, initialEquipmentIds, playerData);
             }
+            else
+            {
+                EquipmentType chosenType = missingEquipmentSlots[UnityEngine.Random.Range(0, missingEquipmentSlots.Count)];
+                Debug.Log($"WhalePatron: Chosen equipment type to give: {chosenType}");
+
+                // Find equipment we don't have (excluding default equipment)
+                // FIXED: Get all equipment of this type, not just unowned ones
+                var availableEquipment = allPurchasableEquipment.Where(e => e.EquipmentType == chosenType).ToList();
+
+                Debug.Log($"WhalePatron: Found {availableEquipment.Count} available equipment of type {chosenType}");
+
+                if (availableEquipment.Count > 0)
+                {
+                    // Give a random piece of equipment
+                    var newEquipment = availableEquipment[UnityEngine.Random.Range(0, availableEquipment.Count)];
+                    Debug.Log($"WhalePatron: Selected equipment: {newEquipment.EquipmentName}");
+                    TryEquipToSuitableUnit(newEquipment, squadUnits, playerData, initialEquipmentIds);
+                    Debug.Log($"WhalePatron: Gave new equipment {newEquipment.EquipmentName}");
+                }
+                else
+                {
+                    Debug.LogWarning($"WhalePatron: No available equipment of type {chosenType} found!");
+                }
+            }
         }
 
-        private static void TryEquipToSuitableUnit(EquipmentDataSO equipment, List<UpgradableUnit> squadUnits, PlayerData playerData)
+        private static void TryEquipToSuitableUnit(EquipmentDataSO equipment, List<UpgradableUnit> squadUnits, PlayerData playerData, HashSet<string> initialEquipmentIds)
         {
+            Debug.Log($"WhalePatron: TryEquipToSuitableUnit called for {equipment.EquipmentName}");
+
             // Try to find a unit that doesn't have this equipment type, or has cheaper equipment of this type
             UpgradableUnit bestUnit = null;
-            int lowestPrice = int.MaxValue;
 
             foreach (var unit in squadUnits)
             {
                 var currentEquipment = unit.GetCurrentEquipmentOfUnit(equipment.EquipmentType);
 
                 // If unit doesn't have this equipment type, prioritize them
-                if (currentEquipment == null)
+                if (currentEquipment == null || initialEquipmentIds.Contains(currentEquipment.Id))
                 {
                     bestUnit = unit;
+                    Debug.Log($"WhalePatron: Found suitable unit (missing equipment or has default)");
                     break;
                 }
-
-                // Otherwise, find the unit with the cheapest equipment of this type
-                if (currentEquipment.BuyingPrice < lowestPrice)
-                {
-                    lowestPrice = currentEquipment.BuyingPrice;
-                    bestUnit = unit;
-                }
             }
 
-            if (bestUnit != null)
+            if (bestUnit == null)
             {
-                // Equip the new equipment
-                bestUnit.ReplaceEquipment(equipment);
+                Debug.LogWarning("WhalePatron: No suitable unit found!");
+                return;
             }
-            else
-            {
-                // Fallback: give coins equal to equipment value (should never happen)
-                playerData.PlayerWallet.ChangeCoinsByValue(equipment.BuyingPrice);
-                Debug.Log($"WhalePatron: Could not equip {equipment.EquipmentName}, gave {equipment.BuyingPrice} coins instead");
-            }
+
+            // Equip the new equipment
+            bestUnit.ReplaceEquipment(equipment);
+            Debug.Log($"WhalePatron: Successfully equipped {equipment.EquipmentName} to unit");
         }
 
         private static void UpgradeEquipment(List<UpgradableUnit> squadUnits, List<EquipmentDataSO> allPurchasableEquipment, HashSet<string> initialEquipmentIds, PlayerData playerData)
         {
+            Debug.Log("WhalePatron: UpgradeEquipment called");
+
             // Collect all currently equipped items with their units (excluding default equipment)
             var equippedItems = new List<Tuple<UpgradableUnit, EquipmentDataSO>>();
 
@@ -133,6 +164,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                     equippedItems.Add(new Tuple<UpgradableUnit, EquipmentDataSO>(unit, gear));
             }
 
+            Debug.Log($"WhalePatron: Found {equippedItems.Count} equipped non-default items");
+
             if (equippedItems.Count == 0)
             {
                 Debug.LogWarning("WhalePatron: No equipped items found, cannot upgrade");
@@ -146,6 +179,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             int cheaperHalfCount = Mathf.Max(1, equippedItems.Count / 2);
             var itemToSell = equippedItems[UnityEngine.Random.Range(0, cheaperHalfCount)];
 
+            Debug.Log($"WhalePatron: Selected item to sell: {itemToSell.Item2.EquipmentName} (price: {itemToSell.Item2.BuyingPrice})");
+
             // Get the equipment type and find more expensive alternatives
             var equipmentType = itemToSell.Item2.EquipmentType;
             var currentPrice = itemToSell.Item2.BuyingPrice;
@@ -155,12 +190,15 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             if (CelebrityAuction.Instance.IsActive)
             {
                 sellPrice = CelebrityAuction.GetSellPrice(itemToSell.Item1, itemToSell.Item2);
+                Debug.Log($"WhalePatron: CelebrityAuction is active, adjusted sell price: {sellPrice}");
             }
 
             // Find all equipment of the same type that's more expensive
             var moreExpensiveOptions = allPurchasableEquipment
                 .Where(e => e.EquipmentType == equipmentType && e.BuyingPrice > currentPrice)
                 .ToList();
+
+            Debug.Log($"WhalePatron: Found {moreExpensiveOptions.Count} more expensive options");
 
             if (moreExpensiveOptions.Count > 0)
             {
@@ -175,7 +213,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             }
             else
             {
-                // No more expensive options available, just give coins
+                // No more expensive options available, give coins instead
                 playerData.PlayerWallet.ChangeCoinsByValue(sellPrice);
                 Debug.Log($"WhalePatron: No upgrade available for {itemToSell.Item2.EquipmentName}, gave {sellPrice} coins instead");
             }
@@ -189,11 +227,15 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         [HarmonyPostfix]
         public static void GiveEndGameRewards(GameManager __instance, bool victory)
         {
+            Debug.Log($"WhalePatron: GiveEndGameRewards patch called, victory={victory}");
+
             if (!WhalePatron.Instance.IsActive)
             {
+                Debug.Log("WhalePatron: Reinforcement is not active, skipping");
                 return;
             }
 
+            Debug.Log("WhalePatron: Reinforcement is active, giving equipment reward");
             // Give equipment reward after each battle
             WhalePatron.GiveEquipmentReward();
         }

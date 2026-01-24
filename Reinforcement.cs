@@ -104,7 +104,6 @@ namespace XenopurgeRougeLike
             string colorHex = ColorUtility.ToHtmlStringRGB(company.BorderColor);
             string rarityColorHex = ColorUtility.ToHtmlStringRGB(RarityColors[rarity]);
             return $@"<color=#{colorHex}>{Name}</color>
-{company}
 Rarity: <color=#{rarityColorHex}>{RarityNames[rarity]}</color>
 Effects: {Description}
 <i>{flavourText}</i>";

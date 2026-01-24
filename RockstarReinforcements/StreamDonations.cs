@@ -128,8 +128,15 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             {
                 MelonLogger.Msg($"- {card.Info.CardName} (Uses: {card.Info.Uses})");
             }
+            string startingSquadId = Singleton<Player>.Instance.PlayerData.Squad.StartingSquadId;
             CardsButtons_BattleManagementDirectory cardsUI = CardsButtons_BattleManagementDirectory_Instance.Instance;
-            var availableCardsToAdd = Singleton<AssetsDatabase>.Instance.ActionCards.Where(x => x.Info.Uses > 0).ToList();
+            var availableCardsToAdd = Singleton<AssetsDatabase>.Instance.ActionCards.Where(card =>
+                card.Info.Uses > 0 &&
+                !card.AvailableOnDeploymentPhase &&
+                !card.Info.SquadIdsThatCannotUseCommand.Contains(startingSquadId) &&
+                (Singleton<Player>.Instance.PlayerData.AccessPointsSystemEnabled || card.Info.Group != ActionCardInfo.ActionCardGroup.accessPoints) &&
+                (Singleton<Player>.Instance.PlayerData.BioweaveSystemEnabled || card.Info.Group != ActionCardInfo.ActionCardGroup.bioweavePoints)
+            ).ToList();
             MelonLogger.Msg($"Available Action Cards in Database: {availableCardsToAdd.Count}");
             var chosenCard = availableCardsToAdd[UnityEngine.Random.Range(0, availableCardsToAdd.Count)];
             MelonLogger.Msg($"Adding Action Card: {chosenCard.Info.CardName}");

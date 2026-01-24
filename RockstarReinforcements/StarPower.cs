@@ -15,24 +15,28 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         private const float AccuracyBonus = 0.05f;
         private const int SpeedBonus = 1;
         private const int PowerBonus = 1;
+
+        public const int FanPerStatBuff = 2000;
+        public const int FanPerCoin = 5000;
+
         public StarPower()
         {
             stackable = true;
             maxStacks = 2;
             company = Company.Rockstar;
             name = "Star Power";
-            description = "Gain +50% fans on perfect victory. Every 1,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage. Star Power II: Uncollected digital collectibles no longer count against perfect victory.Gain 1 point after battle for every 1,000 fans.";
+            description = "Gain +50% fans on perfect victory. Every 2,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage. Star Power II: Uncollected digital collectibles no longer count against perfect victory. Gain 1 coin after battle for every 5,000 fans.";
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
             if (stacks == 1)
             {
-                return "Gain +50% fans on perfect victory. Every 1,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage.";
+                return "Gain +50% fans on perfect victory. Every 2,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage.";
             }
             else
             {
-                return "Gain +50% fans on perfect victory. Every 1,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage. Uncollected digital collectibles no longer count against perfect victory. Gain 1 point after battle for every 1,000 fans.";
+                return "Gain +50% fans on perfect victory. Every 2,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage. Uncollected digital collectibles no longer count against perfect victory. Gain 1 coin after battle for every 5,000 fans.";
             }
         }
 
@@ -68,7 +72,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             if (!Instance.IsActive)
                 return;
 
-            int bonusCount = RockstarAffinityHelpers.fanCount / 1000;
+            int bonusCount = RockstarAffinityHelpers.fanCount / FanPerStatBuff;
             if (bonusCount <= 0)
                 return;
 
@@ -84,6 +88,10 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
             // Apply random stat bonuses based on fan count
             var random = new System.Random();
+            int totalHPBonus = 0;
+            int totalSpeedBonus = 0;
+            int totalPowerBonus = 0;
+            float totalAccuracyBonus = 0;
             for (int i = 0; i < bonusCount; i++)
             {
                 int statChoice = random.Next(4);
@@ -91,22 +99,23 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                 {
                     case 0:
                         firstUnit.ChangeStat(UnitStats.Health, HPBonus, $"StarPower_HP_{i}");
-                        MelonLogger.Msg($"StarPower: +{HPBonus} HP");
+                        totalHPBonus += HPBonus;
                         break;
                     case 1:
                         firstUnit.ChangeStat(UnitStats.Accuracy, AccuracyBonus, $"StarPower_Accuracy_{i}");
-                        MelonLogger.Msg($"StarPower: +{AccuracyBonus * 100}% Accuracy");
+                        totalAccuracyBonus += AccuracyBonus;
                         break;
                     case 2:
                         firstUnit.ChangeStat(UnitStats.Speed, SpeedBonus, $"StarPower_Speed_{i}");
-                        MelonLogger.Msg($"StarPower: +{SpeedBonus} Speed");
+                        totalSpeedBonus += SpeedBonus;
                         break;
                     case 3:
                         firstUnit.ChangeStat(UnitStats.Power, PowerBonus, $"StarPower_Power_{i}");
-                        MelonLogger.Msg($"StarPower: +{PowerBonus} Power");
+                        totalPowerBonus += PowerBonus;
                         break;
                 }
             }
+            MelonLogger.Msg($"StarPower: +{totalHPBonus} HP, +{totalSpeedBonus} Speed, +{totalPowerBonus} Power, +{totalAccuracyBonus * 100}% Accuracy");
         }
     }
 
@@ -129,7 +138,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                 var playerData = Singleton<Player>.Instance.PlayerData;
                 if (playerData?.PlayerWallet != null)
                 {
-                    playerData.PlayerWallet.ChangeCoinsByValue(RockstarAffinityHelpers.fanCount / 1000);
+                    playerData.PlayerWallet.ChangeCoinsByValue(RockstarAffinityHelpers.fanCount / StarPower.FanPerCoin);
                 }
             }
         }

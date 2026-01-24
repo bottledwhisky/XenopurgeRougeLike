@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SpaceCommander;
@@ -237,6 +237,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             {
                 return;
             }
+            CelebrityAuction.IsSellMode = false;
 
             // Get initial equipment that cannot be sold
             var initialEquipmentIds = CelebrityAuction.GetInitialEquipmentIds();
@@ -332,7 +333,6 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                         }
 
                         // Disable sell mode and go back
-                        CelebrityAuction.IsSellMode = false;
                         directoriesFlowController?.GoBack();
                     }
                 });
@@ -345,7 +345,6 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                 Tooltip = "Return to squad management",
                 onClickCallback = () =>
                 {
-                    CelebrityAuction.IsSellMode = false;
                     directoriesFlowController?.GoBack();
                 }
             });

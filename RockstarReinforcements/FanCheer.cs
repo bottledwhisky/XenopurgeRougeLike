@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.GameFlow;
@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TimeSystem;
 using static SpaceCommander.Enumerations;
+using static UnityEngine.UI.CanvasScaler;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
@@ -26,6 +27,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         // Duration per 1000 fans
         public const float DurationPerThousandFans = 1f;
+        public const int FanPerDuraction = 2000;
 
         // Dictionary to track active buff timers for each fan
         private static Dictionary<string, float> activeFanBuffs = new Dictionary<string, float>();
@@ -35,7 +37,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             company = Company.Rockstar;
             rarity = Rarity.Elite;
             name = "Fan Cheer";
-            description = "The first squad member becomes the \"Top Star\". When the \"Top Star\" takes damage, \"Passionate Fan\" stats greatly increase (non-stackable). Effect duration +1 second for every 1,000 fans.";
+            description = "The first squad member becomes the \"Top Star\". When the \"Top Star\" or \"Passionate Fan\" takes damage, the stats of the other(s) greatly increase (non-stackable). Effect duration 5s and +1 second for every 2,000 fans.";
         }
 
         private static FanCheer _instance;
@@ -54,7 +56,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         public static float GetBuffDuration()
         {
-            return BaseDuration + (RockstarAffinityHelpers.fanCount / 1000) * DurationPerThousandFans;
+            return BaseDuration + (RockstarAffinityHelpers.fanCount / FanPerDuraction) * DurationPerThousandFans;
         }
 
         public static bool IsFan(BattleUnit unit)
@@ -162,12 +164,6 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             if (!FanCheer.Instance.IsActive)
                 return;
 
-            // Check if the damaged unit is the Top Star
-            if (!InTheSpotlight.IsTopStar(__instance))
-                return;
-
-            MelonLogger.Msg($"FanCheer: Top Star took {damage} damage! Activating Fan buffs!");
-
             // Apply buffs to all Passionate Fans
             var gameManager = GameManager.Instance;
             if (gameManager == null)
@@ -177,11 +173,29 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             if (playerTeam == null)
                 return;
 
-            foreach (var unit in playerTeam.BattleUnits)
+            // Check if the damaged unit is the Top Star
+            if (InTheSpotlight.IsTopStar(__instance))
             {
-                if (FanCheer.IsFan(unit))
+                MelonLogger.Msg($"FanCheer: Top Star took {damage} damage! Activating Fan buffs!");
+
+                foreach (var unit in playerTeam.BattleUnits)
                 {
-                    FanCheer.ApplyFanBuffs(unit);
+                    if (FanCheer.IsFan(unit))
+                    {
+                        FanCheer.ApplyFanBuffs(unit);
+                    }
+                }
+            }
+            else if (FanCheer.IsFan(__instance))
+            {
+                MelonLogger.Msg($"FanCheer: Fan took {damage} damage! Activating Top Star buffs!");
+
+                foreach (var unit in playerTeam.BattleUnits)
+                {
+                    if (InTheSpotlight.IsTopStar(unit))
+                    {
+                        FanCheer.ApplyFanBuffs(unit);
+                    }
                 }
             }
         }
