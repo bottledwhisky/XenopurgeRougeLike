@@ -32,7 +32,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         }
 
         protected static PsionicScream instance;
-public static PsionicScream Instance => instance ??= new();
+        public static PsionicScream Instance => instance ??= new();
     }
 
     /// <summary>
@@ -243,7 +243,8 @@ public static PsionicScream Instance => instance ??= new();
             var timeListenerType = typeof(TimeSystem.ITimeUpdatedListener);
 
             var implementers = System.AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => {
+                .SelectMany(a =>
+                {
                     try { return a.GetTypes(); }
                     catch { return System.Type.EmptyTypes; }
                 })

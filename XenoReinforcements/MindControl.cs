@@ -3,9 +3,13 @@ using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
+using SpaceCommander.Area.Drawers;
+using SpaceCommander.Audio;
+using SpaceCommander.BattleManagement.UI;
+using SpaceCommander.Commands;
+using SpaceCommander.GameFlow;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -22,7 +26,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         public MindControl()
         {
             company = Company.Xeno;
-            rarity = Rarity.Expert;
+            rarity = Rarity.Elite;
             stackable = true;
             maxStacks = 2;
             name = "Mind Control";
@@ -36,7 +40,20 @@ namespace XenopurgeRougeLike.XenoReinforcements
         }
 
         protected static MindControl instance;
-public static MindControl Instance => instance ??= new();
+        public static MindControl Instance => instance ??= new();
+
+        public static HashSet<BattleUnit> MindControlledUnits = [];
+    }
+
+
+    // Patch to clear buffs when mission ends
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
+    public class MindControl_TestGame_StartGame_Patch
+    {
+        public static void Postfix()
+        {
+            MindControl.MindControlledUnits.Clear();
+        }
     }
 
     /// <summary>
@@ -119,6 +136,12 @@ public static MindControl Instance => instance ??= new();
 
         public string CustomCardDescription =>
             "Take control of an enemy unit, permanently converting it to your team.";
+
+        public MindControlActionCardInfo()
+        {
+            AccessTools.Field(typeof(ActionCardInfo), "_uses").SetValue(this, 1);
+            AccessTools.Field(typeof(ActionCardInfo), "canNotBeReplenished").SetValue(this, false);
+        }
     }
 
     /// <summary>
@@ -184,28 +207,22 @@ public static MindControl Instance => instance ??= new();
 
         static MindControlSystem()
         {
-            var battleUnitType = typeof(BattleUnit);
-            var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+            _unitDataField = AccessTools.Field(typeof(BattleUnit), "_unitData");
+            _currentHealthField = AccessTools.Field(typeof(BattleUnit), "_currentHealth");
+            _currentMaxHealthField = AccessTools.Field(typeof(BattleUnit), "_currentMaxHealth");
+            _currentArmorField = AccessTools.Field(typeof(BattleUnit), "_currentArmor");
+            _currentSpeedField = AccessTools.Field(typeof(BattleUnit), "_currentSpeed");
+            _currentAccuracyField = AccessTools.Field(typeof(BattleUnit), "_currentAccuracy");
+            _currentPowerField = AccessTools.Field(typeof(BattleUnit), "_currentPower");
+            _statChangesField = AccessTools.Field(typeof(BattleUnit), "_statChanges");
+            _permanentStatChangesField = AccessTools.Field(typeof(BattleUnit), "_permanentStatChanges");
+            _unitEquipmentManagerField = AccessTools.Field(typeof(BattleUnit), "_unitEquipmentManager");
+            _isExtractedField = AccessTools.Field(typeof(BattleUnit), "_isExtracted");
 
-            _unitDataField = battleUnitType.GetField("_unitData", flags);
-            _currentHealthField = battleUnitType.GetField("_currentHealth", flags);
-            _currentMaxHealthField = battleUnitType.GetField("_currentMaxHealth", flags);
-            _currentArmorField = battleUnitType.GetField("_currentArmor", flags);
-            _currentSpeedField = battleUnitType.GetField("_currentSpeed", flags);
-            _currentAccuracyField = battleUnitType.GetField("_currentAccuracy", flags);
-            _currentPowerField = battleUnitType.GetField("_currentPower", flags);
-            _statChangesField = battleUnitType.GetField("_statChanges", flags);
-            _permanentStatChangesField = battleUnitType.GetField("_permanentStatChanges", flags);
-            _unitEquipmentManagerField = battleUnitType.GetField("_unitEquipmentManager", flags);
-            _isExtractedField = battleUnitType.GetField("_isExtracted", flags);
+            _battleUnitsField = AccessTools.Field(typeof(BattleUnitsManager), "_battleUnits");
 
-            var managerType = typeof(BattleUnitsManager);
-            _battleUnitsField = managerType.GetField("_battleUnits", flags);
-
-            // BattleUnitToPawnConnector.GetPawn is internal, so we need reflection
-            var connectorType = typeof(BattleUnitToPawnConnector);
-            _getPawnMethod = connectorType.GetMethod("GetPawn", flags);
-            _battleUnitToPawnField = connectorType.GetField("_battleUnitToPawn", flags);
+            _getPawnMethod = AccessTools.Method(typeof(BattleUnitToPawnConnector), "GetPawn");
+            _battleUnitToPawnField = AccessTools.Field(typeof(BattleUnitToPawnConnector), "_battleUnitToPawn");
         }
 
         /// <summary>
@@ -213,53 +230,62 @@ public static MindControl Instance => instance ??= new();
         /// </summary>
         public static void ConvertUnitToPlayer(BattleUnit enemyUnit)
         {
-            if (enemyUnit == null || !enemyUnit.IsAlive || enemyUnit.Team != Enumerations.Team.EnemyAI)
+            try
             {
-                MelonLogger.Warning("MindControl: Invalid target unit");
-                return;
-            }
+                if (enemyUnit == null || !enemyUnit.IsAlive || enemyUnit.Team != Enumerations.Team.EnemyAI)
+                {
+                    MelonLogger.Warning("MindControl: Invalid target unit");
+                    return;
+                }
 
-            var gameManager = GameManager.Instance;
-            if (gameManager == null)
+                var gameManager = GameManager.Instance;
+                if (gameManager == null)
+                {
+                    MelonLogger.Error("MindControl: GameManager not found");
+                    return;
+                }
+
+                var enemyManager = gameManager.GetTeamManager(Enumerations.Team.EnemyAI);
+                var playerManager = gameManager.GetTeamManager(Enumerations.Team.Player);
+
+                if (enemyManager == null || playerManager == null)
+                {
+                    MelonLogger.Error("MindControl: Team managers not found");
+                    return;
+                }
+
+                // Step 1: Capture the unit's current state
+                var capturedState = CaptureUnitState(enemyUnit);
+
+                // Step 2: Get the current tile before removing the unit
+                Tile currentTile = enemyUnit.CurrentTile;
+
+                // Step 3: Remove the enemy unit without triggering death events
+                RemoveUnitSilently(enemyUnit, enemyManager, gameManager);
+
+                // Step 4: Create a new player unit with the captured state
+                var playerUnit = CreatePlayerUnit(capturedState, gameManager.GridManager);
+
+                // Step 5: Add to player team and place on the battlefield
+                playerManager.AddBattleUnit(playerUnit);
+                playerUnit.PlaceOnTile(currentTile);
+                playerUnit.AddCommands();
+                playerUnit.StartCommandsExecution();
+
+                MindControl.MindControlledUnits.Add(playerUnit);
+                // Step 6: Create visual representation
+                CreateVisualRepresentation(playerUnit, gameManager);
+
+                // Track this unit as mind-controlled for DevourWill
+                XenoStunTracker.MarkAsMindControlled(playerUnit);
+
+                MelonLogger.Msg($"MindControl: Successfully converted {capturedState.UnitName} to player team");
+            }
+            catch (Exception e)
             {
-                MelonLogger.Error("MindControl: GameManager not found");
-                return;
+                MelonLogger.Error(e);
+                MelonLogger.Error(e.StackTrace);
             }
-
-            var enemyManager = gameManager.GetTeamManager(Enumerations.Team.EnemyAI);
-            var playerManager = gameManager.GetTeamManager(Enumerations.Team.Player);
-
-            if (enemyManager == null || playerManager == null)
-            {
-                MelonLogger.Error("MindControl: Team managers not found");
-                return;
-            }
-
-            // Step 1: Capture the unit's current state
-            var capturedState = CaptureUnitState(enemyUnit);
-
-            // Step 2: Get the current tile before removing the unit
-            Tile currentTile = enemyUnit.CurrentTile;
-
-            // Step 3: Remove the enemy unit without triggering death events
-            RemoveUnitSilently(enemyUnit, enemyManager, gameManager);
-
-            // Step 4: Create a new player unit with the captured state
-            var playerUnit = CreatePlayerUnit(capturedState, gameManager.GridManager);
-
-            // Step 5: Add to player team and place on the battlefield
-            playerManager.AddBattleUnit(playerUnit);
-            playerUnit.PlaceOnTile(currentTile);
-            playerUnit.AddCommands();
-            playerUnit.StartCommandsExecution();
-
-            // Step 6: Create visual representation
-            CreateVisualRepresentation(playerUnit, gameManager);
-
-            // Track this unit as mind-controlled for DevourWill
-            XenoStunTracker.MarkAsMindControlled(playerUnit);
-
-            MelonLogger.Msg($"MindControl: Successfully converted {capturedState.UnitName} to player team");
         }
 
         /// <summary>
@@ -429,5 +455,147 @@ public static MindControl Instance => instance ??= new();
         public float CurrentPower { get; set; }
         public Dictionary<string, (Enumerations.UnitStats, float)> StatChanges { get; set; }
         public List<(Enumerations.UnitStats, float)> PermanentStatChanges { get; set; }
+    }
+
+    /// <summary>
+    /// Patch to prevent "Line index out of range" error in PathDrawer.ClearPath
+    /// when mind-controlled units have invalid DeploymentOrder values.
+    /// </summary>
+    [HarmonyPatch(typeof(PathDrawer), "ClearPath")]
+    public static class PathDrawer_ClearPath_Patch
+    {
+        public static bool Prefix(BattleUnit battleUnit, LineRenderer[] ____lineRenderers)
+        {
+            if (battleUnit == null)
+                return false;
+
+            if (MindControl.MindControlledUnits.Contains(battleUnit))
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Patch to prevent mind-controlled units from drawing paths.
+    /// </summary>
+    [HarmonyPatch(typeof(PathDrawer), "DrawLine")]
+    public static class PathDrawer_DrawLine_Patch
+    {
+        public static bool Prefix(BattleUnit battleUnit)
+        {
+            if (MindControl.MindControlledUnits.Contains(battleUnit))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Patch to prevent ArgumentNullException when mind-controlled xeno units try to speak.
+    /// Xeno units don't have voice actors, so their VoiceActorId is null.
+    /// </summary>
+    [HarmonyPatch(typeof(WalkieTalkieManager), "SoldierSpeaked", typeof(string), typeof(Enumerations.VoiceSounds))]
+    public static class WalkieTalkieManager_SoldierSpeaked_Patch
+    {
+        public static bool Prefix(string voiceActorId)
+        {
+            // Skip if voiceActorId is null (xeno units don't have voice actors)
+            if (voiceActorId == null)
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Patch to prevent NullReferenceException when mind-controlled xeno units kill enemies.
+    /// Xeno units don't have MeleeWeaponDataSO, so accessing it causes a null reference.
+    /// </summary>
+    [HarmonyPatch(typeof(Melee), "KilledEnemy")]
+    public static class Melee_KilledEnemy_Patch
+    {
+        public static bool Prefix(BattleUnit ____battleUnit)
+        {
+            // Skip original method for mind-controlled units (they don't have weapon data)
+            if (MindControl.MindControlledUnits.Contains(____battleUnit))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Patch to prevent mind-controlled units from counting as dead soldiers for end-game penalties.
+    /// </summary>
+    [HarmonyPatch(typeof(GameManager), "GiveEndGameRewards")]
+    public static class MindControl_GiveEndGameRewards_Patch
+    {
+        public static void Prefix()
+        {
+            if (MindControl.MindControlledUnits.Count == 0)
+                return;
+
+            var gameManager = GameManager.Instance;
+            var teamsField = AccessTools.Field(typeof(GameManager), "_teams");
+            var teams = teamsField.GetValue(gameManager) as Dictionary<Enumerations.Team, BattleUnitsManager>;
+            var playerManager = teams[Enumerations.Team.Player];
+            var deadUnits = playerManager.DeadUnits as List<BattleUnit>;
+
+            foreach (var unit in MindControl.MindControlledUnits)
+            {
+                deadUnits.Remove(unit);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Patch to exclude mind-controlled units from action card targeting.
+    /// </summary>
+    [HarmonyPatch(typeof(ChooseUnitForCard_BattleManagementDirectory), "Initialize")]
+    public static class MindControl_ChooseUnitForCard_Patch
+    {
+        private static List<BattleUnit> removedUnits = new();
+
+        public static void Prefix(ChooseUnitForCard_BattleManagementDirectory __instance)
+        {
+            if (MindControl.MindControlledUnits.Count == 0)
+                return;
+
+            var battleUnitsManagerField = AccessTools.Field(typeof(ChooseUnitForCard_BattleManagementDirectory), "_battleUnitsManager");
+            var battleUnitsManager = battleUnitsManagerField.GetValue(__instance) as BattleUnitsManager;
+            var battleUnits = battleUnitsManager.BattleUnits as List<BattleUnit>;
+
+            removedUnits.Clear();
+            for (int i = battleUnits.Count - 1; i >= 0; i--)
+            {
+                if (MindControl.MindControlledUnits.Contains(battleUnits[i]))
+                {
+                    removedUnits.Add(battleUnits[i]);
+                    battleUnits.RemoveAt(i);
+                }
+            }
+        }
+
+        public static void Postfix(ChooseUnitForCard_BattleManagementDirectory __instance)
+        {
+            if (removedUnits.Count == 0)
+                return;
+
+            var battleUnitsManagerField = AccessTools.Field(typeof(ChooseUnitForCard_BattleManagementDirectory), "_battleUnitsManager");
+            var battleUnitsManager = battleUnitsManagerField.GetValue(__instance) as BattleUnitsManager;
+            var battleUnits = battleUnitsManager.BattleUnits as List<BattleUnit>;
+
+            foreach (var unit in removedUnits)
+            {
+                battleUnits.Add(unit);
+            }
+            removedUnits.Clear();
+        }
     }
 }

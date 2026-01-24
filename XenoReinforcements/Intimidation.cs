@@ -10,11 +10,11 @@ namespace XenopurgeRougeLike.XenoReinforcements
     public class Intimidation : Reinforcement
     {
         public const float SpeedReduction = -5f;
-        
+
         public Intimidation()
         {
             company = Company.Xeno;
-            rarity = Rarity.Elite;
+            rarity = Rarity.Expert;
             stackable = false;
             name = "Intimidation";
             description = "All Xenos permanently have {0} speed.";
@@ -27,7 +27,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         }
 
         protected static Intimidation instance;
-public static Intimidation Instance => instance ??= new();
+        public static Intimidation Instance => instance ??= new();
 
         public override void OnActivate()
         {

@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.Area;
@@ -21,7 +21,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         }
 
         protected static SensoryAssimilation instance;
-public static SensoryAssimilation Instance => instance ??= new();
+        public static SensoryAssimilation Instance => instance ??= new();
     }
 
     /// <summary>
