@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Area;
 using System;
@@ -19,7 +19,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         }
 
         // Damage bonus constants
-        public const float XenoDamageBonus = 0.60f; // +60% damage to xenos
+        public const float XenoDamageBonus = 0f; // +60% damage to xenos
 
         public const int ControlDurationBonusLevel = 3;
 

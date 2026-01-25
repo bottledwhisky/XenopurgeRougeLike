@@ -1,9 +1,12 @@
 ﻿using HarmonyLib;
 using SpaceCommander;
+using SpaceCommander.ActionCards;
+using SpaceCommander.BattleManagement.UI;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TimeSystem;
+using XenopurgeRougeLike.RockstarReinforcements;
 using static SpaceCommander.Enumerations;
 
 namespace XenopurgeRougeLike.XenoReinforcements
@@ -12,24 +15,25 @@ namespace XenopurgeRougeLike.XenoReinforcements
     /// 气味伪装：敌人不会主动攻击拥有气味伪装的单位，持续5秒+5秒*控制加成等级
     /// Scent Camouflage: Enemies will not actively target units with scent camouflage
     /// Duration: 5s + 5s * ControlDurationBonusLevel
+    /// Usable 2/4 times per mission
     /// </summary>
     public class ScentCamouflage : Reinforcement
     {
         public const float BaseDuration = 5f;
         public const float BonusDurationPerLevel = 5f;
+        public static readonly int Uses = 1;
 
         public ScentCamouflage()
         {
             company = Company.Xeno;
-            stackable = false;
             name = "Scent Camouflage";
-            description = "Enemies will not actively target your units for {0} seconds at mission start.";
+            description = "Apply xeno pheromones to a unit, making enemies unable to target it for {0} seconds. Usable {1} time(s) per mission.";
             flavourText = "The xeno pheromones mask your squad's scent, making them invisible to the hive's targeting instincts.";
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            return string.Format(description, GetDuration());
+            return string.Format(description, GetDuration(), Uses);
         }
 
         public static float GetDuration()
@@ -38,7 +42,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         }
 
         protected static ScentCamouflage instance;
-public static ScentCamouflage Instance => instance ??= new();
+        public static ScentCamouflage Instance => instance ??= new();
     }
 
     /// <summary>
@@ -128,28 +132,22 @@ public static ScentCamouflage Instance => instance ??= new();
     }
 
     /// <summary>
-    /// Apply scent camouflage to all player units at mission start
+    /// Patch to inject ScentCamouflageActionCard into InBattleActionCardsManager after initialization
     /// </summary>
-    [HarmonyPatch(typeof(TestGame), "StartGame")]
-    public static class ScentCamouflage_MissionStart_Patch
+    [HarmonyPatch(typeof(InBattleActionCardsManager), "Initialize")]
+    public static class ScentCamouflage_InjectActionCard_Patch
     {
-        public static void Postfix()
+        public static void Postfix(InBattleActionCardsManager __instance)
         {
             if (!ScentCamouflage.Instance.IsActive)
                 return;
 
-            var duration = ScentCamouflage.GetDuration();
-            var gameManager = GameManager.Instance;
-            var tm = gameManager.GetTeamManager(Team.Player);
-            // Apply camouflage to all player-controlled units
-            foreach (var unit in tm.BattleUnits)
-            {
-                if (unit.IsAlive)
-                {
-                    ScentCamouflageSystem.ActivateCamouflage(unit, duration);
-                }
-            }
-            ScentCamouflageSystem.RegisterTimeUpdate();
+            var actionCardInfo = new ScentCamouflageActionCardInfo();
+            actionCardInfo.SetId("ScentCamouflage");
+
+            var scentCamouflageCard = new ScentCamouflageActionCard(actionCardInfo);
+
+            __instance.InBattleActionCards.Add(scentCamouflageCard);
         }
     }
 
@@ -162,6 +160,110 @@ public static ScentCamouflage Instance => instance ??= new();
         public static void Postfix()
         {
             ScentCamouflageSystem.ClearAll();
+        }
+    }
+
+    /// <summary>
+    /// Scent Camouflage action card - applies camouflage to a target unit.
+    /// Implements IUnitTargetable to target player units.
+    /// </summary>
+    public class ScentCamouflageActionCard : ActionCard, IUnitTargetable
+    {
+        public Team TeamToAffect => Team.Player;
+
+        public ScentCamouflageActionCard(ActionCardInfo actionCardInfo)
+        {
+            Info = actionCardInfo;
+            _usesLeft = ScentCamouflage.Uses;
+        }
+
+        public override ActionCard GetCopy()
+        {
+            return new ScentCamouflageActionCard(Info);
+        }
+
+        public void ApplyCommand(BattleUnit unit)
+        {
+            if (!ScentCamouflage.Instance.IsActive)
+                return;
+
+            if (unit == null || !unit.IsAlive || unit.Team != Team.Player)
+                return;
+
+            var duration = ScentCamouflage.GetDuration();
+            ScentCamouflageSystem.ActivateCamouflage(unit, duration);
+            ScentCamouflageSystem.RegisterTimeUpdate();
+        }
+
+        IEnumerable<CommandsAvailabilityChecker.UnitAnavailableReasons> IUnitTargetable.IsUnitValid(BattleUnit unit)
+        {
+            var reasons = new List<CommandsAvailabilityChecker.UnitAnavailableReasons>();
+
+            if (!ScentCamouflage.Instance.IsActive)
+            {
+                return reasons;
+            }
+
+            // Can only target alive, non-fan, non-turret human units
+            if (!unit.IsAlive || unit.Team != Team.Player || MindControl.MindControlledUnits.Contains(unit) || UnitsPlacementPhasePatch.IsFan(unit) || unit.UnitTag == UnitTag.Turret)
+            {
+                reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.UnitIsDead);
+            }
+
+            // Note: TeamToAffect property handles team filtering - only player units will be shown
+
+            return reasons;
+        }
+    }
+
+    /// <summary>
+    /// Custom ActionCardInfo for ScentCamouflage
+    /// </summary>
+    public class ScentCamouflageActionCardInfo : ActionCardInfo
+    {
+        public string CustomCardName => "Scent Camouflage";
+
+        public string CustomCardDescription =>
+            $"Apply xeno pheromones to a unit, making enemies unable to target it for {ScentCamouflage.GetDuration():F1} seconds.";
+
+        public ScentCamouflageActionCardInfo()
+        {
+            AccessTools.Field(typeof(ActionCardInfo), "_uses").SetValue(this, 1);
+            AccessTools.Field(typeof(ActionCardInfo), "canNotBeReplenished").SetValue(this, false);
+        }
+    }
+
+    /// <summary>
+    /// Patch to intercept CardName getter for ScentCamouflageActionCardInfo
+    /// </summary>
+    [HarmonyPatch(typeof(ActionCardInfo), "CardName", MethodType.Getter)]
+    public static class ScentCamouflageActionCardInfo_CardName_Patch
+    {
+        public static bool Prefix(ActionCardInfo __instance, ref string __result)
+        {
+            if (__instance is ScentCamouflageActionCardInfo customInfo)
+            {
+                __result = customInfo.CustomCardName;
+                return false;
+            }
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Patch to intercept CardDescription getter for ScentCamouflageActionCardInfo
+    /// </summary>
+    [HarmonyPatch(typeof(ActionCardInfo), "CardDescription", MethodType.Getter)]
+    public static class ScentCamouflageActionCardInfo_CardDescription_Patch
+    {
+        public static bool Prefix(ActionCardInfo __instance, ref string __result)
+        {
+            if (__instance is ScentCamouflageActionCardInfo customInfo)
+            {
+                __result = customInfo.CustomCardDescription;
+                return false;
+            }
+            return true;
         }
     }
 

@@ -4,6 +4,7 @@ using MelonLoader.Utils;
 using SaveSystem;
 using SpaceCommander;
 using SpaceCommander.Area;
+using SpaceCommander.Commands;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,6 +27,8 @@ namespace XenopurgeRougeLike
         // Sample choices - replace with your actual data
         public static List<Reinforcement> choices = null;
 
+        public static event Action OnUpdateEvent;
+
         public override void OnInitializeMelon()
         {
             Company.LoadSprites();
@@ -41,45 +44,45 @@ namespace XenopurgeRougeLike
         {
             if (Input.GetKeyUp(KeyCode.F11))
             {
-                var bu = FandomRallies.LastSpawnedFan;
-                if (bu == null)
-                {
-                    MelonLogger.Msg("LastSpawnedFan is null");
-                    return;
-                }
-                var los = bu.LineOfSight;
-                var mm = bu.MovementManager;
-
-                // Movement Manager's current coords
-                Vector2Int currentCoords = mm.CurrentTileCoords;      // Current tile coords
-                Vector2Int nextCoords = mm.NextTileCoords;            // Next tile coords (if moving)
-                Vector3 currentPosition = mm.CurrentTilePosition;     // World position
-                Tile currentTile = mm.CurrentTile;                    // Current Tile object
-
-                // Visible tiles from LineOfSight
-                IEnumerable<Tile> visibleTiles = los.Tiles;
-
-                // Example dump:
-                MelonLogger.Msg($"=== LineOfSight Debug for {bu.UnitName} {bu.UnitId} ===");
-                MelonLogger.Msg($"Current Coords: {currentCoords}");
-                MelonLogger.Msg($"Next Coords: {nextCoords}");
-                MelonLogger.Msg($"World Position: {currentPosition}");
-                MelonLogger.Msg($"Current Tile: {currentTile?.Coords}");
-                MelonLogger.Msg($"Visible Tiles Count: {visibleTiles.Count()}");
-
-                foreach (var tile in visibleTiles)
-                {
-                    MelonLogger.Msg($"  - Tile at {tile.Coords}");
-                }
-
                 var gameManager = GameManager.Instance;
-                BattleUnitsManager teamManager = gameManager.GetTeamManager(Team.Player);
-
-                foreach(var bu2 in teamManager.BattleUnits)
+                var playerTM = gameManager.GetTeamManager(Team.Player);
+                foreach (var unit in playerTM.BattleUnits)
                 {
-                    MelonLogger.Msg($"=== Player has {bu2.UnitName} {bu2.UnitId} ===");
+                    MelonLogger.Msg($"Interrupting {unit.UnitName} {unit.CommandsManager.CurrentCommand?.CommandName}");
+                    foreach (var cmd in unit.CommandsManager.Commands)
+                    {
+                        var _lockTarget = AccessTools.FindIncludingBaseTypes(cmd.GetType(), t => t.GetField("_lockTarget", AccessTools.all))?.GetValue(cmd);
+                        if (_lockTarget != null && _lockTarget is LockCloseCombatTarget lcbt)
+                        {
+                            var damagableTarget = lcbt.DamagableTarget;
+                            MelonLogger.Msg($"Interrupting {cmd.GetType().Name} of {unit.UnitName} on {damagableTarget}");
+                            AccessTools.Field(lcbt.GetType(), "_target").SetValue(lcbt, null);
+                            lcbt.UpdateTarget(unit.MovementManager.CurrentTileCoords);
+                        }
+                        else if (_lockTarget != null && _lockTarget is LockTarget lt)
+                        {
+                            var damagableTarget = lt.DamagableTarget;
+                            MelonLogger.Msg($"Interrupting {cmd.GetType().Name} of {unit.UnitName} on {damagableTarget}");
+                            AccessTools.Field(lt.GetType(), "_target").SetValue(lt, null);
+                            lt.UpdateTarget(unit.MovementManager.CurrentTileCoords);
+                        }
+                    }
+
+                    unit.CommandsManager.CurrentCommand?.Interrupt();
+                    unit.CommandsManager.StopCommandsExecution();
+                    unit.CommandsManager.StartCommandsExecution();
                 }
             }
+            else if (Input.GetKeyUp(KeyCode.F10))
+            {
+                var gameManager = GameManager.Instance;
+                var playerTM = gameManager.GetTeamManager(Team.Player);
+                foreach (var unit in playerTM.BattleUnits)
+                {
+                    MelonLogger.Msg($"{unit.UnitName} has Speed {unit.Speed}");
+                }
+            }
+            OnUpdateEvent?.Invoke();
         }
 
         public static List<Reinforcement> GetChoices()

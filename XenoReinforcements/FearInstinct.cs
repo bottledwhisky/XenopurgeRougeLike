@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.Area;
@@ -31,7 +31,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         }
 
         protected static FearInstinct instance;
-public static FearInstinct Instance => instance ??= new();
+        public static FearInstinct Instance => instance ??= new();
     }
 
     /// <summary>
@@ -50,8 +50,7 @@ public static FearInstinct Instance => instance ??= new();
             // Only hook enemy units
             if (team == Team.EnemyAI)
             {
-                Action action = null;
-                action = () =>
+                void action()
                 {
                     // When any enemy dies, delay the next wave
                     var spawner = TempSingleton<GameManager>.Instance?.EnemiesSpawnerInBattle;
@@ -61,7 +60,8 @@ public static FearInstinct Instance => instance ??= new();
                         MelonLogger.Msg($"FearInstinct: Enemy killed, delaying next wave by {FearInstinct.DelayPerKill}s");
                     }
                     __instance.OnDeath -= action;
-                };
+                }
+
                 __instance.OnDeath += action;
             }
         }

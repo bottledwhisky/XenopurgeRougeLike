@@ -16,12 +16,12 @@ using UnityEngine;
 namespace XenopurgeRougeLike.XenoReinforcements
 {
     /// <summary>
-    /// 控制异形：将一个敌人转化为友方单位，可使用1/2次
-    /// Mind Control: Convert an enemy unit to your team, usable 1/2 times
+    /// 控制异形：将一个敌人转化为友方单位，可使用2/4次
+    /// Mind Control: Convert an enemy unit to your team, usable 2/4 times
     /// </summary>
     public class MindControl : Reinforcement
     {
-        public static readonly int[] UsesPerStack = [1, 2];
+        public static readonly int[] UsesPerStack = [2, 4];
 
         public MindControl()
         {
@@ -100,7 +100,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
             if (!MindControl.Instance.IsActive)
                 return;
 
-            if (unit == null || !unit.IsAlive || unit.Team != Enumerations.Team.EnemyAI)
+            if (unit == null || !unit.IsAlive || unit.Team != Enumerations.Team.EnemyAI || unit.UnitTag == Enumerations.UnitTag.Hive)
                 return;
 
             MindControlSystem.ConvertUnitToPlayer(unit);
@@ -116,7 +116,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
             }
 
             // Can only target alive units
-            if (!unit.IsAlive)
+            if (!unit.IsAlive || unit.UnitTag == Enumerations.UnitTag.Hive)
             {
                 reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.UnitIsDead);
             }
@@ -228,7 +228,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
         /// <summary>
         /// Converts an enemy unit to the player's team by removing it and spawning a clone.
         /// </summary>
-        public static void ConvertUnitToPlayer(BattleUnit enemyUnit)
+        /// <param name="enemyUnit">The enemy unit to convert</param>
+        /// <param name="attackerUnit">Optional: The unit that triggered the conversion (e.g., via Submission melee). If provided, their close combat command will be interrupted.</param>
+        public static void ConvertUnitToPlayer(BattleUnit enemyUnit, BattleUnit attackerUnit = null)
         {
             try
             {
@@ -261,7 +263,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
                 Tile currentTile = enemyUnit.CurrentTile;
 
                 // Step 3: Remove the enemy unit without triggering death events
-                RemoveUnitSilently(enemyUnit, enemyManager, gameManager);
+                enemyUnit.Damage(9999);
 
                 // Step 4: Create a new player unit with the captured state
                 var playerUnit = CreatePlayerUnit(capturedState, gameManager.GridManager);
@@ -321,61 +323,6 @@ namespace XenopurgeRougeLike.XenoReinforcements
                 : new List<(Enumerations.UnitStats, float)>();
 
             return state;
-        }
-
-        /// <summary>
-        /// Removes a unit from battle without triggering death events or achievements.
-        /// This manually performs the cleanup that would normally happen in ExtractBattleUnit/DisposeUnit.
-        /// </summary>
-        private static void RemoveUnitSilently(BattleUnit unit, BattleUnitsManager enemyManager, GameManager gameManager)
-        {
-            // First, get and destroy the visual representation
-            var pawnConnector = gameManager.BattleUnitToPawnConnector;
-
-            // GetPawn is internal, so we need to access it via reflection or the dictionary directly
-            BattleUnitGO pawn = null;
-            if (_battleUnitToPawnField != null)
-            {
-                var dict = _battleUnitToPawnField.GetValue(pawnConnector) as Dictionary<BattleUnit, BattleUnitGO>;
-                if (dict != null && dict.TryGetValue(unit, out var foundPawn))
-                {
-                    pawn = foundPawn;
-                }
-            }
-
-            if (pawn != null)
-            {
-                // Unbind the character from the connector
-                pawnConnector.UnBindCharacter(unit);
-                // Destroy the GameObject
-                UnityEngine.Object.Destroy(pawn.gameObject);
-            }
-
-            // Set the _isExtracted flag to prevent OnDeath from triggering achievement logic
-            _isExtractedField.SetValue(unit, true);
-
-            // Stop command execution and movement
-            unit.CommandsManager.StopCommandsExecution();
-            unit.MovementManager.ImmediatelyStopMovement();
-
-            // Remove from tile
-            if (unit.CurrentTile != null)
-            {
-                unit.CurrentTile.CurrentStateOfTile.RemoveUnit(unit);
-            }
-
-            // Clear line of sight
-            unit.LineOfSight.ClearReferencesAndEvents();
-
-            // Dispose abilities
-            unit.UnitAbilityManager.DisposeAbilities();
-
-            // Remove from the enemy manager's list directly (avoiding ExtractBattleUnit which fires events)
-            var battleUnits = _battleUnitsField.GetValue(enemyManager) as List<BattleUnit>;
-            if (battleUnits != null)
-            {
-                battleUnits.Remove(unit);
-            }
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.Abilities;
@@ -10,12 +10,12 @@ using static SpaceCommander.Enumerations;
 namespace XenopurgeRougeLike.XenoReinforcements
 {
     /// <summary>
-    /// 屈服：对异形造成近战伤害后，有50%概率将其变为友军
-    /// Submission: After dealing melee damage to a xeno, there is a 50% chance to convert it to your team
+    /// 屈服：对生命值只剩一半或以下异形造成近战伤害后，有50%概率将其变为友军
+    /// Submission: After dealing melee damage to a xeno below half health, there is a 50% chance to convert it to your team
     /// </summary>
     public class Submission : Reinforcement
     {
-        public const float ConversionChance = 0.5f;
+        public const float ConversionChance = .5f;
 
         public Submission()
         {
@@ -33,7 +33,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         }
 
         protected static Submission instance;
-public static Submission Instance => instance ??= new();
+        public static Submission Instance => instance ??= new();
     }
 
     /// <summary>
@@ -48,16 +48,24 @@ public static Submission Instance => instance ??= new();
                 return;
 
             // Only process for player units attacking
-            if (____battleUnit == null || ____battleUnit.Team != Team.Player)
+            if (____battleUnit == null || ____battleUnit.Team != Team.Player || MindControl.MindControlledUnits.Contains(____battleUnit))
                 return;
 
             // Check if target is a valid enemy unit
             if (____target == null || !____target.IsAlive)
                 return;
 
+            var bu = ____target as BattleUnit;
+            if (bu == null) return;
+
+            if (bu.CurrentHealth / bu.CurrentMaxHealth > 0.5f)
+            {
+                return;
+            }
+
             // Target must be a BattleUnit (xeno)
             var targetUnit = ____target as BattleUnit;
-            if (targetUnit == null || targetUnit.Team != Team.EnemyAI)
+            if (targetUnit == null || targetUnit.Team != Team.EnemyAI || targetUnit.UnitTag == UnitTag.Hive)
                 return;
 
             // Roll for conversion chance
@@ -71,7 +79,7 @@ public static Submission Instance => instance ??= new();
             MelonLogger.Msg($"Submission: Roll succeeded ({roll:F2} <= {Submission.ConversionChance}), converting {targetUnit.UnitNameNoNumber}");
 
             // Convert the xeno to player team
-            MindControlSystem.ConvertUnitToPlayer(targetUnit);
+            MindControlSystem.ConvertUnitToPlayer(targetUnit, ____battleUnit);
         }
     }
 }
