@@ -10,7 +10,13 @@ namespace XenopurgeRougeLike
     {
         Synthetics,
         Xeno,
-        Rockstar
+        Rockstar,
+        Engineer,
+        Support,
+        Warrior,
+        Gunslinger,
+        Scavenger,
+        Clone
     }
 
     public class Company
@@ -36,7 +42,13 @@ namespace XenopurgeRougeLike
                     {
                         { CompanyType.Synthetics, Synthetics },
                         { CompanyType.Xeno, Xeno },
-                        { CompanyType.Rockstar, Rockstar }
+                        { CompanyType.Rockstar, Rockstar },
+                        { CompanyType.Engineer, Engineer },
+                        { CompanyType.Support, Support },
+                        { CompanyType.Warrior, Warrior },
+                        { CompanyType.Gunslinger, Gunslinger },
+                        { CompanyType.Scavenger, Scavenger },
+                        { CompanyType.Clone, Clone }
                     };
                     return companies;
                 }
@@ -105,6 +117,90 @@ namespace XenopurgeRougeLike
             IconPath = "nova-entertainment.png",
             Sprite = null,
             BorderColor = new Color32(255, 80, 180, 255),
+        };
+
+        private static Company _engineer;
+        public static Company Engineer => _engineer ??= new()
+        {
+            ClassType = typeof(Engineer),
+            Type = CompanyType.Engineer,
+            Name = "Sevastopol Systems",
+            ShortName = "Sevastopol",
+            Slogan = "Tomorrow, together.",
+            Description = "Sevastopol Systems specializes in defensive technology and automated systems.",
+            IconPath = "sevastopol-systems.png",
+            Sprite = null,
+            BorderColor = new Color32(120, 140, 160, 255),
+        };
+
+        private static Company _support;
+        public static Company Support => _support ??= new()
+        {
+            ClassType = typeof(Support),
+            Type = CompanyType.Support,
+            Name = "Gateway Medical",
+            ShortName = "Gateway",
+            Slogan = "Your lifeline in deep space.",
+            Description = "Gateway Medical provides comprehensive medical support and supply services.",
+            IconPath = "gateway-medical.png",
+            Sprite = null,
+            BorderColor = new Color32(100, 180, 100, 255),
+        };
+
+        private static Company _warrior;
+        public static Company Warrior => _warrior ??= new()
+        {
+            ClassType = typeof(Warrior),
+            Type = CompanyType.Warrior,
+            Name = "Hadley Security",
+            ShortName = "Hadley Sec.",
+            Slogan = "Last stand, every time.",
+            Description = "Hadley Security trains elite combat specialists for hostile environments.",
+            IconPath = "hadley-security.png",
+            Sprite = null,
+            BorderColor = new Color32(180, 60, 60, 255),
+        };
+
+        private static Company _gunslinger;
+        public static Company Gunslinger => _gunslinger ??= new()
+        {
+            ClassType = typeof(Gunslinger),
+            Type = CompanyType.Gunslinger,
+            Name = "Sulaco Arms",
+            ShortName = "Sulaco",
+            Slogan = "Absolute firepower.",
+            Description = "Sulaco Arms manufactures military-grade weaponry and tactical equipment.",
+            IconPath = "sulaco-arms.png",
+            Sprite = null,
+            BorderColor = new Color32(200, 120, 40, 255),
+        };
+
+        private static Company _scavenger;
+        public static Company Scavenger => _scavenger ??= new()
+        {
+            ClassType = typeof(Scavenger),
+            Type = CompanyType.Scavenger,
+            Name = "Torrens Salvage",
+            ShortName = "Torrens",
+            Slogan = "One person's trash is our treasure.",
+            Description = "Torrens Salvage is a loose collective of independent scavengers and opportunists operating under a common banner.",
+            IconPath = "torrens-salvage.png",
+            Sprite = null,
+            BorderColor = new Color32(140, 120, 80, 255),
+        };
+
+        private static Company _clone;
+        public static Company Clone => _clone ??= new()
+        {
+            ClassType = typeof(Clone),
+            Type = CompanyType.Clone,
+            Name = "Acheron BioGen",
+            ShortName = "Acheron",
+            Slogan = "Death is just the beginning.",
+            Description = "Acheron BioGen pioneers resurrection and biological replication technology.",
+            IconPath = "acheron-biogen.png",
+            Sprite = null,
+            BorderColor = new Color32(100, 100, 140, 255),
         };
     }
 
