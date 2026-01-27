@@ -75,12 +75,7 @@ namespace XenopurgeRougeLike
             }
             else if (Input.GetKeyUp(KeyCode.F10))
             {
-                var gameManager = GameManager.Instance;
-                var playerTM = gameManager.GetTeamManager(Team.Player);
-                foreach (var unit in playerTM.BattleUnits)
-                {
-                    MelonLogger.Msg($"{unit.UnitName} has Speed {unit.Speed}");
-                }
+                LoggingUtils.LogAllDatabaseActionCards();
             }
             OnUpdateEvent?.Invoke();
         }
