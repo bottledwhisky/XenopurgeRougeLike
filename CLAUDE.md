@@ -7,52 +7,15 @@ I might use Chinese to communicate with you, but the code is mostly in English.
 About this mod:
 This mod adds a rouge-like system to the game, allowing players to call for reinforcements after each mission. The reinforcements have unique attributes and abilities, making each playthrough different.
 
+Some important files:
+    Companies.cs: Contains all definitions of the companies (paths). And basic classes like Company/CompanyAffinity
+    Reinforcement.cs: The base class of all Reinforcements.
+    UnitStatsTools.cs: Some existing code to help mess with unit stats.
+    ActionCardsUpgraderTools.cs: Some existing code to help mess with generating action cards in the action cards store.
+    XenopurgeRougeLike.txt: If you are looking for some existing examples of certain effects, you can check this file. Please be noted that not all reinforcements/affinities are implemented yet. But it's a good place to start.
+
 About the original game:
 The original game is called "Xenopurge". It is a tactical RTS where players control a squad of soldiers fighting against aliens(xenoes). During battle, the game allows the player to use "ActionCards" to perform actions, not direct control.
-
-D:\projects\xenopurge\old> dir
-    Directory: D:\projects\xenopurge\old
-
-Mode                 LastWriteTime         Length Name
-----                 -------------         ------ ----
-d----            2026/1/3    17:44                .claude
-d----            2026/1/3    17:07                SpaceCommander
-d----            2026/1/3    17:11                SpaceCommander.Abilities
-d----          2025/12/25    21:30                SpaceCommander.Achievements
-d----            2026/1/3    17:15                SpaceCommander.ActionCards
-d----            2026/1/3    17:22                SpaceCommander.Area
-d----          2025/12/25    21:30                SpaceCommander.Area.BSP
-d----          2025/12/25    21:30                SpaceCommander.Area.Drawers
-d----          2025/12/25    21:30                SpaceCommander.Audio
-d----            2026/1/3    17:26                SpaceCommander.BattleManagement
-d----            2026/1/3    17:27                SpaceCommander.BattleManagement.UI
-d----          2025/12/25    21:30                SpaceCommander.Camera
-d----          2025/12/25    21:30                SpaceCommander.CommanderStatus.UI
-d----            2026/1/3    17:32                SpaceCommander.Commands
-d----          2025/12/25    21:30                SpaceCommander.Commands.SpaceCommander.Commands
-d----          2025/12/25    21:30                SpaceCommander.CustomInputControls
-d----            2026/1/3    17:35                SpaceCommander.Database
-d----            2026/1/3    17:38                SpaceCommander.Difficulties
-d----            2026/1/3    17:39                SpaceCommander.EndGame
-d----            2026/1/3    17:41                SpaceCommander.GameFlow
-d----            2026/1/3    17:41                SpaceCommander.HomeScreen.UI
-d----          2025/12/25    21:30                SpaceCommander.InteractionSystem
-d----          2025/12/25    21:30                SpaceCommander.LogsScreen.UI
-d----            2026/1/3    17:42                SpaceCommander.Objectives
-d----            2026/1/3    17:44                SpaceCommander.PartyCustomization
-d----          2025/12/25    21:30                SpaceCommander.PartyCustomization.UI
-d----            2026/1/3    17:44                SpaceCommander.PersistentProgression
-d----            2026/1/3    17:44                SpaceCommander.Progression
-d----          2025/12/25    21:30                SpaceCommander.ScenesFlow
-d----          2025/12/25    21:30                SpaceCommander.ScreensSystem
-d----          2025/12/25    21:30                SpaceCommander.SquadSelection.UI
-d----          2025/12/25    21:30                SpaceCommander.Tests
-d----          2025/12/25    21:30                SpaceCommander.Tutorial
-d----            2026/1/3    17:46                SpaceCommander.UI
-d----          2025/12/25    21:30                SpaceCommander.Utilities
-d----          2025/12/25    21:30                SpaceCommander.Variants
-d----            2026/1/3    17:46                SpaceCommander.Weapons
--a---            2026/1/3    17:19            161 README
 
 Keywords:
     增援(reinforcement) is a term only used in the mod, not in the original game.

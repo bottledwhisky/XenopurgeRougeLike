@@ -51,28 +51,102 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     }
 
     /// <summary>
-    /// Patch to boost grenade damage (ChangeCurrentHealthArea_Card)
+    /// Shared helpers for Engineer affinity patches
     /// </summary>
-    [HarmonyPatch(typeof(ChangeCurrentHealthArea_Card), "ApplyCommand")]
-    public static class EngineerAffinity2_GrenadeDamage_Patch
+    public static class EngineerAffinityHelpers
     {
+        // Cached field accessors
         private static readonly AccessTools.FieldRef<ChangeCurrentHealthArea_Card, float> _changeValueRef =
             AccessTools.FieldRefAccess<ChangeCurrentHealthArea_Card, float>("_changeValue");
+        private static readonly AccessTools.FieldRef<ChangeStatArea_Card, float> _durationRef =
+            AccessTools.FieldRefAccess<ChangeStatArea_Card, float>("_duration");
+        private static readonly AccessTools.FieldRef<ChangeStatArea_Card, float> _remainingTimeRef =
+            AccessTools.FieldRefAccess<ChangeStatArea_Card, float>("_remainingTime");
 
-        public static void Prefix(ChangeCurrentHealthArea_Card __instance)
+        /// <summary>
+        /// Get the highest active explosive damage multiplier
+        /// </summary>
+        public static float GetExplosiveDamageMultiplier()
         {
-            if (!EngineerAffinity2.Instance.IsActive)
+            float multiplier = 1f;
+
+            if (EngineerAffinity2.Instance.IsActive)
+                multiplier = EngineerAffinity2.ExplosiveDamageMultiplier;
+
+            // Higher level affinities override
+            if (EngineerAffinity4.Instance?.IsActive == true)
+                multiplier = EngineerAffinity4.ExplosiveDamageMultiplier;
+
+            if (EngineerAffinity6.Instance?.IsActive == true)
+                multiplier = EngineerAffinity6.ExplosiveDamageMultiplier;
+
+            return multiplier;
+        }
+
+        /// <summary>
+        /// Get the highest active flashbang duration multiplier
+        /// </summary>
+        public static float GetFlashbangDurationMultiplier()
+        {
+            float multiplier = 1f;
+
+            if (EngineerAffinity2.Instance.IsActive)
+                multiplier = EngineerAffinity2.FlashbangDurationMultiplier;
+
+            // Higher level affinities override
+            if (EngineerAffinity4.Instance?.IsActive == true)
+                multiplier = EngineerAffinity4.FlashbangDurationMultiplier;
+
+            if (EngineerAffinity6.Instance?.IsActive == true)
+                multiplier = EngineerAffinity6.FlashbangDurationMultiplier;
+
+            return multiplier;
+        }
+
+        /// <summary>
+        /// Apply explosive damage multiplier to ChangeCurrentHealthArea_Card
+        /// </summary>
+        public static void ApplyExplosiveDamageBoost(ChangeCurrentHealthArea_Card instance)
+        {
+            float multiplier = GetExplosiveDamageMultiplier();
+            if (multiplier <= 1f)
                 return;
 
-            // Get the damage value (negative value for damage)
-            ref float changeValue = ref _changeValueRef(__instance);
+            ref float changeValue = ref _changeValueRef(instance);
 
             // Only boost if it's damage (negative value)
             if (changeValue < 0f)
             {
-                // Apply explosive damage multiplier (grenades and mines)
-                changeValue *= EngineerAffinity2.ExplosiveDamageMultiplier;
+                changeValue *= multiplier;
             }
+        }
+
+        /// <summary>
+        /// Apply flashbang duration multiplier to ChangeStatArea_Card
+        /// </summary>
+        public static void ApplyFlashbangDurationBoost(ChangeStatArea_Card instance)
+        {
+            float multiplier = GetFlashbangDurationMultiplier();
+            if (multiplier <= 1f)
+                return;
+
+            ref float duration = ref _durationRef(instance);
+            ref float remainingTime = ref _remainingTimeRef(instance);
+
+            duration *= multiplier;
+            remainingTime *= multiplier;
+        }
+    }
+
+    /// <summary>
+    /// Patch to boost grenade damage (ChangeCurrentHealthArea_Card)
+    /// </summary>
+    [HarmonyPatch(typeof(ChangeCurrentHealthArea_Card), "ApplyCommand")]
+    public static class Engineer_GrenadeDamage_Patch
+    {
+        public static void Prefix(ChangeCurrentHealthArea_Card __instance)
+        {
+            EngineerAffinityHelpers.ApplyExplosiveDamageBoost(__instance);
         }
     }
 
@@ -80,25 +154,11 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     /// Patch to boost flashbang duration (ChangeStatArea_Card)
     /// </summary>
     [HarmonyPatch(typeof(ChangeStatArea_Card), "ApplyCommand")]
-    public static class EngineerAffinity2_FlashbangDuration_Patch
+    public static class Engineer_FlashbangDuration_Patch
     {
-        private static readonly AccessTools.FieldRef<ChangeStatArea_Card, float> _durationRef =
-            AccessTools.FieldRefAccess<ChangeStatArea_Card, float>("_duration");
-        private static readonly AccessTools.FieldRef<ChangeStatArea_Card, float> _remainingTimeRef =
-            AccessTools.FieldRefAccess<ChangeStatArea_Card, float>("_remainingTime");
-
         public static void Prefix(ChangeStatArea_Card __instance)
         {
-            if (!EngineerAffinity2.Instance.IsActive)
-                return;
-
-            // Get references to the duration values
-            ref float duration = ref _durationRef(__instance);
-            ref float remainingTime = ref _remainingTimeRef(__instance);
-
-            // Apply flashbang duration multiplier
-            duration *= EngineerAffinity2.FlashbangDurationMultiplier;
-            remainingTime *= EngineerAffinity2.FlashbangDurationMultiplier;
+            EngineerAffinityHelpers.ApplyFlashbangDurationBoost(__instance);
         }
     }
 }

@@ -29,14 +29,21 @@ namespace XenopurgeRougeLike
         public static List<CompanyAffinity> Affinities => _affinities ??=
         [
             EngineerAffinity2.Instance,
-            // TODO: EngineerAffinity4.Instance,
-            // TODO: EngineerAffinity6.Instance,
+            EngineerAffinity4.Instance,
+            EngineerAffinity6.Instance,
         ];
 
         public static Dictionary<Type, Reinforcement> _reinforcements;
         public static Dictionary<Type, Reinforcement> Reinforcements => _reinforcements ??= new()
         {
-            // TODO: Register engineer reinforcements here
+            { typeof(AdvancedMagazine), AdvancedMagazine.Instance },
+            { typeof(SpiderMine), SpiderMine.Instance },
+            { typeof(ShapedCharge), ShapedCharge.Instance },
+            { typeof(HeavyTurret), HeavyTurret.Instance },
+            // { typeof(ModularDesign), ModularDesign.Instance }, // TODO: Fix ModularDesign implementation
+            { typeof(TacticalBelt), TacticalBelt.Instance },
+            { typeof(BigBang), BigBang.Instance },
+            { typeof(CarbonFiberSupport), CarbonFiberSupport.Instance },
         };
 
         public static bool IsAvailable()
