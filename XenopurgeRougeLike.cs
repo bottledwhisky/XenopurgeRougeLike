@@ -38,6 +38,7 @@ namespace XenopurgeRougeLike
             Company.Synthetics.Affinities = Synthetics.Affinities;
             Company.Rockstar.Affinities = Rockstar.Affinities;
             Company.Xeno.Affinities = Xeno.Affinities;
+            Company.Engineer.Affinities = Engineer.Affinities;
         }
 
         public override void OnUpdate()

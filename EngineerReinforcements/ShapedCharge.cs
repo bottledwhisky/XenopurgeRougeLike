@@ -206,7 +206,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     [HarmonyPatch(typeof(BattleUnit), "ChangeStat")]
     public static class ShapedCharge_ReduceFlashbangEffect_Patch
     {
-        public static void Prefix(BattleUnit __instance, ref float changeValue)
+        public static void Prefix(BattleUnit __instance, ref float value)
         {
             if (!ShapedCharge.Instance.IsActive)
                 return;
@@ -214,10 +214,10 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             // Only reduce negative effects (debuffs) on friendly units in explosion context
             if (ShapedChargeContext.IsUnitInExplosionContext(__instance) &&
                 __instance.Team == Enumerations.Team.Player &&
-                changeValue < 0f)
+                value < 0f)
             {
                 float reductionMultiplier = ShapedCharge.FriendlyFireReduction[ShapedCharge.Instance.currentStacks - 1];
-                changeValue *= reductionMultiplier;
+                value *= reductionMultiplier;
             }
         }
     }

@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander.ActionCards;
 using System;
 using System.Collections.Generic;
@@ -36,7 +36,6 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     /// Patch ActionCard constructor to add bonus uses for turret cards when CarbonFiberSupport is active
     /// </summary>
     [HarmonyPatch(typeof(ActionCard), MethodType.Constructor)]
-    [HarmonyPatch(new Type[] { typeof(ActionCardInfo) })]
     public static class CarbonFiberSupport_ActionCard_Constructor_Patch
     {
         public static void Postfix(ActionCard __instance)

@@ -57,18 +57,18 @@ namespace XenopurgeRougeLike.EngineerReinforcements
         [HarmonyPatch(typeof(RangedWeapon), "ShootOneBullet")]
         public static class RangedWeapon_ShootOneBullet_Patch
         {
-            private static readonly AccessTools.FieldRef<RangedWeapon, BattleUnit> _targetRef =
-                AccessTools.FieldRefAccess<RangedWeapon, BattleUnit>("_target");
+            private static readonly AccessTools.FieldRef<RangedWeapon, IDamagable> _targetRef =
+                AccessTools.FieldRefAccess<RangedWeapon, IDamagable>("_target");
 
             public static void Prefix(RangedWeapon __instance)
             {
                 if (!HeavyTurret.Instance.IsActive)
                     return;
 
-                BattleUnit target = _targetRef(__instance);
-                if (target != null)
+                IDamagable target = _targetRef(__instance);
+                if (target is BattleUnit battleUnit)
                 {
-                    _unitsBeingShotByRangedWeapon.Add(target);
+                    _unitsBeingShotByRangedWeapon.Add(battleUnit);
                 }
             }
 
@@ -77,10 +77,10 @@ namespace XenopurgeRougeLike.EngineerReinforcements
                 if (!HeavyTurret.Instance.IsActive)
                     return;
 
-                BattleUnit target = _targetRef(__instance);
-                if (target != null)
+                IDamagable target = _targetRef(__instance);
+                if (target is BattleUnit battleUnit)
                 {
-                    _unitsBeingShotByRangedWeapon.Remove(target);
+                    _unitsBeingShotByRangedWeapon.Remove(battleUnit);
                 }
             }
         }

@@ -1,4 +1,4 @@
-using SpaceCommander;
+﻿using SpaceCommander;
 using System;
 using System.Collections.Generic;
 using XenopurgeRougeLike.EngineerReinforcements;
@@ -22,7 +22,7 @@ namespace XenopurgeRougeLike
     // 专家：
     //     大爆炸：地雷，手雷，闪光弹范围加1
     //     碳纤维支架：可额外携带一架炮台进入任务
-    //     炮台升级为SIN转轮机枪，炮台准确率+15
+    //     双联发炮台：炮台每次发射双倍的投射物
     public class Engineer
     {
         public static List<CompanyAffinity> _affinities;
@@ -40,15 +40,15 @@ namespace XenopurgeRougeLike
             { typeof(SpiderMine), SpiderMine.Instance },
             { typeof(ShapedCharge), ShapedCharge.Instance },
             { typeof(HeavyTurret), HeavyTurret.Instance },
-            // { typeof(ModularDesign), ModularDesign.Instance }, // TODO: Fix ModularDesign implementation
+            { typeof(ModularDesign), ModularDesign.Instance },
             { typeof(TacticalBelt), TacticalBelt.Instance },
             { typeof(BigBang), BigBang.Instance },
             { typeof(CarbonFiberSupport), CarbonFiberSupport.Instance },
+            { typeof(DoubleBarreledTurret), DoubleBarreledTurret.Instance },
         };
 
         public static bool IsAvailable()
         {
-            // TODO: Define availability conditions
             return true;
         }
     }

@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander.ActionCards;
 using System;
 using XenopurgeRougeLike.EngineerReinforcements;
@@ -30,7 +30,6 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     /// Shared logic with EngineerAffinity6
     /// </summary>
     [HarmonyPatch(typeof(ActionCard), MethodType.Constructor)]
-    [HarmonyPatch(new Type[] { typeof(ActionCardInfo) })]
     public static class TacticalBelt_ActionCard_Constructor_Patch
     {
         public static void Postfix(ActionCard __instance)
