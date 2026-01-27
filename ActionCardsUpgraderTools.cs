@@ -67,15 +67,12 @@ namespace XenopurgeRougeLike
         }
 
         /// <summary>
-        /// Apply all active probability modifiers to the card pool
+        /// Apply all active probability modifiers to weighted card choices
         /// </summary>
-        internal static void ApplyProbabilityModifiers(List<string> cardPool)
+        internal static void ApplyProbabilityModifiers(List<Tuple<int, string>> weightedChoices)
         {
-            if (cardPool == null || cardPool.Count == 0)
+            if (weightedChoices == null || weightedChoices.Count == 0)
                 return;
-
-            int originalCount = cardPool.Count;
-            int addedCount = 0;
 
             foreach (var modifierPair in ProbabilityModifiers)
             {
@@ -86,27 +83,22 @@ namespace XenopurgeRougeLike
                 if (!modifier.IsActive())
                     continue;
 
-                // For each card ID in the modifier
-                foreach (var cardId in modifier.CardIds)
+                // For each weighted choice
+                for (int i = 0; i < weightedChoices.Count; i++)
                 {
-                    // Check if this card is in the pool
-                    if (cardPool.Contains(cardId))
-                    {
-                        // Add additional copies to increase probability
-                        for (int i = 0; i < modifier.AdditionalCopies; i++)
-                        {
-                            cardPool.Add(cardId);
-                            addedCount++;
-                        }
+                    var cardId = weightedChoices[i].Item2;
 
-                        MelonLogger.Msg($"ActionCardsUpgraderTools: Applied modifier '{id}' - added {modifier.AdditionalCopies} copies of card {cardId}");
+                    // Check if this card should get a weight boost
+                    if (modifier.CardIds.Contains(cardId))
+                    {
+                        // Increase the weight by adding additional copies worth of weight
+                        int currentWeight = weightedChoices[i].Item1;
+                        int newWeight = currentWeight * (1 + modifier.AdditionalCopies);
+                        weightedChoices[i] = new Tuple<int, string>(newWeight, cardId);
+
+                        MelonLogger.Msg($"ActionCardsUpgraderTools: Applied modifier '{id}' - boosted card {cardId} weight from {currentWeight} to {newWeight}");
                     }
                 }
-            }
-
-            if (addedCount > 0)
-            {
-                MelonLogger.Msg($"ActionCardsUpgraderTools: Card pool expanded from {originalCount} to {cardPool.Count} cards (+{addedCount} copies)");
             }
         }
     }
@@ -175,8 +167,9 @@ namespace XenopurgeRougeLike
                 var persistentProgressionManager = Singleton<PersistentProgressionManager>.Instance;
                 var startingSquadId = Singleton<Player>.Instance.PlayerData.Squad.StartingSquadId;
 
-                // Build list of cards that are unlocked and not owned
-                List<string> cardsUnlockedAndNotOwnedByPlayer = new List<string>();
+                // Build weighted list of cards that are unlocked and not owned
+                // Each card starts with weight of 1
+                List<Tuple<int, string>> weightedChoices = [];
 
                 foreach (var item in allCards)
                 {
@@ -190,43 +183,45 @@ namespace XenopurgeRougeLike
 
                     if (!isOwned && isUnlocked && canUseBySquad && accessPointsAllowed && bioweaveAllowed)
                     {
-                        cardsUnlockedAndNotOwnedByPlayer.Add(item.Id);
+                        weightedChoices.Add(new Tuple<int, string>(1, item.Id)); // Default weight = 1
                     }
                 }
 
-                MelonLogger.Msg($"ActionCardsUpgrader_ChooseActionCards_Patch: Found {cardsUnlockedAndNotOwnedByPlayer.Count} available cards");
+                MelonLogger.Msg($"ActionCardsUpgrader_ChooseActionCards_Patch: Found {weightedChoices.Count} available cards");
 
                 // Apply probability modifiers to increase chances of specific cards
-                ActionCardsUpgraderTools.ApplyProbabilityModifiers(cardsUnlockedAndNotOwnedByPlayer);
+                ActionCardsUpgraderTools.ApplyProbabilityModifiers(weightedChoices);
 
                 // Handle special priority for access points and bioweave cards
                 string priorityCard = string.Empty;
+                var availableCardIds = weightedChoices.Select(wc => wc.Item2).ToList();
 
                 if (Singleton<Player>.Instance.PlayerData.AccessPointsSystemEnabled)
                 {
                     var accessPointsCards = allCards
                         .Where(card => card.Info.Group == SpaceCommander.ActionCards.ActionCardInfo.ActionCardGroup.accessPoints &&
-                                      cardsUnlockedAndNotOwnedByPlayer.Contains(card.Id))
+                                      availableCardIds.Contains(card.Id))
                         .ToList();
                     if (accessPointsCards.Count > 0)
                     {
                         priorityCard = accessPointsCards[UnityEngine.Random.Range(0, accessPointsCards.Count)].Id;
-                        // Remove all instances of this card from the pool
-                        cardsUnlockedAndNotOwnedByPlayer.RemoveAll(id => id == priorityCard);
+                        // Remove this card from the weighted pool
+                        weightedChoices.RemoveAll(wc => wc.Item2 == priorityCard);
                     }
                 }
 
                 if (Singleton<Player>.Instance.PlayerData.BioweaveSystemEnabled && string.IsNullOrEmpty(priorityCard))
                 {
+                    availableCardIds = weightedChoices.Select(wc => wc.Item2).ToList();
                     var bioweaveCards = allCards
                         .Where(card => card.Info.Group == SpaceCommander.ActionCards.ActionCardInfo.ActionCardGroup.bioweavePoints &&
-                                      cardsUnlockedAndNotOwnedByPlayer.Contains(card.Id))
+                                      availableCardIds.Contains(card.Id))
                         .ToList();
                     if (bioweaveCards.Count > 0)
                     {
                         priorityCard = bioweaveCards[UnityEngine.Random.Range(0, bioweaveCards.Count)].Id;
-                        // Remove all instances of this card from the pool
-                        cardsUnlockedAndNotOwnedByPlayer.RemoveAll(id => id == priorityCard);
+                        // Remove this card from the weighted pool
+                        weightedChoices.RemoveAll(wc => wc.Item2 == priorityCard);
                     }
                 }
 
@@ -237,10 +232,29 @@ namespace XenopurgeRougeLike
                 int extraSlots = persistentProgressionManager.GetStoreExtraSlots(Enumerations.StoreType.ActionCards);
                 int amountToShow = upgradeDataSO.AmountOfActionCardsToBuy + extraSlots - difficultyReduction;
 
-                // Select random cards
-                if (cardsUnlockedAndNotOwnedByPlayer.Count > 0)
+                // Select random cards using weighted random selection (like GetChoices)
+                if (weightedChoices.Count > 0)
                 {
-                    actionCardsAvailableToBuy.AddRange(CollectionUtils.GetRandomElements(cardsUnlockedAndNotOwnedByPlayer, amountToShow));
+                    int totalWeight = weightedChoices.Sum(wc => wc.Item1);
+                    Random rng = new();
+
+                    for (int i = 0; i < amountToShow && weightedChoices.Count > 0; i++)
+                    {
+                        int roll = rng.Next(totalWeight);
+                        int cumulative = 0;
+
+                        for (int j = 0; j < weightedChoices.Count; j++)
+                        {
+                            cumulative += weightedChoices[j].Item1;
+                            if (roll < cumulative)
+                            {
+                                actionCardsAvailableToBuy.Add(weightedChoices[j].Item2);
+                                totalWeight -= weightedChoices[j].Item1;
+                                weightedChoices.RemoveAt(j); // Remove to avoid duplicates
+                                break;
+                            }
+                        }
+                    }
 
                     // Replace last slot with priority card if we have one
                     if (!string.IsNullOrEmpty(priorityCard))
