@@ -35,12 +35,12 @@ namespace XenopurgeRougeLike.XenoReinforcements
 
         public override void OnActivate()
         {
-            XenopurgeRougeLike.WeightModifiers.Add(ModifyWeights);
+            AwardSystem.WeightModifiers.Add(ModifyWeights);
         }
 
         public override void OnDeactivate()
         {
-            XenopurgeRougeLike.WeightModifiers.Remove(ModifyWeights);
+            AwardSystem.WeightModifiers.Remove(ModifyWeights);
             XenoAffinity6_StunSystem.ClearAllStuns();
         }
 

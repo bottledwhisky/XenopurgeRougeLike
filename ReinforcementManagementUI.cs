@@ -44,7 +44,7 @@ namespace XenopurgeRougeLike
                     {
                         ShowDetails(aff);
                     })
-                }), ..XenopurgeRougeLike.acquiredReinforcements.Select(x => new ButtonData()
+                }), ..AwardSystem.acquiredReinforcements.Select(x => new ButtonData()
                 {
                     MainText = x.ToMenuItem(),
                     Tooltip = x.ToString(),

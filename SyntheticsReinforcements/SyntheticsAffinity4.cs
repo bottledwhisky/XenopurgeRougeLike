@@ -23,7 +23,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
 
         public override void OnActivate()
         {
-            XenopurgeRougeLike.WeightModifiers.Add(ModifyWeights);
+            AwardSystem.WeightModifiers.Add(ModifyWeights);
             UnitStatsTools.InBattleUnitStatChanges["SyntheticsAffinity4_Speed"] = new UnitStatChange(UnitStats.Speed, SpeedBonus, ShouldApply);
             UnitStatsTools.InBattleUnitStatChanges["SyntheticsAffinity4_Accuracy"] = new UnitStatChange(UnitStats.Accuracy, AccuracyBonus, ShouldApply);
             UnitStatsTools.InBattleUnitStatChanges["SyntheticsAffinity4_Power"] = new UnitStatChange(UnitStats.Power, PowerBonus, ShouldApply);
@@ -35,7 +35,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             UnitStatsTools.InBattleUnitStatChanges.Remove("SyntheticsAffinity4_Accuracy");
             UnitStatsTools.InBattleUnitStatChanges.Remove("SyntheticsAffinity4_Power");
 
-            XenopurgeRougeLike.WeightModifiers.Remove(ModifyWeights);
+            AwardSystem.WeightModifiers.Remove(ModifyWeights);
         }
 
 

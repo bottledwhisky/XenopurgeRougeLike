@@ -23,7 +23,7 @@ namespace XenopurgeRougeLike
         public int Stacks;
     }
 
-    public class Reinforcement: Activatable
+    public class Reinforcement : Activatable
     {
         public static Dictionary<Rarity, Color> RarityColors = new()
         {

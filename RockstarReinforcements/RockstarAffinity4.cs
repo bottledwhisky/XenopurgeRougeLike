@@ -23,7 +23,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             RockstarAffinityHelpers.fanMoney += 10;
             RockstarAffinityHelpers.fanGainLow += 1000;
             RockstarAffinityHelpers.fanGainHigh += 1000;
-            XenopurgeRougeLike.WeightModifiers.Add(ModifyWeights);
+            AwardSystem.WeightModifiers.Add(ModifyWeights);
         }
 
         public override void OnDeactivate()
@@ -31,7 +31,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             RockstarAffinityHelpers.fanMoney -= 10;
             RockstarAffinityHelpers.fanGainLow -= 1000;
             RockstarAffinityHelpers.fanGainHigh -= 1000;
-            XenopurgeRougeLike.WeightModifiers.Remove(ModifyWeights);
+            AwardSystem.WeightModifiers.Remove(ModifyWeights);
         }
 
         private void ModifyWeights(List<Tuple<int, Reinforcement>> choices)

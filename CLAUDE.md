@@ -8,6 +8,37 @@ Localization.cs (read it!) contains the code to format the string. If the origin
 
 You only need to localize the strings that the user can see. Logs can be left in English.
 
+There some available icons that you can should use in the strings when appropriate.
+
+<sprite name="CoinIcon">
+<sprite name="AccuracyIcon">
+<sprite name="Armoricon">
+<sprite name="BiomassIcon">
+<sprite name="Healthicon">
+<sprite name="override icon">
+<sprite name="PackageIcon">
+<sprite name="Powericon">
+<sprite name="Speedicon">
+<sprite name="time icon">
+<sprite name=AccessPointIcon>
+
+For example: "5 coins" should be written as "5 <sprite name="CoinIcon">".
+
+All the below languages should be added:
+* English (en)
+* Greek(el)
+* French(fr)
+* Chinese(Simplified) (zh)
+* Chinese(Traditional) (zh-TW)
+* German(de)
+* Polish(pl)
+* Portuguese(pt)
+* Russian(ru)
+* Spanish(es)
+* Ukrainian(uk)
+* Japanese(ja)
+* Korean(ko)
+
 About this mod:
 This mod adds a rouge-like system to the game, allowing players to call for reinforcements after each mission. The reinforcements have unique attributes and abilities, making each playthrough different.
 

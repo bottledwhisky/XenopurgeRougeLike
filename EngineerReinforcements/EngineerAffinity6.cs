@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using System;
@@ -36,7 +36,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             );
 
             // Register reinforcement weight modifier
-            XenopurgeRougeLike.WeightModifiers.Add(ModifyWeights);
+            AwardSystem.WeightModifiers.Add(ModifyWeights);
         }
 
         public override void OnDeactivate()
@@ -45,7 +45,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             ActionCardsUpgraderTools.UnregisterProbabilityModifier("EngineerAffinity6_ShopBoost");
 
             // Unregister reinforcement weight modifier
-            XenopurgeRougeLike.WeightModifiers.Remove(ModifyWeights);
+            AwardSystem.WeightModifiers.Remove(ModifyWeights);
         }
 
         private void ModifyWeights(List<Tuple<int, Reinforcement>> choices)
