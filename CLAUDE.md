@@ -12,7 +12,7 @@ Some important files:
     Reinforcement.cs: The base class of all Reinforcements.
     UnitStatsTools.cs: Some existing code to help mess with unit stats.
     ActionCardsUpgraderTools.cs: Some existing code to help mess with generating action cards in the action cards store.
-    XenopurgeRougeLike.txt: If you are looking for some existing examples of certain effects, you can check this file. Please be noted that not all reinforcements/affinities are implemented yet. But it's a good place to start.
+    (Higely recommended) XenopurgeRougeLike.txt: If you are looking for some existing examples of certain effects, you can check this file. Please be noted that not all reinforcements/affinities are implemented yet. But it's a good place to start.
 
 About the original game:
 The original game is called "Xenopurge". It is a tactical RTS where players control a squad of soldiers fighting against aliens(xenoes). During battle, the game allows the player to use "ActionCards" to perform actions, not direct control.

@@ -27,6 +27,9 @@ namespace XenopurgeRougeLike
         // Sample choices - replace with your actual data
         public static List<Reinforcement> choices = null;
 
+        // Reroll cost tracking (coins are now in PlayerWallet)
+        public static int currentRerollCost = 1;
+
         public static event Action OnUpdateEvent;
 
         public override void OnInitializeMelon()
@@ -375,6 +378,9 @@ namespace XenopurgeRougeLike
             {
                 // Clear existing reinforcements
                 XenopurgeRougeLike.acquiredReinforcements.Clear();
+
+                // Reset reroll cost
+                XenopurgeRougeLike.currentRerollCost = 1;
 
                 // Load from the reinforcements file
                 string saveFolderPath = Path.Combine(Application.persistentDataPath, saveName);

@@ -49,6 +49,12 @@ namespace XenopurgeRougeLike
             { Rarity.Elite, 30 },
             { Rarity.Expert, 10 }
         };
+        public static Dictionary<Rarity, int> RarityCosts = new()
+        {
+            { Rarity.Standard, 0 },
+            { Rarity.Elite, 3 },
+            { Rarity.Expert, 6 }
+        };
 
         public Company company;
         public Rarity rarity = Rarity.Standard;
