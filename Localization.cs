@@ -29,7 +29,10 @@ namespace XenopurgeRougeLike
             string normalizedCode = languageCode.ToLower();
             string oldLanguage = _currentLanguage;
 
-            if (_translations.ContainsKey(normalizedCode))
+            // Check if any translation exists for this language
+            bool languageExists = _translations.Values.Any(dict => dict.ContainsKey(normalizedCode));
+
+            if (languageExists)
             {
                 _currentLanguage = normalizedCode;
             }
@@ -37,7 +40,9 @@ namespace XenopurgeRougeLike
             {
                 // Try without region code (e.g., "en-US" -> "en")
                 string baseCode = normalizedCode.Split('-')[0];
-                if (_translations.ContainsKey(baseCode))
+                bool baseLanguageExists = _translations.Values.Any(dict => dict.ContainsKey(baseCode));
+
+                if (baseLanguageExists)
                 {
                     _currentLanguage = baseCode;
                 }
@@ -56,19 +61,19 @@ namespace XenopurgeRougeLike
 
         public static string Get(string key, params object[] args)
         {
-            if (_translations.ContainsKey(_currentLanguage) &&
-                _translations[_currentLanguage].ContainsKey(key))
+            if (_translations.ContainsKey(key) &&
+                _translations[key].ContainsKey(_currentLanguage))
             {
-                string text = _translations[_currentLanguage][key];
+                string text = _translations[key][_currentLanguage];
                 return args.Length > 0 ? string.Format(text, args) : text;
             }
 
             // Fallback to English
             if (_currentLanguage != "en" &&
-                _translations.ContainsKey("en") &&
-                _translations["en"].ContainsKey(key))
+                _translations.ContainsKey(key) &&
+                _translations[key].ContainsKey("en"))
             {
-                string text = _translations["en"][key];
+                string text = _translations[key]["en"];
                 return args.Length > 0 ? string.Format(text, args) : text;
             }
 

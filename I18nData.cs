@@ -21,47 +21,10 @@ namespace XenopurgeRougeLike
         //Ukrainian(uk)
         //Japanese(ja)
         //Korean(ko)
+
+        // This dictionary holds [language_code] => [string_id] => [translation]
         public static Dictionary<string, Dictionary<string, string>> _translations = new Dictionary<string, Dictionary<string, string>>
         {
-            ["en"] = new Dictionary<string, string>
-            {
-            },
-            ["el"] = new Dictionary<string, string>
-            {
-            },
-            ["fr"] = new Dictionary<string, string>
-            {
-            },
-            ["zh"] = new Dictionary<string, string>
-            {
-            },
-            ["zh-TW"] = new Dictionary<string, string>
-            {
-            },
-            ["de"] = new Dictionary<string, string>
-            {
-            },
-            ["pl"] = new Dictionary<string, string>
-            {
-            },
-            ["pt"] = new Dictionary<string, string>
-            {
-            },
-            ["ru"] = new Dictionary<string, string>
-            {
-            },
-            ["es"] = new Dictionary<string, string>
-            {
-            },
-            ["uk"] = new Dictionary<string, string>
-            {
-            },
-            ["ja"] = new Dictionary<string, string>
-            {
-            },
-            ["ko"] = new Dictionary<string, string>
-            {
-            },
         };
     }
 }

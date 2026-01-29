@@ -1,12 +1,8 @@
 This is a game mod project.
-
-I am on Windows, but some of your commands are run in MinGW, IDK why. It is a bit confusing.
-
-You are working on localizing the mod. The data is stored in I18nData.cs. But the file can be very large, so please restrain yourself to only read (grep) the part you are working on.
-
-Localization.cs (read it!) contains the code to format the string. If the original string needs some placeholders from the other parts of the code, feel free to refactor and use them.
-
-You only need to localize the strings that the user can see. Logs can be left in English.
+You are encouraged to read the existing Reinforcement sub-classes to quickly get an example of what we are working on. Existing code already contains common patterns like how to run code upon a mission start/end, or how to change stats, or test unit type conditions.
+The decompiled source code of the original game is available here: D:\projects\xenopurge\old
+In D:\projects\xenopurge\old, each folder contains a "README" text file that tells you which functionalities are implemented in that folder, and in which files. You should read those README files first to understand the code structure to avoid getting lost.
+I might use Chinese to communicate with you, but the code is mostly in English.
 
 About this mod:
 This mod adds a rouge-like system to the game, allowing players to call for reinforcements after each mission. The reinforcements have unique attributes and abilities, making each playthrough different.
@@ -27,3 +23,9 @@ Keywords:
     装备(equipment) is a general term for items that can be equipped by units, including ranged weapons, melee weapons, and gears.
     公司(company) is a mod-only flavor term for the player's faction(流派) or path(路线) of the reinforcements. For example, Wayland-Yutani is a company that specializes in synthetic units. Its path (internal class name) is Synthetics. Companies.cs contains all the companies in the mod.
 
+Common confusions:
+    BattleUnit is the unit object in battles. To persist the changes you made to a unit, you need to update the UpgradableUnit object associated with the BattleUnit. If you do not wish to persist the changes, you can just modify the BattleUnit object, or patch the attribute getters.
+
+    This error can be ignored: 所生成项目的处理器架构“MSIL”与引用“MelonLoader”的处理器架构“AMD64”不匹配。
+
+    All reinforcements should be registered in its corresponding "Path" class. For example, SyntheticsReinforcements\SmartWeaponModule.cs is registered in Synthetics.cs. Same for other paths like Xeno or Rockstar.
