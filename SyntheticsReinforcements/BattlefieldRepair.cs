@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
@@ -14,14 +15,14 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             company = Company.Synthetics;
             stackable = true;
             maxStacks = 3;
-            name = "Battlefield Repair";
-            description = "Consume points during battle to restore health. Excess healing converts to armor. 1 point -> {0} HP/Armor.";
-            flavourText = "Weyland-Yutani synthetics can consume patented nano robots to accelerate tissue regeneration during combat operations.";
+            name = L("synthetics.battlefield_repair.name");
+            description = L("synthetics.battlefield_repair.description");
+            flavourText = L("synthetics.battlefield_repair.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            return string.Format(description, HealPerPoint[stacks - 1]);
+            return L("synthetics.battlefield_repair.description", HealPerPoint[stacks - 1]);
         }
 
         protected static BattlefieldRepair instance;

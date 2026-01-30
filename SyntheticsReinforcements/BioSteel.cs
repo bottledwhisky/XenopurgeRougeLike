@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Database;
 using SpaceCommander.EndGame;
@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
@@ -17,15 +18,15 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             company = Company.Synthetics;
             stackable = true;
             maxStacks = 3;
-            name = "Bio-Steel";
-            description = "Your synthetic units restore {0} health after each mission.";
-            flavourText = "A carbon-titanium weave beneath synthetic skin allows minor damage to self-repair between engagements.";
+            name = L("synthetics.bio_steel.name");
+            description = L("synthetics.bio_steel.description");
+            flavourText = L("synthetics.bio_steel.flavour");
         }
 
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            return string.Format(description, HealthRestored * stacks);
+            return L("synthetics.bio_steel.description", HealthRestored * stacks);
         }
 
         protected static BioSteel instance;

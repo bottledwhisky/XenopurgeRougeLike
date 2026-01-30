@@ -4,6 +4,7 @@ using SpaceCommander;
 using SpaceCommander.Area;
 using System;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -20,14 +21,14 @@ namespace XenopurgeRougeLike.XenoReinforcements
             company = Company.Xeno;
             rarity = Rarity.Elite;
             stackable = false;
-            name = "Devour Will";
-            description = "When a stunned or mind-controlled xeno dies, all your units restore {0} HP.";
-            flavourText = "The hive mind's suffering becomes your squad's sustenance.";
+            name = L("xeno.devour_will.name");
+            description = L("xeno.devour_will.description");
+            flavourText = L("xeno.devour_will.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            return string.Format(description, HealAmount);
+            return L("xeno.devour_will.description", HealAmount);
         }
 
         protected static DevourWill instance;

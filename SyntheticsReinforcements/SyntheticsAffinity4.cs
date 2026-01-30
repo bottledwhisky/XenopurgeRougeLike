@@ -1,25 +1,27 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using SpaceCommander;
 using System;
 using System.Collections.Generic;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
+    // Synthetics Affinity Level 4: All units gain +2 speed, +20% accuracy, and +2 power. Start missions with +4 access points. Synthetics reinforcements appear 2x more often.
     public class SyntheticsAffinity4 : CompanyAffinity
     {
-        public SyntheticsAffinity4()
-        {
-            unlockLevel = 4;
-            company = Company.Synthetics;
-            description = "速度+2，瞄准+20，近战伤害+2，开局获得4点接入点数，更高概率获得同流派增援";
-        }
-
         public const float SpeedBonus = 2f;
         public const float AccuracyBonus = .2f;
         public const float PowerBonus = 2f;
         public const int StartingAccessPointsBonus = 4;
         public const float ReinforcementChanceBonus = 2f;
+
+        public SyntheticsAffinity4()
+        {
+            unlockLevel = 4;
+            company = Company.Synthetics;
+            description = L("synthetics.affinity4.description", (int)SpeedBonus, (int)(AccuracyBonus * 100), (int)PowerBonus, StartingAccessPointsBonus, (int)ReinforcementChanceBonus);
+        }
 
         public override void OnActivate()
         {

@@ -5,9 +5,12 @@ using SpaceCommander;
 using SpaceCommander.EndGame;
 using SpaceCommander.GameFlow;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
+    // Star Power: Gain +50% fans on perfect victory. Every 2,000 fans grants the first squad member one random stat buff.
+    // Star Power II: Uncollected digital collectibles no longer count against perfect victory. Gain coins after battle based on fan count.
     public class StarPower : Reinforcement
     {
         public const float FanBonusMultiplier = 0.5f;
@@ -24,19 +27,19 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             stackable = true;
             maxStacks = 2;
             company = Company.Rockstar;
-            name = "Star Power";
-            description = "Gain +50% fans on perfect victory. Every 2,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage. Star Power II: Uncollected digital collectibles no longer count against perfect victory. Gain 1 coin after battle for every 5,000 fans.";
+            name = L("rockstar.star_power.name");
+            description = L("rockstar.star_power.description");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
             if (stacks == 1)
             {
-                return "Gain +50% fans on perfect victory. Every 2,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage.";
+                return L("rockstar.star_power.description_stack1", (int)(FanBonusMultiplier * 100), FanPerStatBuff, HPBonus, (int)(AccuracyBonus * 100), SpeedBonus, PowerBonus);
             }
             else
             {
-                return "Gain +50% fans on perfect victory. Every 2,000 fans grants the first squad member one random stat: +5 HP, +5 Aim, +1 Speed, or +1 Melee Damage. Uncollected digital collectibles no longer count against perfect victory. Gain 1 coin after battle for every 5,000 fans.";
+                return L("rockstar.star_power.description_stack2", (int)(FanBonusMultiplier * 100), FanPerStatBuff, HPBonus, (int)(AccuracyBonus * 100), SpeedBonus, PowerBonus, FanPerCoin);
             }
         }
 

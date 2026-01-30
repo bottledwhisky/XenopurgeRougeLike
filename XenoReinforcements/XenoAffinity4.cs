@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -14,7 +15,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         {
             unlockLevel = 4;
             company = Company.Xeno;
-            description = "对异形伤害+45%，控制类效果持续时间进一步增加，更高概率获得同流派增援";
+            description = L("xeno.affinity4.description");
         }
 
         // Damage bonus constants

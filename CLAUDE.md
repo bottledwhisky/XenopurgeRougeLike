@@ -2,11 +2,42 @@ This is a game mod project.
 
 I am on Windows, but some of your commands are run in MinGW, IDK why. It is a bit confusing.
 
-You are working on localizing the mod. The data is stored in I18nData.cs. But the file can be very large, so please restrain yourself to only read (grep) the part you are working on.
+You are encouraged to read the existing Reinforcement sub-classes to quickly get an example of what we are working on. Existing code already contains common patterns like how to run code upon a mission start/end, or how to change stats, or test unit type conditions.
+The decompiled source code of the original game is available here: D:\projects\xenopurge\old
+In D:\projects\xenopurge\old, each folder contains a "README" text file that tells you which functionalities are implemented in that folder, and in which files. You should read those README files first to understand the code structure to avoid getting lost.
+I might use Chinese to communicate with you, but the code is mostly in English.
+
+Some important files:
+    Companies.cs: Contains all definitions of the companies (paths). And basic classes like Company/CompanyAffinity
+    Reinforcement.cs: The base class of all Reinforcements.
+    UnitStatsTools.cs: Some existing code to help mess with unit stats.
+    ActionCardsUpgraderTools.cs: Some existing code to help mess with generating action cards in the action cards store.
+    (Higely recommended) XenopurgeRougeLike.txt: If you are looking for some existing examples of certain effects, you can check this file. Please be noted that not all reinforcements/affinities are implemented yet. But it's a good place to start.
+
+
+If you are working on localizing the mod. The data is stored in .\I18nData\ folder. But the files in it can be very large, so please restrain yourself to only read (grep) the part you are working on. I18nData\affinity.cs is a small file that you can use as an example.
+
+At the time of writing, the files in I18nData are:
+PS D:\projects\xenopurge\XenopurgeRougeLike> dir I18nData   
+
+    Directory: D:\projects\xenopurge\XenopurgeRougeLike\I18nData
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---           2026/1/30    19:12           4660 affinity.cs
+-a---           2026/1/30    19:12          40692 company.cs
+-a---           2026/1/30    19:12          50704 engineer.cs
+-a---           2026/1/30    19:11          69071 rockstar.cs
+-a---           2026/1/30    19:11          13498 ui.cs
+
+And they are merged in I18nData.cs
 
 Localization.cs (read it!) contains the code to format the string. If the original string needs some placeholders from the other parts of the code, feel free to refactor and use them.
 
 You only need to localize the strings that the user can see. Logs can be left in English.
+Use `using static XenopurgeRougeLike.ModLocalization;` then `L("my_module.my_string")` should be used because it is shorter.
+
+L supports placeholders, for example ` L("rockstar.star_power.description_stack1", (int)(FanBonusMultiplier*100), FanPerStatBuff, HPBonus, (int)(AccuracyBonus*100), SpeedBonus, PowerBonus)`.
 
 There some available icons that you can should use in the strings when appropriate.
 

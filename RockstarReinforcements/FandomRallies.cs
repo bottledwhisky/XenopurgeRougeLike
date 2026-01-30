@@ -6,6 +6,7 @@ using SpaceCommander.Tests;
 using System;
 using System.Linq;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
@@ -18,8 +19,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         {
             rarity = Rarity.Elite;
             company = Company.Rockstar;
-            name = "Fandom Rallies";
-            description = "When a \"Passionate Fan\" dies, another \"Passionate Fan\" joins the battlefield.";
+            name = L("rockstar.fandom_rallies.name");
+            description = L("rockstar.fandom_rallies.description");
         }
 
         private static FandomRallies _instance;

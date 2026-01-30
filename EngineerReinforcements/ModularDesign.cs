@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements
 {
@@ -23,9 +24,9 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             company = Company.Engineer;
             rarity = Rarity.Elite;
             stackable = false;
-            name = "Modular Design";
-            description = "Destroyed turrets can be quickly redeployed at their original location.";
-            flavourText = "Prefabricated turret modules allow for rapid redeployment on familiar mounting points.";
+            name = L("engineer.modular_design.name");
+            description = L("engineer.modular_design.description");
+            flavourText = L("engineer.modular_design.flavour");
         }
 
         protected static ModularDesign instance;

@@ -1,4 +1,6 @@
-﻿namespace XenopurgeRougeLike.RockstarReinforcements
+﻿using static XenopurgeRougeLike.ModLocalization;
+
+namespace XenopurgeRougeLike.RockstarReinforcements
 {
     public class RockstarAffinity6 : RockstarAffinityBase
     {
@@ -6,7 +8,7 @@
         {
             unlockLevel = 6;
             company = Company.Rockstar;
-            description = "A \"Passionate Fan\" is automatically deployed at the start of battle and will find their own fun. \"Fan\" has their combat logic upgraded, and is much stronger. Unlock Fan Count; Gain 3k-4k fans after each battle.";
+            description = L("rockstar.affinity6.description");
         }
 
         public static RockstarAffinity6 _instance;
@@ -29,7 +31,7 @@
 
         public override string ToFullDescription()
         {
-            return base.ToFullDescription() + $"\nCurrent Fan Count: {RockstarAffinityHelpers.fanCount}";
+            return base.ToFullDescription() + $"\n{L("rockstar.affinity2.fan_count", RockstarAffinityHelpers.fanCount)}";
         }
     }
 }

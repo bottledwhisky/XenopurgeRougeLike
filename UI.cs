@@ -15,6 +15,7 @@ using UnityEngine.UI;
 
 namespace XenopurgeRougeLike
 {
+    using static XenopurgeRougeLike.ModLocalization;
     // Helper class for PlayerWallet access
     public static class PlayerWalletHelper
     {
@@ -86,8 +87,8 @@ namespace XenopurgeRougeLike
                                 string nextUnlockAffinyText = affinityToEnable.ToString();
 
                                 string progressLabel = affinityToEnable.unlockLevel < nExsitingCompanyReinforces
-                                    ? ModLocalization.Get("ui.max_level_reached")
-                                    : ModLocalization.Get("ui.next_unlock");
+                                    ? L("ui.max_level_reached")
+                                    : L("ui.next_unlock");
                                 string nextUnlockProgress = progressLabel + $": ({nExsitingCompanyReinforces}/{affinityToEnable.unlockLevel}) ";
 
                                 EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = capturedIndex;
@@ -157,7 +158,7 @@ namespace XenopurgeRougeLike
 
                 ButtonData rerollButtonData = new ButtonData
                 {
-                    MainText = ModLocalization.Get("ui.reroll_button", rerollCost),
+                    MainText = L("ui.reroll_button", rerollCost),
                     IsDisabled = !canAffordReroll,
                     IgnoreClickCount = true,
                     onClickCallback = () =>
@@ -194,7 +195,7 @@ namespace XenopurgeRougeLike
                             {
                                 int newRerollCost = AwardSystem.currentRerollCost;
                                 bool canAffordNewReroll = PlayerWalletHelper.GetCoins() >= newRerollCost;
-                                buttonDataList[rerollButtonIndex].MainText = ModLocalization.Get("ui.reroll_button", newRerollCost);
+                                buttonDataList[rerollButtonIndex].MainText = L("ui.reroll_button", newRerollCost);
                                 buttonDataList[rerollButtonIndex].IsDisabled = !canAffordNewReroll;
                                 buttonDataList[rerollButtonIndex].ChangeInteractionState(buttonDataList[rerollButtonIndex].IsDisabled);
                                 MelonLogger.Msg($"Updated reroll button: cost={newRerollCost}, disabled={!canAffordNewReroll}");
@@ -211,7 +212,7 @@ namespace XenopurgeRougeLike
                 // Add a "Skip" button
                 ButtonData skipButtonData = new ButtonData
                 {
-                    MainText = ModLocalization.Get("ui.skip_button"),
+                    MainText = L("ui.skip_button"),
                     onClickCallback = () =>
                     {
                         MelonLoader.MelonLogger.Msg("Player chose to skip reinforcement selection.");
@@ -327,7 +328,7 @@ namespace XenopurgeRougeLike
             _coinsText.fontSize = 20f;
             _coinsText.color = Color.yellow;
             _coinsText.alignment = TextAlignmentOptions.Center;
-            _coinsText.text = ModLocalization.Get("ui.coins_display", PlayerWalletHelper.GetCoins());
+            _coinsText.text = L("ui.coins_display", PlayerWalletHelper.GetCoins());
 
             var coinsLayout = coinsGO.AddComponent<LayoutElement>();
             coinsLayout.preferredHeight = 25f;
@@ -343,7 +344,7 @@ namespace XenopurgeRougeLike
             headerText.fontSize = 24f;
             headerText.color = Color.white;
             headerText.alignment = TextAlignmentOptions.Center;
-            headerText.text = ModLocalization.Get("ui.choose_reinforcement");
+            headerText.text = L("ui.choose_reinforcement");
 
             var headerLayout = headerGO.AddComponent<LayoutElement>();
             headerLayout.preferredHeight = 30f;
@@ -403,7 +404,7 @@ namespace XenopurgeRougeLike
             _descriptionText.color = new Color(0.9f, 0.9f, 0.9f);
             _descriptionText.alignment = TextAlignmentOptions.Top;  // Changed to Top
             _descriptionText.richText = true;
-            _descriptionText.text = ModLocalization.Get("ui.hover_description");
+            _descriptionText.text = L("ui.hover_description");
             _descriptionText.textWrappingMode = TextWrappingModes.Normal;
 
             var descTextLayout = descTextGO.AddComponent<LayoutElement>();
@@ -515,7 +516,7 @@ namespace XenopurgeRougeLike
             // Update coins display
             if (_coinsText != null)
             {
-                _coinsText.text = ModLocalization.Get("ui.coins_display", PlayerWalletHelper.GetCoins());
+                _coinsText.text = L("ui.coins_display", PlayerWalletHelper.GetCoins());
             }
 
             for (int i = 0; i < 3 && i < choices.Count; i++)
@@ -529,7 +530,7 @@ namespace XenopurgeRougeLike
 
                 // Set cost
                 int cost = Reinforcement.RarityCosts[preview.Rarity];
-                _choiceCosts[i].text = ModLocalization.Get("ui.cost_format", cost);
+                _choiceCosts[i].text = L("ui.cost_format", cost);
                 _choiceCosts[i].color = PlayerWalletHelper.GetCoins() >= cost ? Color.yellow : Color.red;
 
                 MelonLogger.Msg($" - Title set to: {_choiceTitles[i].text}");

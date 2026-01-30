@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SpaceCommander;
@@ -7,20 +7,23 @@ using SpaceCommander.Area;
 using SpaceCommander.Database;
 using SpaceCommander.Weapons;
 using UnityEngine;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
-    // 强化学习：同时获得血斧、bark、trac三种武器，开局即获得智能武器提升上限的50%增幅，血斧在任务开始时提供额外10点护甲
+    // Reinforcement Learning: Gain all three smart weapons (Hemogrip, BARK, TRAC), start with 50% of max kills for smart weapon upgrades, and Hemogrip provides +10 armor at mission start.
     public class ReinforcementLearning : SmartWeaponReinforcementBase
     {
         private bool weaponsEquipped = false;
+        public const float StartingKillsMultiplier = 0.5f;
+        public const int HemogripArmorBonus = 10;
 
         public ReinforcementLearning()
         {
-            name = "Reinforcement Learning";
-            description = "Receive all three smart weapons (Hemogrip, BARK System, and TRAC Carbine). At mission start, smart weapons gain 50% of their max upgrade stacks immediately. Hemogrip grants +10 armor at mission start.";
+            name = L("synthetics.reinforcement_learning.name");
+            description = L("synthetics.reinforcement_learning.description", (int)(StartingKillsMultiplier * 100), HemogripArmorBonus);
             rarity = Rarity.Expert;
-            flavourText = "Combat data is analyzed in real-time, allowing the synthetic to achieve peak weapon synchronization from the moment of deployment.";
+            flavourText = L("synthetics.reinforcement_learning.flavour");
         }
 
         protected static ReinforcementLearning instance;
@@ -75,7 +78,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             }
 
             int maxKills = (int)maxKillsField.GetValue(__instance);
-            int startingKills = (int)Math.Floor(maxKills * 0.5f); // 50% of max
+            int startingKills = (int)Math.Floor(maxKills * StartingKillsMultiplier); // 50% of max
 
             if (startingKills <= 0)
                 return;
@@ -129,8 +132,8 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
                 if (armorField != null)
                 {
                     float currentArmor = (float)armorField.GetValue(__instance);
-                    armorField.SetValue(__instance, currentArmor + 10f);
-                    Debug.Log($"ReinforcementLearning: Added +10 armor to {__instance.UnitName} with Hemogrip");
+                    armorField.SetValue(__instance, currentArmor + ReinforcementLearning.HemogripArmorBonus);
+                    Debug.Log($"ReinforcementLearning: Added +{ReinforcementLearning.HemogripArmorBonus} armor to {__instance.UnitName} with Hemogrip");
                 }
             }
         }

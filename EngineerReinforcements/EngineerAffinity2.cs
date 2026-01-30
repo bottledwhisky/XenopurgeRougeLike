@@ -2,21 +2,24 @@ using HarmonyLib;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
 using System.Collections.Generic;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements
 {
     public class EngineerAffinity2 : CompanyAffinity
     {
+        public const float ExplosiveDamageMultiplier = 1.25f;
+        public const float FlashbangDurationMultiplier = 1.5f;
+        public const int ShopProbabilityBoostCopies = 2;
+
         public EngineerAffinity2()
         {
             unlockLevel = 2;
             company = Company.Engineer;
-            description = "地雷、手雷伤害+25%，闪光弹效果持续时间+50%，指令商店出现地雷、手雷、闪光弹、炮台的概率提升";
+            int explosiveDamagePercent = (int)((ExplosiveDamageMultiplier - 1f) * 100);
+            int flashbangDurationPercent = (int)((FlashbangDurationMultiplier - 1f) * 100);
+            description = L("engineer.affinity2.description", explosiveDamagePercent, flashbangDurationPercent);
         }
-
-        public const float ExplosiveDamageMultiplier = 1.25f;
-        public const float FlashbangDurationMultiplier = 1.5f;
-        public const int ShopProbabilityBoostCopies = 2;
 
         // Action card IDs for Engineer-related equipment
         public static readonly List<string> EngineerActionCards = new()

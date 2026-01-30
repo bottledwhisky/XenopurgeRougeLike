@@ -13,6 +13,7 @@ using SpaceCommander.EndGame;
 using SpaceCommander.GameFlow;
 using SpaceCommander.UI;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
@@ -58,8 +59,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             stackable = true;
             maxStacks = 2;
             company = Company.Rockstar;
-            name = "Stream Donations";
-            description = "When eliminating enemies in battle, randomly gain consumable charges based on fan count. Stream Donations II: Increases the chance of receiving donations.";
+            name = L("rockstar.stream_donations.name");
+            description = L("rockstar.stream_donations.description");
         }
 
 
@@ -67,11 +68,11 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         {
             if (stacks == 1)
             {
-                return "When eliminating enemies in battle, randomly gain consumable charges based on fan count.";
+                return L("rockstar.stream_donations.description_stack1");
             }
             else
             {
-                return "When eliminating enemies in battle, randomly gain consumable charges based on fan count. Increases the chance of receiving donations.";
+                return L("rockstar.stream_donations.description_stack2");
             }
         }
 

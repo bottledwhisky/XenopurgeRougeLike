@@ -12,6 +12,8 @@ using XenopurgeRougeLike.RockstarReinforcements;
 
 namespace XenopurgeRougeLike
 {
+    using static XenopurgeRougeLike.ModLocalization;
+
     public class InspectReinforcementDirectory : MonoBehaviour, IDirectory<DirectoryData>
     {
         private readonly DirectoryTextData _directoryTextData = new();
@@ -116,8 +118,8 @@ namespace XenopurgeRougeLike
             var buttonData = __result.ButtonData.ToList();
             buttonData.Add(new()
             {
-                MainText = "Inspect Reinfocements",
-                Tooltip = "Inspect the acquired reinforcements and company affinities.",
+                MainText = L("ui.inspect_reinforcements"),
+                Tooltip = L("ui.inspect_reinforcements_tooltip"),
                 onClickCallback = new Action(InspectClicked)
             });
 
@@ -126,8 +128,8 @@ namespace XenopurgeRougeLike
                 // Add fan count display
                 buttonData.Add(new()
                 {
-                    MainText = "Fan Count",
-                    Tooltip = $"Current fan count: {RockstarAffinityHelpers.fanCount}",
+                    MainText = L("ui.fan_count"),
+                    Tooltip = L("ui.current_fan_count", RockstarAffinityHelpers.fanCount),
                     IsDisabled = true
                 });
             }

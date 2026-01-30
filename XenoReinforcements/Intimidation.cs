@@ -1,5 +1,6 @@
 ﻿using SpaceCommander;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -16,14 +17,14 @@ namespace XenopurgeRougeLike.XenoReinforcements
             company = Company.Xeno;
             rarity = Rarity.Expert;
             stackable = false;
-            name = "Intimidation";
-            description = "All Xenos permanently have {0} speed.";
-            flavourText = "Your mere presence fills them with dread, slowing their movements as fear grips their primitive minds.";
+            name = L("xeno.intimidation.name");
+            description = L("xeno.intimidation.description");
+            flavourText = L("xeno.intimidation.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            return string.Format(description, SpeedReduction);
+            return L("xeno.intimidation.description", SpeedReduction);
         }
 
         protected static Intimidation instance;

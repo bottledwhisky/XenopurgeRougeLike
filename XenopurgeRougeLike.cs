@@ -1,17 +1,8 @@
-﻿using HarmonyLib;
-using MelonLoader;
+﻿using MelonLoader;
 using MelonLoader.Utils;
-using SaveSystem;
-using SpaceCommander;
-using SpaceCommander.Area;
-using SpaceCommander.Commands;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
-using XenopurgeRougeLike.RockstarReinforcements;
-using static SpaceCommander.Enumerations;
 
 
 [assembly: MelonInfo(typeof(XenopurgeRougeLike.XenopurgeRougeLike), "Xenopurge RougeLike", "1.0.0", "Felix Hao")]

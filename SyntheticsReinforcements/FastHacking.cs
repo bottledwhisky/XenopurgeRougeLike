@@ -1,5 +1,6 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using SpaceCommander.ActionCards;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
@@ -14,9 +15,9 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             stackable = false;
             maxStacks = 1;
             rarity = Rarity.Expert;
-            name = "Fast Hacking";
-            description = "All hacking commands cost 1 less access point.";
-            flavourText = "Optimized bypass routines reduce the processing cycles required to breach security protocols.";
+            name = L("synthetics.fast_hacking.name");
+            description = L("synthetics.fast_hacking.description");
+            flavourText = L("synthetics.fast_hacking.flavour");
         }
 
         protected static FastHacking instance;

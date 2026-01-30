@@ -2,6 +2,7 @@ using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Weapons;
 using System.Reflection;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements
 {
@@ -9,14 +10,16 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     // Double-Barreled Turret: Turrets fire double projectiles each shot
     public class DoubleBarreledTurret : Reinforcement
     {
+        public static readonly int ProjectileMultiplier = 2;
+
         public DoubleBarreledTurret()
         {
             company = Company.Engineer;
             rarity = Rarity.Expert;
             stackable = false;
-            name = "Double-Barreled Turret";
-            description = "Turrets fire double projectiles each shot.";
-            flavourText = "Twin-linked barrels synchronized to fire in perfect unison, doubling your suppressive firepower.";
+            name = L("engineer.double_barreled_turret.name");
+            description = L("engineer.double_barreled_turret.description", ProjectileMultiplier);
+            flavourText = L("engineer.double_barreled_turret.flavour");
         }
 
         protected static DoubleBarreledTurret instance;

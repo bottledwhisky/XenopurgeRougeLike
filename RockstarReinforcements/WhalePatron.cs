@@ -7,6 +7,7 @@ using SpaceCommander.Database;
 using SpaceCommander.Weapons;
 using UnityEngine;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
@@ -19,8 +20,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         {
             company = Company.Rockstar;
             rarity = Rarity.Expert;
-            name = "Whale Patron";
-            description = "After battle, gain a piece of equipment you don't have. If everyone already has a melee weapon, ranged weapon, and equipment, randomly sell a lower base-price item and gain one with a higher price.";
+            name = L("rockstar.whale_patron.name");
+            description = L("rockstar.whale_patron.description");
         }
 
         protected static WhalePatron _instance;

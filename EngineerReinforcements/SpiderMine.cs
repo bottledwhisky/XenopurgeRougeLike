@@ -1,5 +1,6 @@
 using HarmonyLib;
 using SpaceCommander.Commands;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements
 {
@@ -14,15 +15,15 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             rarity = Rarity.Standard;
             stackable = true;
             maxStacks = 2;
-            name = "Spider Mine";
-            description = "Mine deployment time -{0}%.";
-            flavourText = "Automated spider-leg deployment systems get your mines in position faster than you can say 'boom'.";
+            name = L("engineer.spider_mine.name");
+            description = L("engineer.spider_mine.description");
+            flavourText = L("engineer.spider_mine.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
             int reductionPercent = (int)((1f - DeployTimeMultiplier[stacks - 1]) * 100);
-            return string.Format(description, reductionPercent);
+            return L("engineer.spider_mine.description", reductionPercent);
         }
 
         protected static SpiderMine instance;

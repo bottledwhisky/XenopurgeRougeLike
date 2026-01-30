@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -29,14 +30,14 @@ namespace XenopurgeRougeLike.XenoReinforcements
             rarity = Rarity.Elite;
             stackable = true;
             maxStacks = 2;
-            name = "Mind Control";
-            description = "Take control of an enemy unit, converting it to your team. Usable {0} time(s) per mission.";
-            flavourText = "By tapping into the hive mind, you can sever an alien's connection and bend it to your will.";
+            name = L("xeno.mind_control.name");
+            description = L("xeno.mind_control.description");
+            flavourText = L("xeno.mind_control.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            return string.Format(description, UsesPerStack[stacks - 1]);
+            return L("xeno.mind_control.description", UsesPerStack[stacks - 1]);
         }
 
         protected static MindControl instance;
@@ -132,10 +133,10 @@ namespace XenopurgeRougeLike.XenoReinforcements
     /// </summary>
     public class MindControlActionCardInfo : ActionCardInfo
     {
-        public string CustomCardName => "Mind Control";
+        public string CustomCardName => L("xeno.mind_control.name");
 
         public string CustomCardDescription =>
-            "Take control of an enemy unit, permanently converting it to your team.";
+            L("xeno.mind_control.card_description");
 
         public MindControlActionCardInfo()
         {

@@ -2,6 +2,7 @@
 using SpaceCommander.ActionCards;
 using System;
 using System.Collections.Generic;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements
 {
@@ -23,9 +24,9 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             rarity = Rarity.Expert;
             stackable = false;
             maxStacks = 1;
-            name = "Carbon Fiber Support";
-            description = "Can carry +1 additional turret into missions.";
-            flavourText = "Lightweight but incredibly strong carbon fiber frame allows for carrying extra turret equipment.";
+            name = L("engineer.carbon_fiber_support.name");
+            description = L("engineer.carbon_fiber_support.description", BonusTurretUses);
+            flavourText = L("engineer.carbon_fiber_support.flavour");
         }
 
         protected static CarbonFiberSupport instance;

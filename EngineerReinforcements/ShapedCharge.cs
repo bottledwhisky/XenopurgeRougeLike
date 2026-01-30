@@ -4,6 +4,7 @@ using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
 using System.Collections.Generic;
 using System.Linq;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements
 {
@@ -19,15 +20,15 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             rarity = Rarity.Standard;
             stackable = true;
             maxStacks = 2;
-            name = "Shaped Charge";
-            description = "Mines, grenades, and flashbangs deal {0}% reduced damage/effects to friendly units.";
-            flavourText = "Precision explosives that focus the blast away from your own troops. Mostly.";
+            name = L("engineer.shaped_charge.name");
+            description = L("engineer.shaped_charge.description");
+            flavourText = L("engineer.shaped_charge.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
             int reductionPercent = (int)(FriendlyFireReduction[stacks - 1] * 100);
-            return string.Format(description, reductionPercent);
+            return L("engineer.shaped_charge.description", reductionPercent);
         }
 
         protected static ShapedCharge instance;

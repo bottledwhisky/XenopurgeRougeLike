@@ -5,7 +5,8 @@
       "Bash(rm:*)",
       "Bash(dotnet build:*)",
       "Bash(grep:*)",
-      "Bash(git -C \"d:\\\\projects\\\\xenopurge\\\\XenopurgeRougeLike\" diff --stat)"
+      "Bash(git -C \"d:\\\\projects\\\\xenopurge\\\\XenopurgeRougeLike\" diff --stat)",
+      "Bash(ls:*)"
     ]
   }
 }

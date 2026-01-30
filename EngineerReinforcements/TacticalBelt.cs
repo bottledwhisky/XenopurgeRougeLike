@@ -2,6 +2,7 @@
 using SpaceCommander.ActionCards;
 using System;
 using XenopurgeRougeLike.EngineerReinforcements;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements
 {
@@ -16,9 +17,9 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             rarity = Rarity.Elite;
             stackable = false;
             maxStacks = 1;
-            name = "Tactical Belt";
-            description = "Mines, grenades, and flashbangs have +1 use.";
-            flavourText = "Advanced load-bearing equipment with reinforced pouches for extra ordnance capacity.";
+            name = L("engineer.tactical_belt.name");
+            description = L("engineer.tactical_belt.description", BonusUses);
+            flavourText = L("engineer.tactical_belt.flavour");
         }
 
         protected static TacticalBelt instance;

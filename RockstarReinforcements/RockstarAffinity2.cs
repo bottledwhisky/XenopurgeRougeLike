@@ -13,10 +13,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
-    // 战斗开始时自动部署一个“热情的粉丝”，他会自己找乐子。解锁粉丝数，每场战斗后，获得1k-2k粉丝。
+    // 战斗开始时自动部署一个"热情的粉丝"，他会自己找乐子。解锁粉丝数，每场战斗后，获得1k-2k粉丝。
     public class RockstarAffinityBase: CompanyAffinity
     {
         public RockstarAffinityBase()
@@ -47,7 +48,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public RockstarAffinity2()
         {
             unlockLevel = 2;
-            description = "A \"Passionate Fan\" is automatically deployed at the start of battle and will find their own fun. Unlock Fan Count; gain 1k-2k fans after each battle.";
+            description = L("rockstar.affinity2.description");
         }
 
         public static RockstarAffinity2 _instance;
@@ -56,7 +57,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         public override string ToFullDescription()
         {
-            return base.ToFullDescription() + $"\nCurrent Fan Count: {RockstarAffinityHelpers.fanCount}";
+            return base.ToFullDescription() + $"\n{L("rockstar.affinity2.fan_count", RockstarAffinityHelpers.fanCount)}";
         }
 
         public static bool IsAnyRockstarAffinityActive => Instance.IsActive || RockstarAffinity4.Instance.IsActive || RockstarAffinity6.Instance.IsActive;

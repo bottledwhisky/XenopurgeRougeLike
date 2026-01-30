@@ -7,12 +7,11 @@ using SpaceCommander.GameFlow;
 using SpaceCommander.Weapons;
 using System.Linq;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
-    // 聚光灯下
-    // In the Spotlight
-    // The first squad member becomes the "Top Star". Eliminating enemies has a higher chance to trigger Stream Donations.
+    // In the Spotlight: The first squad member becomes the "Top Star". Eliminating enemies has a 150% chance to trigger Stream Donations.
     // As long as they successfully extract, the mission counts as a perfect victory.
     // "Passionate Fans" will follow and fight alongside them, locked to Run-and-Gun behavior.
     public class InTheSpotlight : Reinforcement
@@ -25,8 +24,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         {
             company = Company.Rockstar;
             rarity = Rarity.Elite;
-            name = "In the Spotlight";
-            description = "The first squad member becomes the \"Top Star\". Eliminating enemies has a higher chance to trigger Stream Donations. As long as they successfully extract, the mission counts as a perfect victory. \"Passionate Fans\" will follow and fight alongside them, locked to Run-and-Gun behavior.";
+            name = L("rockstar.in_the_spotlight.name");
+            description = L("rockstar.in_the_spotlight.description", (int)(TopStarDonationMultiplier * 100));
         }
 
         private static InTheSpotlight _instance;

@@ -6,6 +6,7 @@ using SpaceCommander.GameFlow;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -15,9 +16,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
         public SensoryAssimilation()
         {
             company = Company.Xeno;
-            name = "Sensory Assimilation";
-            description = "At the start of each mission, reveals all enemy spawn points on the map.";
-            flavourText = "Tapping into the hive mind allows you to sense where the swarm will be.";
+            name = L("xeno.sensory_assimilation.name");
+            description = L("xeno.sensory_assimilation.description");
+            flavourText = L("xeno.sensory_assimilation.flavour");
         }
 
         protected static SensoryAssimilation instance;

@@ -8,6 +8,7 @@ using SpaceCommander.UI;
 using SpaceCommander.Weapons;
 using Traptics.EventsSystem;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
@@ -25,8 +26,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public CelebrityAuction()
         {
             company = Company.Rockstar;
-            name = "Celebrity Auction";
-            description = "You can sell equipment. Sale price increases by 1 for each battle the equipment has been through.";
+            name = L("rockstar.celebrity_auction.name");
+            description = L("rockstar.celebrity_auction.description");
         }
 
         protected static CelebrityAuction _instance;
@@ -204,8 +205,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             {
                 ButtonData sellButton = new()
                 {
-                    MainText = "Sell Equipment",
-                    Tooltip = "Sell equipment for coins.",
+                    MainText = L("rockstar.celebrity_auction.sell_equipment"),
+                    Tooltip = L("rockstar.celebrity_auction.sell_equipment_tooltip"),
                     onClickCallback = () =>
                     {
                         // Enable sell mode
@@ -213,7 +214,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
                         // Trigger the OnWeaponUpgrade event to open the weapon selection screen
                         var directoryTextData = AccessTools.Property(typeof(MenuButtons_SquadManagementDirectory), "NameTextDataOfDirectory").GetValue(__instance) as DirectoryTextData;
-                        directoryTextData?.SetText("Sell Equipment");
+                        directoryTextData?.SetText(L("rockstar.celebrity_auction.sell_equipment"));
 
                         var eventField = typeof(MenuButtons_SquadManagementDirectory).GetField("OnWeaponUpgrade", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
                         var onWeaponUpgrade = eventField?.GetValue(__instance) as Action;

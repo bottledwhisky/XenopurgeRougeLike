@@ -1,4 +1,5 @@
 using SpaceCommander;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
@@ -13,8 +14,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         {
             company = Company.Rockstar;
             rarity = Rarity.Expert;
-            name = "Building the Brand";
-            description = "Double the amount of fans gained.";
+            name = L("rockstar.building_the_brand.name");
+            description = L("rockstar.building_the_brand.description");
         }
 
         private static BuildingTheBrand _instance;

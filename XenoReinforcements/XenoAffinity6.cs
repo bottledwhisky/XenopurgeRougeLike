@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -15,7 +16,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         {
             unlockLevel = 6;
             company = Company.Xeno;
-            description = "对异形伤害+60%，控制类效果持续时间更进一步增加，更高概率获得同流派增援，异形死亡时会眩晕附近的异形";
+            description = L("xeno.affinity6.description");
         }
 
         // Damage bonus constants

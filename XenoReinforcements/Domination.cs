@@ -4,6 +4,7 @@ using SpaceCommander;
 using SpaceCommander.ActionCards;
 using System.Collections.Generic;
 using System.Linq;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -18,9 +19,9 @@ namespace XenopurgeRougeLike.XenoReinforcements
             company = Company.Xeno;
             rarity = Rarity.Expert;
             stackable = false;
-            name = "Domination";
-            description = "Take control of all xenos on the battlefield. Usable 1 time per mission.";
-            flavourText = "The hive mind bows before your absolute will.";
+            name = L("xeno.domination.name");
+            description = L("xeno.domination.description");
+            flavourText = L("xeno.domination.flavour");
         }
 
         protected static Domination instance;
@@ -118,10 +119,10 @@ public static Domination Instance => instance ??= new();
     /// </summary>
     public class DominationActionCardInfo : ActionCardInfo
     {
-        public string CustomCardName => "Domination";
+        public string CustomCardName => L("xeno.domination.name");
 
         public string CustomCardDescription =>
-            "Take control of ALL enemy units on the battlefield, permanently converting them to your team.";
+            L("xeno.domination.card_description");
     }
 
     /// <summary>

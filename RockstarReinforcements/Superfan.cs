@@ -1,4 +1,5 @@
 using SpaceCommander;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
@@ -11,8 +12,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         {
             company = Company.Rockstar;
             rarity = Rarity.Expert;
-            name = "Superfan";
-            description = "An additional \"Passionate Fan\" is automatically deployed at the start of battle.";
+            name = L("rockstar.superfan.name");
+            description = L("rockstar.superfan.description");
         }
 
         private static Superfan _instance;

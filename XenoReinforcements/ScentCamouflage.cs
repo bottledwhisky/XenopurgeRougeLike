@@ -8,6 +8,7 @@ using System.Reflection;
 using TimeSystem;
 using XenopurgeRougeLike.RockstarReinforcements;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -26,14 +27,14 @@ namespace XenopurgeRougeLike.XenoReinforcements
         public ScentCamouflage()
         {
             company = Company.Xeno;
-            name = "Scent Camouflage";
-            description = "Apply xeno pheromones to a unit, making enemies unable to target it for {0} seconds. Usable {1} time(s) per mission.";
-            flavourText = "The xeno pheromones mask your squad's scent, making them invisible to the hive's targeting instincts.";
+            name = L("xeno.scent_camouflage.name");
+            description = L("xeno.scent_camouflage.description");
+            flavourText = L("xeno.scent_camouflage.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            return string.Format(description, GetDuration(), Uses);
+            return L("xeno.scent_camouflage.description", GetDuration(), Uses);
         }
 
         public static float GetDuration()
@@ -221,10 +222,10 @@ namespace XenopurgeRougeLike.XenoReinforcements
     /// </summary>
     public class ScentCamouflageActionCardInfo : ActionCardInfo
     {
-        public string CustomCardName => "Scent Camouflage";
+        public string CustomCardName => L("xeno.scent_camouflage.name");
 
         public string CustomCardDescription =>
-            $"Apply xeno pheromones to a unit, making enemies unable to target it for {ScentCamouflage.GetDuration():F1} seconds.";
+            L("xeno.scent_camouflage.card_description", ScentCamouflage.GetDuration());
 
         public ScentCamouflageActionCardInfo()
         {

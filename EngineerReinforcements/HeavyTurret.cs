@@ -2,6 +2,7 @@ using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Weapons;
 using System.Collections.Generic;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements
 {
@@ -16,9 +17,9 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             company = Company.Engineer;
             rarity = Rarity.Elite;
             stackable = false;
-            name = "Heavy Turret";
-            description = "Turrets are immune to ranged damage and gain +15 accuracy.";
-            flavourText = "Reinforced armor plating turns your turrets into immovable bastions that shrug off enemy fire.";
+            name = L("engineer.heavy_turret.name");
+            description = L("engineer.heavy_turret.description", (int)(AccuracyBonus * 100));
+            flavourText = L("engineer.heavy_turret.flavour");
         }
 
         protected static HeavyTurret instance;

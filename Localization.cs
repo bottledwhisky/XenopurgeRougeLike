@@ -59,7 +59,7 @@ namespace XenopurgeRougeLike
             }
         }
 
-        public static string Get(string key, params object[] args)
+        public static string L(string key, params object[] args)
         {
             if (_translations.ContainsKey(key) &&
                 _translations[key].ContainsKey(_currentLanguage))

@@ -6,6 +6,7 @@ using SpaceCommander.Commands;
 using System;
 using UnityEngine;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -22,14 +23,14 @@ namespace XenopurgeRougeLike.XenoReinforcements
             company = Company.Xeno;
             rarity = Rarity.Expert;
             stackable = false;
-            name = "Submission";
-            description = "After dealing melee damage to a xeno, there is a {0}% chance to convert it to your team.";
-            flavourText = "Your presence bends the hive mind to your will.";
+            name = L("xeno.submission.name");
+            description = L("xeno.submission.description");
+            flavourText = L("xeno.submission.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            return string.Format(description, (int)(ConversionChance * 100));
+            return L("xeno.submission.description", (int)(ConversionChance * 100));
         }
 
         protected static Submission instance;

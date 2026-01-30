@@ -1,24 +1,25 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Abilities;
 using UnityEngine;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
-    // 智能武器模块：获得Hemogrip、bark、trac三者之一，智能武器的提升上限+50%，血斧+2伤害
-    // 装备逻辑：如果获得Hemogrip，寻找装备着Combat Knife的Power最高的单位
-    // 否则寻找装备着MOP多用途手枪的Accuracy最高的单位
-    // 如果没有这样的单位，则给玩家PlayerWallet加入对应武器的BuyingPrice
+    // Smart Weapon Module: Gain one of three smart weapons (Hemogrip, BARK, TRAC), smart weapon upgrade cap +50%, and Hemogrip gets +2 damage.
     public class SmartWeaponModule : SmartWeaponReinforcementBase
     {
+        public const float UpgradeCapMultiplier = 1.5f;
+        public const int HemogripDamageBonus = 2;
+
         public SmartWeaponModule()
         {
-            name = "Smart Weapon Module";
-            description = "Receive one of three smart weapons (Hemogrip, BARK System, or TRAC Carbine). Smart weapon upgrade caps increased by 50%. Hemogrip gains +2 damage.";
+            name = L("synthetics.smart_weapon_module.name");
+            description = L("synthetics.smart_weapon_module.description", (int)((UpgradeCapMultiplier - 1) * 100), HemogripDamageBonus);
             rarity = Rarity.Elite;
-            flavourText = "Factory-installed interface ports allow direct neural integration with Weyland-Yutani smart weapon systems.";
+            flavourText = L("synthetics.smart_weapon_module.flavour");
         }
 
         protected static SmartWeaponModule instance;
@@ -47,7 +48,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             {
                 int currentMaxKills = (int)maxKillsField.GetValue(__instance);
                 // Increase by 50% (e.g., 5 -> 7, 6 -> 9)
-                int newMaxKills = (int)Math.Floor(currentMaxKills * 1.5f);
+                int newMaxKills = (int)Math.Floor(currentMaxKills * SmartWeaponModule.UpgradeCapMultiplier);
                 maxKillsField.SetValue(__instance, newMaxKills);
 
                 Debug.Log($"SmartWeaponModule: Increased weapon upgrade cap from {currentMaxKills} to {newMaxKills}");
@@ -70,7 +71,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             var meleeWeapon = __instance.MeleeWeaponDataSO;
             if (meleeWeapon != null && meleeWeapon.Id == SmartWeaponReinforcementBase.HEMOGRIP_ID)
             {
-                __result += 2f;
+                __result += SmartWeaponModule.HemogripDamageBonus;
             }
         }
     }

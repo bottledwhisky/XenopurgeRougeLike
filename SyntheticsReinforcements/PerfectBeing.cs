@@ -1,12 +1,14 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Area;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
+    // Perfect Being: While at full health, gain +5 speed, +50% accuracy, and +5 power. Lose these bonuses when damaged.
     public class PerfectBeing : Reinforcement
     {
         public const float SpeedBonus = 5f;
@@ -18,9 +20,9 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             stackable = false;
             maxStacks = 1;
             rarity = Rarity.Expert;
-            name = "Perfect Being";
-            description = "Your units gain +5 speed, +50 aim, and +5 melee damage when at full health.";
-            flavourText = "The synthetic body is Weyland-Yutani's answer to life itself. In pristine condition, it performs exactly as designed: flawless.";
+            name = L("synthetics.perfect_being.name");
+            description = L("synthetics.perfect_being.description", (int)SpeedBonus, (int)(AimBonus * 100), (int)MeleeDamageBonus);
+            flavourText = L("synthetics.perfect_being.flavour");
         }
 
         protected static PerfectBeing instance;

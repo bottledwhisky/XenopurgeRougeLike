@@ -1,21 +1,23 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Abilities;
 using UnityEngine;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
-    // 智能武器总线：获得血斧、bark、trac三者之一，智能武器的提升幅度+50%
-    // 装备逻辑与SmartWeaponModule相同
+    // Smart Weapon Bus: Gain one of three smart weapons (Hemogrip, BARK, TRAC), and smart weapon stat improvements are increased by 50%.
     public class SmartWeaponBus : SmartWeaponReinforcementBase
     {
+        public const float StatImprovementMultiplier = 1.5f;
+
         public SmartWeaponBus()
         {
-            name = "Smart Weapon Bus";
-            description = "Receive one of three smart weapons (Hemogrip, BARK System, or TRAC Carbine). Smart weapon stat improvements increased by 50%.";
+            name = L("synthetics.smart_weapon_bus.name");
+            description = L("synthetics.smart_weapon_bus.description", (int)((StatImprovementMultiplier - 1) * 100));
             rarity = Rarity.Elite;
-            flavourText = "An expanded data bus permits higher throughput between synthetic cognition and linked weapon targeting systems.";
+            flavourText = L("synthetics.smart_weapon_bus.flavour");
         }
 
         protected static SmartWeaponBus instance;
@@ -58,14 +60,14 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
                         {
                             var accuracyField = AccessTools.Field(typeof(StatChange), "AccuracyChangeValue");
                             float originalValue = (float)accuracyField.GetValue(statChange);
-                            float newValue = originalValue * 1.5f;
+                            float newValue = originalValue * SmartWeaponBus.StatImprovementMultiplier;
                             accuracyField.SetValue(modifiedStatChange, newValue);
                         }
                         else
                         {
                             var changeValueField = AccessTools.Field(typeof(StatChange), "ChangeValue");
                             float originalValue = (float)changeValueField.GetValue(statChange);
-                            float newValue = originalValue * 1.5f;
+                            float newValue = originalValue * SmartWeaponBus.StatImprovementMultiplier;
                             changeValueField.SetValue(modifiedStatChange, newValue);
                         }
 

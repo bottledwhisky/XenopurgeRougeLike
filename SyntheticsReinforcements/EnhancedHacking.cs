@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
@@ -10,10 +10,12 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using TimeSystem;
 using UnityEngine;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
-    // 强化黑入：被黑入的门生命值提升100%，点燃房间伤害+100%，降压房间不再要求房间封闭。
+    // Enhanced Breaching: Hacked doors have +200% health, ignited rooms deal +100% damage, and decompressing room no longer requires sealed rooms.
+    // Lv2: Reveal spaceship also reveals extraction, explore rooms grants vision in revealed rooms, and delay enemy wave stuns all enemies for 5s.
     public class EnhancedHacking : Reinforcement
     {
         public static readonly float DoorHealthMultiplier = 3f; // 200% increase = 3x multiplier
@@ -25,21 +27,21 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             company = Company.Synthetics;
             stackable = true;
             maxStacks = 2;
-            name = "Enhanced Breaching";
+            name = L("synthetics.enhanced_hacking.name");
             description = "";
             rarity = Rarity.Elite;
-            flavourText = "Military-grade intrusion software pushes compromised systems beyond their standard operational parameters.";
+            flavourText = L("synthetics.enhanced_hacking.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
             if (stacks == 1)
             {
-                return "Lv1: Hacked doors have +200% health, ignited rooms deal +100% damage, and decompressing room no longer requires sealed rooms.";
+                return L("synthetics.enhanced_hacking.description_lv1", (int)((DoorHealthMultiplier - 1) * 100), (int)((RigDamageMultiplier - 1) * 100));
             }
             else
             {
-                return "Lv2: Download Schematics will reveal the extract point. Pull Camera Recordings will grant you vision in the revealed rooms. Subsonic Disruption will stun all enemies on map for 5 seconds.";
+                return L("synthetics.enhanced_hacking.description_lv2", (int)((DoorHealthMultiplier - 1) * 100), (int)((RigDamageMultiplier - 1) * 100), (int)StunDuration);
             }
         }
 

@@ -1,10 +1,11 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using SpaceCommander;
 using TimeSystem;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
-    // 高性能集群：接入点数会随时间（10s/5s/5s）缓慢增加（1/1/2）
+    // High Performance Cluster: Access points slowly increase over time (10s/5s/5s intervals, granting 1/1/2 access points respectively)
     public class HighPerformanceCluster : Reinforcement
     {
         // Time intervals for each stack level
@@ -20,19 +21,19 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             company = Company.Synthetics;
             stackable = true;
             maxStacks = 3;
-            name = "High Performance Cluster";
-            description = "Access points regenerate over time.";
-            flavourText = "Additional processing nodes enable continuous background calculation of system vulnerabilities in the local environment.";
+            name = L("synthetics.high_performance_cluster.name");
+            description = L("synthetics.high_performance_cluster.description");
+            flavourText = L("synthetics.high_performance_cluster.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
             if (stacks == 1)
-                return "Access points regenerate over time (1 point every 10 seconds).";
+                return L("synthetics.high_performance_cluster.description_lv1", TimeIntervals[0], AccessPointsAdded[0]);
             else if (stacks == 2)
-                return "Access points regenerate over time (1 point every 5 seconds).";
+                return L("synthetics.high_performance_cluster.description_lv2", TimeIntervals[1], AccessPointsAdded[1]);
             else
-                return "Access points regenerate over time (2 points every 5 seconds).";
+                return L("synthetics.high_performance_cluster.description_lv3", TimeIntervals[2], AccessPointsAdded[2]);
         }
 
         protected static HighPerformanceCluster instance;

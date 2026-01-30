@@ -5,6 +5,7 @@ using SpaceCommander.Area;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements
 {
@@ -14,10 +15,13 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     /// </summary>
     public class BigBang : Reinforcement
     {
+        public static readonly int AreaExpansion = 1;
+
         public BigBang()
         {
-            name = "大爆炸";
-            description = "地雷、手雷、闪光弹范围+1";
+            name = L("engineer.big_bang.name");
+            description = L("engineer.big_bang.description", AreaExpansion);
+            flavourText = L("engineer.big_bang.flavour");
             rarity = Rarity.Expert;
             company = Company.Engineer;
             stackable = false;

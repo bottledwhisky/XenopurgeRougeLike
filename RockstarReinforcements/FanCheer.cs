@@ -7,13 +7,12 @@ using System.Linq;
 using TimeSystem;
 using static SpaceCommander.Enumerations;
 using static UnityEngine.UI.CanvasScaler;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
-    // 应援
-    // Fan Cheer
-    // The first squad member becomes the "Top Star". When the "Top Star" takes damage,
-    // "Passionate Fan" stats greatly increase (non-stackable). Effect duration +1 second for every 1,000 fans.
+    // Fan Cheer: The first squad member becomes the "Top Star". When the "Top Star" or "Passionate Fan" takes damage,
+    // the stats of the other(s) greatly increase (non-stackable). Effect duration 5s and +1 second for every 2,000 fans.
     public class FanCheer : Reinforcement
     {
         // Stat bonuses for Passionate Fans when Top Star takes damage
@@ -36,8 +35,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         {
             company = Company.Rockstar;
             rarity = Rarity.Elite;
-            name = "Fan Cheer";
-            description = "The first squad member becomes the \"Top Star\". When the \"Top Star\" or \"Passionate Fan\" takes damage, the stats of the other(s) greatly increase (non-stackable). Effect duration 5s and +1 second for every 2,000 fans.";
+            name = L("rockstar.fan_cheer.name");
+            description = L("rockstar.fan_cheer.description", (int)HealthBonus, (int)(AccuracyBonus * 100), (int)SpeedBonus, (int)PowerBonus, (int)BaseDuration, FanPerDuraction);
         }
 
         private static FanCheer _instance;

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike
 {
@@ -82,10 +83,10 @@ namespace XenopurgeRougeLike
         {
             ClassType = typeof(Synthetics),
             Type = CompanyType.Synthetics,
-            Name = "Wayland-Yutani",
-            ShortName = "W-Y Corp.",
-            Slogan = "Building better worlds.",
-            Description = "Weyland-Yutani provides various upgrades to synthetics.",
+            Name = L("company.synthetics.name"),
+            ShortName = L("company.synthetics.short_name"),
+            Slogan = L("company.synthetics.slogan"),
+            Description = L("company.synthetics.description"),
             IconPath = "wayland-yutani.png",
             Sprite = null,
             BorderColor = new Color32(80, 130, 140, 255),
@@ -96,10 +97,10 @@ namespace XenopurgeRougeLike
         {
             ClassType = typeof(Xeno),
             Type = CompanyType.Xeno,
-            Name = "Prometheus Institute",
-            ShortName = "Prom. Inst.",
-            Slogan = "To understand them, become them.",
-            Description = "Prometheus Institute is a mysterious research organization specializing in Xeno biotechnology.",
+            Name = L("company.xeno.name"),
+            ShortName = L("company.xeno.short_name"),
+            Slogan = L("company.xeno.slogan"),
+            Description = L("company.xeno.description"),
             IconPath = "prometheus-institute.png",
             Sprite = null,
             BorderColor = new Color32(180, 220, 50, 255),
@@ -110,10 +111,10 @@ namespace XenopurgeRougeLike
         {
             ClassType = typeof(Rockstar),
             Type = CompanyType.Rockstar,
-            Name = "Nova-Entertainment",
-            ShortName = "Nova Ent.",
-            Slogan = "Everything can be entertainment, including your death.",
-            Description = "Your mission is now a galactical live TV show.",
+            Name = L("company.rockstar.name"),
+            ShortName = L("company.rockstar.short_name"),
+            Slogan = L("company.rockstar.slogan"),
+            Description = L("company.rockstar.description"),
             IconPath = "nova-entertainment.png",
             Sprite = null,
             BorderColor = new Color32(255, 80, 180, 255),
@@ -124,10 +125,10 @@ namespace XenopurgeRougeLike
         {
             ClassType = typeof(Engineer),
             Type = CompanyType.Engineer,
-            Name = "Sevastopol Systems",
-            ShortName = "Sevastopol",
-            Slogan = "Tomorrow, together.",
-            Description = "Sevastopol Systems specializes in defensive technology and automated systems.",
+            Name = L("company.engineer.name"),
+            ShortName = L("company.engineer.short_name"),
+            Slogan = L("company.engineer.slogan"),
+            Description = L("company.engineer.description"),
             IconPath = "sevastopol-systems.png",
             Sprite = null,
             BorderColor = new Color32(120, 140, 160, 255),
@@ -138,10 +139,10 @@ namespace XenopurgeRougeLike
         {
             ClassType = typeof(Support),
             Type = CompanyType.Support,
-            Name = "Gateway Medical",
-            ShortName = "Gateway",
-            Slogan = "Your lifeline in deep space.",
-            Description = "Gateway Medical provides comprehensive medical support and supply services.",
+            Name = L("company.support.name"),
+            ShortName = L("company.support.short_name"),
+            Slogan = L("company.support.slogan"),
+            Description = L("company.support.description"),
             IconPath = "gateway-medical.png",
             Sprite = null,
             BorderColor = new Color32(100, 180, 100, 255),
@@ -152,10 +153,10 @@ namespace XenopurgeRougeLike
         {
             ClassType = typeof(Warrior),
             Type = CompanyType.Warrior,
-            Name = "Hadley Security",
-            ShortName = "Hadley Sec.",
-            Slogan = "Last stand, every time.",
-            Description = "Hadley Security trains elite combat specialists for hostile environments.",
+            Name = L("company.warrior.name"),
+            ShortName = L("company.warrior.short_name"),
+            Slogan = L("company.warrior.slogan"),
+            Description = L("company.warrior.description"),
             IconPath = "hadley-security.png",
             Sprite = null,
             BorderColor = new Color32(180, 60, 60, 255),
@@ -166,10 +167,10 @@ namespace XenopurgeRougeLike
         {
             ClassType = typeof(Gunslinger),
             Type = CompanyType.Gunslinger,
-            Name = "Sulaco Arms",
-            ShortName = "Sulaco",
-            Slogan = "Absolute firepower.",
-            Description = "Sulaco Arms manufactures military-grade weaponry and tactical equipment.",
+            Name = L("company.gunslinger.name"),
+            ShortName = L("company.gunslinger.short_name"),
+            Slogan = L("company.gunslinger.slogan"),
+            Description = L("company.gunslinger.description"),
             IconPath = "sulaco-arms.png",
             Sprite = null,
             BorderColor = new Color32(200, 120, 40, 255),
@@ -180,10 +181,10 @@ namespace XenopurgeRougeLike
         {
             ClassType = typeof(Scavenger),
             Type = CompanyType.Scavenger,
-            Name = "Torrens Salvage",
-            ShortName = "Torrens",
-            Slogan = "One person's trash is our treasure.",
-            Description = "Torrens Salvage is a loose collective of independent scavengers and opportunists operating under a common banner.",
+            Name = L("company.scavenger.name"),
+            ShortName = L("company.scavenger.short_name"),
+            Slogan = L("company.scavenger.slogan"),
+            Description = L("company.scavenger.description"),
             IconPath = "torrens-salvage.png",
             Sprite = null,
             BorderColor = new Color32(140, 120, 80, 255),
@@ -194,10 +195,10 @@ namespace XenopurgeRougeLike
         {
             ClassType = typeof(Clone),
             Type = CompanyType.Clone,
-            Name = "Acheron BioGen",
-            ShortName = "Acheron",
-            Slogan = "Death is just the beginning.",
-            Description = "Acheron BioGen pioneers resurrection and biological replication technology.",
+            Name = L("company.clone.name"),
+            ShortName = L("company.clone.short_name"),
+            Slogan = L("company.clone.slogan"),
+            Description = L("company.clone.description"),
             IconPath = "acheron-biogen.png",
             Sprite = null,
             BorderColor = new Color32(100, 100, 140, 255),
@@ -241,7 +242,6 @@ namespace XenopurgeRougeLike
 
     public class CompanyAffinity : Activatable
     {
-        public const string AffinityHelp = "As a token of trust, each company can provide unique support to your missions based on the number of distinct reinforments you accepted from them.";
         public int unlockLevel;
         public string description;
         public Company company;
@@ -253,7 +253,7 @@ namespace XenopurgeRougeLike
 
         public virtual string ToFullDescription()
         {
-            return AffinityHelp + "\n" + company.ToFullDescription() + $"\nUnlocked after acquiring {unlockLevel} reinforments:\n" + description;
+            return L("affinity.help") + "\n" + company.ToFullDescription() + "\n" + L("affinity.unlock_description", unlockLevel, description);
         }
 
         public virtual string ToMenuItem()

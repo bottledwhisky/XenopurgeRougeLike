@@ -1,6 +1,7 @@
 using HarmonyLib;
 using SpaceCommander;
 using System;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements
 {
@@ -8,22 +9,23 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     public class AdvancedMagazine : Reinforcement
     {
         public static readonly float[] DurabilityMultiplier = [1.5f, 2.0f];
-        public static readonly float AccuracyBonus = 15f;
+        public static readonly float AccuracyBonus = .15f;
 
         public AdvancedMagazine()
         {
             company = Company.Engineer;
             stackable = true;
             maxStacks = 2;
-            name = "Advanced Magazine";
-            description = "Turret ammo capacity +{0}%, turret accuracy +15.";
-            flavourText = "Extended ammunition feeds and stabilized mounting systems maximize turret combat effectiveness.";
+            name = L("engineer.advanced_magazine.name");
+            description = GetDescriptionForStacks(1);
+            flavourText = L("engineer.advanced_magazine.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
             int durabilityPercent = (int)((DurabilityMultiplier[stacks - 1] - 1f) * 100);
-            return string.Format(description, durabilityPercent);
+            int accuracyBonus = (int)(AccuracyBonus * 100);
+            return L("engineer.advanced_magazine.description", durabilityPercent, accuracyBonus);
         }
 
         protected static AdvancedMagazine instance;

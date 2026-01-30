@@ -4,6 +4,7 @@ using SpaceCommander;
 using SpaceCommander.Area;
 using System;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -20,14 +21,14 @@ namespace XenopurgeRougeLike.XenoReinforcements
             company = Company.Xeno;
             rarity = Rarity.Elite;
             stackable = false;
-            name = "Fear Instinct";
-            description = "Each enemy killed delays the next enemy wave by {0} seconds.";
-            flavourText = "The death of their kin sends ripples of terror through the hive mind, causing them to hesitate.";
+            name = L("xeno.fear_instinct.name");
+            description = L("xeno.fear_instinct.description");
+            flavourText = L("xeno.fear_instinct.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            return string.Format(description, DelayPerKill);
+            return L("xeno.fear_instinct.description", DelayPerKill);
         }
 
         protected static FearInstinct instance;

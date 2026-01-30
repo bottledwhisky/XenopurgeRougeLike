@@ -4,6 +4,7 @@ using SpaceCommander.ActionCards;
 using System.Collections.Generic;
 using System.Linq;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements
 {
@@ -21,14 +22,14 @@ namespace XenopurgeRougeLike.XenoReinforcements
             company = Company.Xeno;
             stackable = true;
             maxStacks = 2;
-            name = "Psionic Scream";
-            description = "Stun all xenos for {0} seconds. Usable {1} time(s) per mission.";
-            flavourText = "A psychic shriek that reverberates through the hive mind, temporarily paralyzing all xenos in range.";
+            name = L("xeno.psionic_scream.name");
+            description = L("xeno.psionic_scream.description");
+            flavourText = L("xeno.psionic_scream.flavour");
         }
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            return string.Format(description, StunDuration, UsesPerStack[stacks - 1]);
+            return L("xeno.psionic_scream.description", StunDuration, UsesPerStack[stacks - 1]);
         }
 
         protected static PsionicScream instance;
@@ -130,10 +131,10 @@ namespace XenopurgeRougeLike.XenoReinforcements
     /// </summary>
     public class PsionicScreamActionCardInfo : ActionCardInfo
     {
-        public string CustomCardName => "Psionic Scream";
+        public string CustomCardName => L("xeno.psionic_scream.name");
 
         public string CustomCardDescription =>
-            $"Stun all xenos for {PsionicScream.StunDuration} seconds.";
+            L("xeno.psionic_scream.card_description", PsionicScream.StunDuration);
     }
 
     /// <summary>

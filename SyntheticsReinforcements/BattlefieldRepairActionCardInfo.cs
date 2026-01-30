@@ -1,5 +1,6 @@
 using HarmonyLib;
 using SpaceCommander.ActionCards;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
@@ -10,11 +11,11 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
     public class BattlefieldRepairActionCardInfo : ActionCardInfo
     {
         // These properties will be accessed by the Harmony patches
-        public string CustomCardName => "Battlefield Repair";
+        public string CustomCardName => L("synthetics.battlefield_repair.card_name");
 
         public string CustomCardDescription =>
-            $"Heal a unit for {BattlefieldRepair.HealPerPoint[BattlefieldRepair.Instance.currentStacks - 1]} HP. " +
-            "Excess healing converts to armor. Costs 1 point.";
+            L("synthetics.battlefield_repair.card_description",
+              BattlefieldRepair.HealPerPoint[BattlefieldRepair.Instance.currentStacks - 1]);
     }
 
     /// <summary>

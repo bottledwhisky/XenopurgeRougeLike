@@ -1,25 +1,27 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using SpaceCommander;
 using System;
 using System.Collections.Generic;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
+    // Synthetics Affinity Level 6: All units gain +3 speed, +30% accuracy, and +3 power. Start missions with +8 access points. Synthetics reinforcements appear 2x more often.
     public class SyntheticsAffinity6 : CompanyAffinity
     {
-        public SyntheticsAffinity6()
-        {
-            unlockLevel = 6;
-            company = Company.Synthetics;
-            description = "速度+3，瞄准+30，近战伤害+3，开局获得8点接入点数，更高概率获得同流派增援";
-        }
-
         public const float SpeedBonus = 3f;
         public const float AccuracyBonus = .3f;
         public const float PowerBonus = 3f;
         public const int StartingAccessPointsBonus = 8;
         public const float ReinforcementChanceBonus = 2f;
+
+        public SyntheticsAffinity6()
+        {
+            unlockLevel = 6;
+            company = Company.Synthetics;
+            description = L("synthetics.affinity6.description", (int)SpeedBonus, (int)(AccuracyBonus * 100), (int)PowerBonus, StartingAccessPointsBonus, (int)ReinforcementChanceBonus);
+        }
 
         public override void OnActivate()
         {
