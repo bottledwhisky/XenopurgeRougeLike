@@ -15,7 +15,7 @@ using UnityEngine.UI;
 
 namespace XenopurgeRougeLike
 {
-    using static XenopurgeRougeLike.ModLocalization;
+    using static ModLocalization;
     // Helper class for PlayerWallet access
     public static class PlayerWalletHelper
     {
@@ -60,7 +60,7 @@ namespace XenopurgeRougeLike
 
                     ButtonData buttonData = new()
                     {
-                        MainText = preview.MenuItem,
+                        MainText = preview.MenuItem + $"({L("ui.cost_format", cost)})",
                         IsDisabled = !canAfford,
                         onSelectCallback = () =>
                         {
@@ -158,55 +158,53 @@ namespace XenopurgeRougeLike
 
                 ButtonData rerollButtonData = new ButtonData
                 {
-                    MainText = L("ui.reroll_button", rerollCost),
+                    MainText = L("ui.reroll_button", rerollCost, PlayerWalletHelper.GetCoins()),
                     IsDisabled = !canAffordReroll,
                     IgnoreClickCount = true,
-                    onClickCallback = () =>
+                };
+
+                // Set the callback after creating the button so we can capture a reference to it
+                rerollButtonData.onClickCallback = () =>
+                {
+                    int currentRerollCost = AwardSystem.currentRerollCost;
+
+                    // Check if player can afford reroll
+                    int currentCoins = PlayerWalletHelper.GetCoins();
+                    if (currentCoins < currentRerollCost)
                     {
-                        int currentRerollCost = AwardSystem.currentRerollCost;
+                        MelonLogger.Warning($"Cannot afford reroll - costs {currentRerollCost}, have {currentCoins}");
+                        return;
+                    }
 
-                        // Check if player can afford reroll
-                        int currentCoins = PlayerWalletHelper.GetCoins();
-                        if (currentCoins < currentRerollCost)
-                        {
-                            MelonLogger.Warning($"Cannot afford reroll - costs {currentRerollCost}, have {currentCoins}");
-                            return;
-                        }
+                    MelonLoader.MelonLogger.Msg("Player chose to reroll reinforcement choices.");
+                    try
+                    {
+                        // Deduct reroll cost
+                        PlayerWalletHelper.ChangeCoins(-currentRerollCost);
+                        MelonLogger.Msg($"Spent {currentRerollCost} coins on reroll, {PlayerWalletHelper.GetCoins()} remaining");
 
-                        MelonLoader.MelonLogger.Msg("Player chose to reroll reinforcement choices.");
-                        try
-                        {
-                            // Deduct reroll cost
-                            PlayerWalletHelper.ChangeCoins(-currentRerollCost);
-                            MelonLogger.Msg($"Spent {currentRerollCost} coins on reroll, {PlayerWalletHelper.GetCoins()} remaining");
+                        // Increase reroll cost for next reroll
+                        AwardSystem.currentRerollCost++;
+                        MelonLogger.Msg($"Reroll cost increased to {AwardSystem.currentRerollCost}");
 
-                            // Increase reroll cost for next reroll
-                            AwardSystem.currentRerollCost++;
-                            MelonLogger.Msg($"Reroll cost increased to {AwardSystem.currentRerollCost}");
+                        // Logic to reroll choices
+                        GameManager_GiveEndGameRewards_Patch.Prefix(true);
+                        EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = 0;
+                        EndGameWindowView_SetResultText_Patch.PopulateChoices(AwardSystem.choices, buttonDataList);
 
-                            // Logic to reroll choices
-                            GameManager_GiveEndGameRewards_Patch.Prefix(true);
-                            EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = 0;
-                            EndGameWindowView_SetResultText_Patch.PopulateChoices(AwardSystem.choices, buttonDataList);
-
-                            // Update reroll button text and state (it's the second to last button)
-                            int rerollButtonIndex = buttonDataList.Count - 2;
-                            if (rerollButtonIndex >= 0 && rerollButtonIndex < buttonDataList.Count)
-                            {
-                                int newRerollCost = AwardSystem.currentRerollCost;
-                                bool canAffordNewReroll = PlayerWalletHelper.GetCoins() >= newRerollCost;
-                                buttonDataList[rerollButtonIndex].MainText = L("ui.reroll_button", newRerollCost);
-                                buttonDataList[rerollButtonIndex].IsDisabled = !canAffordNewReroll;
-                                buttonDataList[rerollButtonIndex].ChangeInteractionState(buttonDataList[rerollButtonIndex].IsDisabled);
-                                MelonLogger.Msg($"Updated reroll button: cost={newRerollCost}, disabled={!canAffordNewReroll}");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MelonLogger.Error(ex);
-                            MelonLogger.Error(ex.StackTrace);
-                            throw ex;
-                        }
+                        // Update reroll button text and state (we have a direct reference)
+                        int newRerollCost = AwardSystem.currentRerollCost;
+                        bool canAffordNewReroll = PlayerWalletHelper.GetCoins() >= newRerollCost;
+                        rerollButtonData.MainText = L("ui.reroll_button", newRerollCost, PlayerWalletHelper.GetCoins());
+                        rerollButtonData.IsDisabled = !canAffordNewReroll;
+                        rerollButtonData.ChangeInteractionState(rerollButtonData.IsDisabled);
+                        MelonLogger.Msg($"Updated reroll button: cost={newRerollCost}, disabled={!canAffordNewReroll}");
+                    }
+                    catch (Exception ex)
+                    {
+                        MelonLogger.Error(ex);
+                        MelonLogger.Error(ex.StackTrace);
+                        throw ex;
                     }
                 };
                 // Add a "Skip" button
@@ -253,7 +251,6 @@ namespace XenopurgeRougeLike
         private static TextMeshProUGUI[] _choiceTitles = new TextMeshProUGUI[3];
         private static TextMeshProUGUI[] _choiceCosts = new TextMeshProUGUI[3];
         public static TextMeshProUGUI _descriptionText;
-        public static TextMeshProUGUI _coinsText;
         public static bool isGameContinue = false;
         public static int selectedChoiceIndex = 0;
 
@@ -316,22 +313,6 @@ namespace XenopurgeRougeLike
             var containerLayoutElement = _chooserContainer.AddComponent<LayoutElement>();
             containerLayoutElement.preferredWidth = 500f;
             containerLayoutElement.preferredHeight = 250f;
-
-            // Coins display at the top
-            var coinsGO = new GameObject("CoinsDisplay");
-            coinsGO.transform.SetParent(_chooserContainer.transform, false);
-            _coinsText = coinsGO.AddComponent<TextMeshProUGUI>();
-            if (referenceText != null)
-            {
-                _coinsText.font = referenceText.font;
-            }
-            _coinsText.fontSize = 20f;
-            _coinsText.color = Color.yellow;
-            _coinsText.alignment = TextAlignmentOptions.Center;
-            _coinsText.text = L("ui.coins_display", PlayerWalletHelper.GetCoins());
-
-            var coinsLayout = coinsGO.AddComponent<LayoutElement>();
-            coinsLayout.preferredHeight = 25f;
 
             // Header text
             var headerGO = new GameObject("Header");
@@ -512,12 +493,6 @@ namespace XenopurgeRougeLike
         public static void PopulateChoices(List<Reinforcement> choices, List<ButtonData> buttonDataList = null)
         {
             MelonLogger.Msg($"Populating reinforcement choices UI with {choices.Count} choices.");
-
-            // Update coins display
-            if (_coinsText != null)
-            {
-                _coinsText.text = L("ui.coins_display", PlayerWalletHelper.GetCoins());
-            }
 
             for (int i = 0; i < 3 && i < choices.Count; i++)
             {

@@ -12,7 +12,7 @@ using XenopurgeRougeLike.RockstarReinforcements;
 
 namespace XenopurgeRougeLike
 {
-    using static XenopurgeRougeLike.ModLocalization;
+    using static ModLocalization;
 
     public class InspectReinforcementDirectory : MonoBehaviour, IDirectory<DirectoryData>
     {

@@ -9,22 +9,6 @@ namespace XenopurgeRougeLike
         {
             return new Dictionary<string, Dictionary<string, string>>
             {
-                ["ui.coins_display"] = new Dictionary<string, string>
-                {
-                    ["en"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["el"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["fr"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["zh"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["zh-TW"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["de"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["pl"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["pt"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["ru"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["es"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["uk"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["ja"] = "<sprite name=\"CoinIcon\">: {0}",
-                    ["ko"] = "<sprite name=\"CoinIcon\">: {0}",
-                },
                 ["ui.choose_reinforcement"] = new Dictionary<string, string>
                 {
                     ["en"] = "CHOOSE YOUR REINFORCEMENT",
@@ -59,19 +43,19 @@ namespace XenopurgeRougeLike
                 },
                 ["ui.reroll_button"] = new Dictionary<string, string>
                 {
-                    ["en"] = "Reroll ({0} <sprite name=\"CoinIcon\">)",
-                    ["el"] = "Επανάληψη ({0} <sprite name=\"CoinIcon\">)",
-                    ["fr"] = "Relancer ({0} <sprite name=\"CoinIcon\">)",
-                    ["zh"] = "重新选择 ({0} <sprite name=\"CoinIcon\">)",
-                    ["zh-TW"] = "重新選擇 ({0} <sprite name=\"CoinIcon\">)",
-                    ["de"] = "Neu würfeln ({0} <sprite name=\"CoinIcon\">)",
-                    ["pl"] = "Losuj ponownie ({0} <sprite name=\"CoinIcon\">)",
-                    ["pt"] = "Rolar novamente ({0} <sprite name=\"CoinIcon\">)",
-                    ["ru"] = "Перебросить ({0} <sprite name=\"CoinIcon\">)",
-                    ["es"] = "Volver a tirar ({0} <sprite name=\"CoinIcon\">)",
-                    ["uk"] = "Перекинути ({0} <sprite name=\"CoinIcon\">)",
-                    ["ja"] = "リロール ({0} <sprite name=\"CoinIcon\">)",
-                    ["ko"] = "다시 굴리기 ({0} <sprite name=\"CoinIcon\">)",
+                    ["en"] = "Reroll ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["el"] = "Επανάληψη ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["fr"] = "Relancer ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["zh"] = "重新选择 ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["zh-TW"] = "重新選擇 ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["de"] = "Neu würfeln ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["pl"] = "Losuj ponownie ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["pt"] = "Rolar novamente ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["ru"] = "Перебросить ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["es"] = "Volver a tirar ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["uk"] = "Перекинути ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["ja"] = "リロール ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
+                    ["ko"] = "다시 굴리기 ({0} <sprite name=\"CoinIcon\">/{1} <sprite name=\"CoinIcon\">)",
                 },
                 ["ui.skip_button"] = new Dictionary<string, string>
                 {
