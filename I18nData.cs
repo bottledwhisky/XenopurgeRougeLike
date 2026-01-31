@@ -28,6 +28,7 @@ namespace XenopurgeRougeLike
                 .Concat(GetRockstarTranslations())
                 .Concat(GetSyntheticsTranslations())
                 .Concat(GetUiTranslations())
+                .Concat(GetWarriorTranslations())
                 .Concat(GetXenoTranslations())
                 .ToDictionary(x => x.Key, x => x.Value);
     }

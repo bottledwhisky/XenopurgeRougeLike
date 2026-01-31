@@ -207,7 +207,6 @@ namespace XenopurgeRougeLike.RockstarReinforcements
     }
 
     [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
-    [HarmonyPatch(new Type[] { typeof(UnitData), typeof(Team), typeof(GridManager) })]
     public class BattleUnit_Constructor_Patch
     {
         public static void Postfix(BattleUnit __instance, Team team)

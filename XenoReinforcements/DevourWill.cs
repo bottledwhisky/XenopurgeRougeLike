@@ -40,7 +40,6 @@ public static DevourWill Instance => instance ??= new();
     /// Handles both enemy xenos (stunned) and player units (mind-controlled)
     /// </summary>
     [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
-    [HarmonyPatch(new Type[] { typeof(UnitData), typeof(Team), typeof(GridManager) })]
     public static class DevourWill_BattleUnit_Constructor_Patch
     {
         public static void Postfix(BattleUnit __instance, Team team)

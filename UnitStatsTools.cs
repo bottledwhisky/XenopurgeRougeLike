@@ -88,7 +88,6 @@ namespace XenopurgeRougeLike
 
 
     [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
-    [HarmonyPatch([typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
     public static class UnitStatsChangeConstructor
     {
         public static void Postfix(BattleUnit __instance, Enumerations.Team team)

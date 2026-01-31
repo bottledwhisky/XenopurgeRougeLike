@@ -80,6 +80,50 @@ Some important files:
     ActionCardsUpgraderTools.cs: Some existing code to help mess with generating action cards in the action cards store.
     (Higely recommended) XenopurgeRougeLike.txt: If you are looking for some existing examples of certain effects, you can check this file. Please be noted that not all reinforcements/affinities are implemented yet. But it's a good place to start.
 
+Each run consists of many missions (a.k.a battles). If you use a mission-wide state, you should use this pattern to clear the state when the mission ends:
+
+```c#
+    // Example from reinforcement "ModularDesign"
+    [HarmonyPatch(typeof(TestGame), "EndGame")]
+    public static class ModularDesign_ClearTracking_Patch
+    {
+        public static void Postfix()
+        {
+            TurretRedeploymentTracker.ClearAll();
+        }
+    }
+```
+
+Similarly, TestGame has "StartGame" that you can use to initialize your state.
+
+For BattleUnit, you should use this pattern to hook the OnDeath event:
+
+```c#
+    // Example from affinity "XenoAffinity6"
+    // Patch BattleUnit constructor to add OnDeath listener
+    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
+    public static class XenoAffinity6_BattleUnit_Constructor_Patch
+    {
+        public static void Postfix(BattleUnit __instance, Team team)
+        {
+            if (!XenoAffinity6.Instance.IsActive)
+                return;
+
+            if (team == Team.EnemyAI)
+            {
+                void action()
+                {
+                    // When this xeno dies, stun nearby xenos
+                    XenoAffinity6_StunSystem.StunNearbyXenos(__instance);
+                    __instance.OnDeath -= action;
+                }
+
+                __instance.OnDeath += action;
+            }
+        }
+    }
+```
+
 About the original game:
 The original game is called "Xenopurge". It is a tactical RTS where players control a squad of soldiers fighting against aliens(xenoes). During battle, the game allows the player to use "ActionCards" to perform actions, not direct control.
 

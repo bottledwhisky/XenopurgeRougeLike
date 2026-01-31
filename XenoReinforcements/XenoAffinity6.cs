@@ -185,7 +185,6 @@ namespace XenopurgeRougeLike.XenoReinforcements
 
     // Patch BattleUnit constructor to add OnDeath listener
     [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
-    [HarmonyPatch(new Type[] { typeof(UnitData), typeof(Team), typeof(GridManager) })]
     public static class XenoAffinity6_BattleUnit_Constructor_Patch
     {
         public static void Postfix(BattleUnit __instance, Team team)
@@ -195,13 +194,13 @@ namespace XenopurgeRougeLike.XenoReinforcements
 
             if (team == Team.EnemyAI)
             {
-                Action action = null;
-                action = () =>
+                void action()
                 {
                     // When this xeno dies, stun nearby xenos
                     XenoAffinity6_StunSystem.StunNearbyXenos(__instance);
                     __instance.OnDeath -= action;
-                };
+                }
+
                 __instance.OnDeath += action;
             }
         }

@@ -31,7 +31,6 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
 
 
     [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
-    [HarmonyPatch([typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
     public static class PerfectBeing_UnitStatsChangeConstructor
     {
         public static void Postfix(BattleUnit __instance, Enumerations.Team team)

@@ -40,7 +40,6 @@ namespace XenopurgeRougeLike.XenoReinforcements
     /// When an enemy dies, delay the next wave spawn
     /// </summary>
     [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
-    [HarmonyPatch(new Type[] { typeof(UnitData), typeof(Team), typeof(GridManager) })]
     public static class FearInstinct_BattleUnit_Constructor_Patch
     {
         public static void Postfix(BattleUnit __instance, Team team)

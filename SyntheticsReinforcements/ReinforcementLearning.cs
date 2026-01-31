@@ -113,7 +113,6 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
     /// Patch BattleUnit constructor to add +10 armor at mission start for units with Hemogrip
     /// </summary>
     [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
-    [HarmonyPatch([typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
     public static class ReinforcementLearning_BattleUnitConstructor_Patch
     {
         public static void Postfix(BattleUnit __instance, Enumerations.Team team)
