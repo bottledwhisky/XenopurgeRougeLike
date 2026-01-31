@@ -61,9 +61,9 @@ namespace XenopurgeRougeLike
         public bool stackable = false;
         public int maxStacks = 1;
         public int currentStacks = 0;
-        public string name;
-        protected string description;
-        public string flavourText;
+        public LocalizedString name;
+        protected LocalizedString description;
+        public LocalizedString flavourText;
         public string Name
         {
             get
@@ -72,20 +72,20 @@ namespace XenopurgeRougeLike
                 {
                     return $"{name} ({currentStacks}/{maxStacks})";
                 }
-                return name;
+                return name.ToString();
             }
-            protected set { name = value; }
+            protected set { name = new LocalizedString(value); }
         }
 
         public virtual string Description
         {
-            get { return description; }
-            protected set { description = value; }
+            get { return description.ToString(); }
+            protected set { description = new LocalizedString(value); }
         }
 
         public virtual string GetDescriptionForStacks(int stacks)
         {
-            return description;
+            return Description;
         }
 
         public override string ToString()
@@ -125,7 +125,7 @@ Effects: {Description}
         public ReinforcementPreview GetNextLevelPreview()
         {
             int nextStacks = stackable ? Math.Min(currentStacks + 1, maxStacks) : currentStacks;
-            string nextName = stackable ? $"{name} ({nextStacks}/{maxStacks})" : name;
+            string nextName = stackable ? $"{Name} ({nextStacks}/{maxStacks})" : Name;
             string nextDescription = GetDescriptionForStacks(nextStacks);
 
             return new ReinforcementPreview

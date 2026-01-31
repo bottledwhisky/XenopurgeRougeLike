@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
@@ -28,7 +28,6 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             stackable = true;
             maxStacks = 2;
             name = L("synthetics.enhanced_hacking.name");
-            description = "";
             rarity = Rarity.Elite;
             flavourText = L("synthetics.enhanced_hacking.flavour");
         }

@@ -17,7 +17,6 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             stackable = true;
             maxStacks = 2;
             name = L("engineer.advanced_magazine.name");
-            description = GetDescriptionForStacks(1);
             flavourText = L("engineer.advanced_magazine.flavour");
         }
 

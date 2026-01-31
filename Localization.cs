@@ -9,6 +9,36 @@ using UI.Settings;
 
 namespace XenopurgeRougeLike
 {
+    public class LocalizedString(string key, params object[] args)
+    {
+        private readonly string _key = key;
+        private readonly object[] _args = args;
+
+        public override string ToString()
+        {
+            var _translations = I18nData._translations;
+            if (_translations.ContainsKey(_key) &&
+                _translations[_key].ContainsKey(ModLocalization.CurrentLanguage))
+            {
+                string text = _translations[_key][ModLocalization.CurrentLanguage];
+                return string.Format(text, _args);
+            }
+
+            // Fallback to English
+            if (ModLocalization.CurrentLanguage != "en" &&
+                _translations.ContainsKey(_key) &&
+                _translations[_key].ContainsKey("en"))
+            {
+                string text = _translations[_key]["en"];
+                return string.Format(text, _args);
+            }
+
+            return _key;
+        }
+
+        public static implicit operator string(LocalizedString _this) => _this.ToString();
+    }
+
     public static class ModLocalization
     {
         private static string _currentLanguage = "en";
@@ -59,13 +89,13 @@ namespace XenopurgeRougeLike
             }
         }
 
-        public static string L(string key, params object[] args)
+        public static LocalizedString L(string key, params object[] args)
         {
             if (_translations.ContainsKey(key) &&
                 _translations[key].ContainsKey(_currentLanguage))
             {
                 string text = _translations[key][_currentLanguage];
-                return args.Length > 0 ? string.Format(text, args) : text;
+                return new LocalizedString(text, args);
             }
 
             // Fallback to English
@@ -74,10 +104,10 @@ namespace XenopurgeRougeLike
                 _translations[key].ContainsKey("en"))
             {
                 string text = _translations[key]["en"];
-                return args.Length > 0 ? string.Format(text, args) : text;
+                return new LocalizedString(text, args);
             }
 
-            return key;
+            return new LocalizedString(key);
         }
 
         public static string CurrentLanguage => _currentLanguage;

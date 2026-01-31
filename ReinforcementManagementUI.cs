@@ -118,8 +118,8 @@ namespace XenopurgeRougeLike
             var buttonData = __result.ButtonData.ToList();
             buttonData.Add(new()
             {
-                MainText = L("ui.inspect_reinforcements"),
-                Tooltip = L("ui.inspect_reinforcements_tooltip"),
+                MainText = L("ui.inspect_reinforcements").ToString(),
+                Tooltip = L("ui.inspect_reinforcements_tooltip").ToString(),
                 onClickCallback = new Action(InspectClicked)
             });
 
@@ -128,8 +128,8 @@ namespace XenopurgeRougeLike
                 // Add fan count display
                 buttonData.Add(new()
                 {
-                    MainText = L("ui.fan_count"),
-                    Tooltip = L("ui.current_fan_count", RockstarAffinityHelpers.fanCount),
+                    MainText = L("ui.fan_count").ToString(),
+                    Tooltip = L("ui.current_fan_count", RockstarAffinityHelpers.fanCount).ToString(),
                     IsDisabled = true
                 });
             }

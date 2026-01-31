@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SpaceCommander;
@@ -78,7 +78,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
             }
 
             int maxKills = (int)maxKillsField.GetValue(__instance);
-            int startingKills = (int)Math.Floor(maxKills * StartingKillsMultiplier); // 50% of max
+            int startingKills = (int)Math.Floor(maxKills * ReinforcementLearning.StartingKillsMultiplier); // 50% of max
 
             if (startingKills <= 0)
                 return;
