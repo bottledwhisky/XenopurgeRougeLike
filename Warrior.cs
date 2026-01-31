@@ -1,4 +1,4 @@
-using SpaceCommander;
+﻿using SpaceCommander;
 using System;
 using System.Collections.Generic;
 using XenopurgeRougeLike.WarriorReinforcements;

@@ -27,19 +27,19 @@ namespace XenopurgeRougeLike
                 },
                 ["engineer.advanced_magazine.description"] = new Dictionary<string, string>
                 {
-                    ["en"] = "Turret ammo capacity +{0}%, turret <sprite name=\"AccuracyIcon\"> +{1}.",
-                    ["el"] = "Χωρητικότητα πυρομαχικών πυργίσκου +{0}%, <sprite name=\"AccuracyIcon\"> πυργίσκου +{1}.",
-                    ["fr"] = "Capacité de munitions de tourelle +{0}%, <sprite name=\"AccuracyIcon\"> de tourelle +{1}.",
-                    ["zh"] = "炮台弹药量 +{0}%，炮台<sprite name=\"AccuracyIcon\"> +{1}。",
-                    ["zh-TW"] = "炮台彈藥量 +{0}%，炮台<sprite name=\"AccuracyIcon\"> +{1}。",
-                    ["de"] = "Geschützturm-Munitionskapazität +{0}%, Geschützturm-<sprite name=\"AccuracyIcon\"> +{1}.",
-                    ["pl"] = "Pojemność amunicji wieżyczki +{0}%, <sprite name=\"AccuracyIcon\"> wieżyczki +{1}.",
-                    ["pt"] = "Capacidade de munição da torre +{0}%, <sprite name=\"AccuracyIcon\"> da torre +{1}.",
-                    ["ru"] = "Емкость боеприпасов турели +{0}%, <sprite name=\"AccuracyIcon\"> турели +{1}.",
-                    ["es"] = "Capacidad de munición de torreta +{0}%, <sprite name=\"AccuracyIcon\"> de torreta +{1}.",
-                    ["uk"] = "Ємність боєприпасів турелі +{0}%, <sprite name=\"AccuracyIcon\"> турелі +{1}.",
-                    ["ja"] = "タレットの弾薬容量 +{0}%、タレットの<sprite name=\"AccuracyIcon\"> +{1}。",
-                    ["ko"] = "포탑 탄약 용량 +{0}%, 포탑 <sprite name=\"AccuracyIcon\"> +{1}.",
+                    ["en"] = "Turret ammo capacity +{0}%, turret +{1} <sprite name=\"AccuracyIcon\">.",
+                    ["el"] = "Χωρητικότητα πυρομαχικών πυργίσκου +{0}%, πυργίσκου +{1} <sprite name=\"AccuracyIcon\">.",
+                    ["fr"] = "Capacité de munitions de tourelle +{0}%, +{1} <sprite name=\"AccuracyIcon\"> de tourelle.",
+                    ["zh"] = "炮台弹药量 +{0}%，炮台 +{1} <sprite name=\"AccuracyIcon\">。",
+                    ["zh-TW"] = "炮台彈藥量 +{0}%，炮台 +{1} <sprite name=\"AccuracyIcon\">。",
+                    ["de"] = "Geschützturm-Munitionskapazität +{0}%, Geschützturm +{1} <sprite name=\"AccuracyIcon\">.",
+                    ["pl"] = "Pojemność amunicji wieżyczki +{0}%, +{1} <sprite name=\"AccuracyIcon\"> wieżyczki.",
+                    ["pt"] = "Capacidade de munição da torre +{0}%, +{1} <sprite name=\"AccuracyIcon\"> da torre.",
+                    ["ru"] = "Емкость боеприпасов турели +{0}%, +{1} <sprite name=\"AccuracyIcon\"> турели.",
+                    ["es"] = "Capacidad de munición de torreta +{0}%, +{1} <sprite name=\"AccuracyIcon\"> de torreta.",
+                    ["uk"] = "Ємність боєприпасів турелі +{0}%, +{1} <sprite name=\"AccuracyIcon\"> турелі.",
+                    ["ja"] = "タレットの弾薬容量 +{0}%、タレットの +{1} <sprite name=\"AccuracyIcon\">。",
+                    ["ko"] = "포탑 탄약 용량 +{0}%, 포탑 +{1} <sprite name=\"AccuracyIcon\">.",
                 },
                 ["engineer.advanced_magazine.flavour"] = new Dictionary<string, string>
                 {
@@ -278,8 +278,8 @@ namespace XenopurgeRougeLike
                     ["ru"] = "Турели невосприимчивы к дальнему урону и получают +{0} <sprite name=\"AccuracyIcon\">.",
                     ["es"] = "Las torretas son inmunes al daño a distancia y ganan +{0} <sprite name=\"AccuracyIcon\">.",
                     ["uk"] = "Турелі імунні до дальньої шкоди та отримують +{0} <sprite name=\"AccuracyIcon\">.",
-                    ["ja"] = "タレットは遠距離ダメージを無効化し、<sprite name=\"AccuracyIcon\"> +{0} を獲得します。",
-                    ["ko"] = "포탑이 원거리 피해에 면역이 되고 <sprite name=\"AccuracyIcon\"> +{0}를 얻습니다.",
+                    ["ja"] = "タレットは遠距離ダメージを無効化し、+{0} <sprite name=\"AccuracyIcon\"> を獲得します。",
+                    ["ko"] = "포탑이 원거리 피해에 면역이 되고 +{0} <sprite name=\"AccuracyIcon\">를 얻습니다.",
                 },
                 ["engineer.heavy_turret.flavour"] = new Dictionary<string, string>
                 {

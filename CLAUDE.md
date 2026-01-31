@@ -53,7 +53,7 @@ There some available icons that you can should use in the strings when appropria
 <sprite name="time icon">
 <sprite name=AccessPointIcon>
 
-For example: "5 coins" should be written as "5 <sprite name="CoinIcon">".
+For example: "5 coins" should be written as "5 <sprite name="CoinIcon">". Coin, Accuracy, Armor, etc. should be used a unit. For example in English, +20 Accuracy/Aim should be written as "+20 <sprite name="AccuracyIcon">", instead of "<sprite name="AccuracyIcon"> +20".
 
 All the below languages should be added:
 * English (en)
@@ -123,6 +123,8 @@ For BattleUnit, you should use this pattern to hook the OnDeath event:
         }
     }
 ```
+
+瞄准 Accuracy is displayed in x100 scale, but is actually a float. E.g. +20 Aim is implemented as .2f in code.
 
 About the original game:
 The original game is called "Xenopurge". It is a tactical RTS where players control a squad of soldiers fighting against aliens(xenoes). During battle, the game allows the player to use "ActionCards" to perform actions, not direct control.
