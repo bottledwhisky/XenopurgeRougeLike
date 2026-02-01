@@ -39,7 +39,7 @@ public static DevourWill Instance => instance ??= new();
     /// Patch BattleUnit constructor to add OnDeath listener for DevourWill
     /// Handles both enemy xenos (stunned) and player units (mind-controlled)
     /// </summary>
-    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
+    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor, [typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
     public static class DevourWill_BattleUnit_Constructor_Patch
     {
         public static void Postfix(BattleUnit __instance, Team team)

@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
@@ -9,6 +9,7 @@ using SpaceCommander.Commands;
 using SpaceCommander.GameFlow;
 using System;
 using System.Collections.Generic;
+using TimeSystem;
 using UnityEngine;
 using static XenopurgeRougeLike.ModLocalization;
 
@@ -202,12 +203,12 @@ namespace XenopurgeRougeLike.WarriorReinforcements
     }
 
     /// <summary>
-    /// Patch to update berserk timers and remove buffs when they expire
+    /// Patch to subscribe to OnDeath event for player units
     /// </summary>
-    [HarmonyPatch(typeof(BattleUnit), "Update")]
-    public static class Berserker_BattleUnit_Update_Patch
+    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor, [typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
+    public class Berserker_BattleUnit_Constructor_Patch
     {
-        public static void Postfix(BattleUnit __instance)
+        public static void OnUpdate(BattleUnit __instance, float deltaTime)
         {
             if (!Berserker.Instance.IsActive)
                 return;
@@ -216,7 +217,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
                 return;
 
             // Decrease timer
-            Berserker.BerserkTimers[__instance] -= Time.deltaTime;
+            Berserker.BerserkTimers[__instance] -= deltaTime;
 
             // Check if berserk expired
             if (Berserker.BerserkTimers[__instance] <= 0)
@@ -239,35 +240,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
 
             MelonLogger.Msg($"Berserker: {unit.UnitNameNoNumber} rage mode ended.");
         }
-    }
 
-    /// <summary>
-    /// Patch to prevent berserked units from receiving new commands
-    /// </summary>
-    [HarmonyPatch(typeof(BattleUnit), "AddCommand")]
-    public class Berserker_BattleUnit_AddCommand_Patch
-    {
-        public static bool Prefix(BattleUnit __instance)
-        {
-            if (!Berserker.Instance.IsActive)
-                return true;
-
-            // Prevent adding commands to berserked units
-            if (Berserker.BerserkedUnits.Contains(__instance))
-            {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
-    /// <summary>
-    /// Patch to subscribe to OnDeath event for player units
-    /// </summary>
-    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
-    public class Berserker_BattleUnit_Constructor_Patch
-    {
         public static void Postfix(BattleUnit __instance, Enumerations.Team team)
         {
             if (!Berserker.Instance.IsActive)
@@ -275,6 +248,12 @@ namespace XenopurgeRougeLike.WarriorReinforcements
 
             if (team == Enumerations.Team.Player)
             {
+                void onUpdateAction(float deltaTime)
+                {
+                    OnUpdate(__instance, deltaTime);
+                }
+                TempSingleton<TimeManager>.Instance.OnTimeUpdated += onUpdateAction;
+
                 void action()
                 {
                     if (Berserker.BerserkedUnits.Contains(__instance))
@@ -283,6 +262,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
                         Berserker.BerserkTimers.Remove(__instance);
                     }
                     __instance.OnDeath -= action;
+                    TempSingleton<TimeManager>.Instance.OnTimeUpdated -= onUpdateAction;
                 }
 
                 __instance.OnDeath += action;

@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander;
 using System;
 using static XenopurgeRougeLike.ModLocalization;
@@ -8,7 +8,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     // 高级弹鼓：炮台弹药量+50%/100%（可叠加2），炮台准确率+15
     public class AdvancedMagazine : Reinforcement
     {
-        public static readonly float[] DurabilityMultiplier = [1.5f, 2.0f];
+        public static readonly float[] DurabilityMultiplier = [2.0f, 3.0f];
         public static readonly float AccuracyBonus = .15f;
 
         public AdvancedMagazine()

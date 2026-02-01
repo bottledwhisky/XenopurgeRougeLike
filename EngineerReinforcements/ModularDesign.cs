@@ -1,7 +1,9 @@
-using HarmonyLib;
+﻿using HarmonyLib;
+using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
+using SpaceCommander.BattleManagement;
 using SpaceCommander.Commands;
 using SpaceCommander.Weapons;
 using System.Collections.Generic;
@@ -231,6 +233,8 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             return new RedeployTurretActionCard(Info);
         }
 
+        public new int UsesLeft => TurretRedeploymentTracker.DestroyedTurrets.Count();
+
         public void ApplyCommand(BattleUnit unit, Tile tile)
         {
             _selectedUnit = unit;
@@ -240,7 +244,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
 
         public void ApplyCommand(BattleUnit unit, SpecialTile specialTile)
         {
-            // Not applicable for turret redeployment
+            ApplyCommand(unit, specialTile.Tile);
         }
 
         public IEnumerable<CommandsAvailabilityChecker.UnitAnavailableReasons> IsUnitValid(BattleUnit unit)
@@ -289,40 +293,93 @@ namespace XenopurgeRougeLike.EngineerReinforcements
 
         public IEnumerable<CommandsAvailabilityChecker.TileAnavailableReasons> IsTileValid(SpecialTile specialTile, BattleUnit unit)
         {
-            // Not applicable for turret redeployment
-            return new List<CommandsAvailabilityChecker.TileAnavailableReasons> { CommandsAvailabilityChecker.TileAnavailableReasons.AlreadyHasLogic };
+            var reasons = new List<CommandsAvailabilityChecker.TileAnavailableReasons>();
+            var tile = specialTile.Tile;
+
+            if (!ModularDesign.Instance.IsActive)
+            {
+                reasons.Add(CommandsAvailabilityChecker.TileAnavailableReasons.AlreadyHasLogic);
+                return reasons;
+            }
+
+            // Check if the tile matches a destroyed turret location
+            var matchingTurret = TurretRedeploymentTracker.DestroyedTurrets
+                .FirstOrDefault(t => t.Tile == tile);
+
+            if (matchingTurret == null)
+            {
+                reasons.Add(CommandsAvailabilityChecker.TileAnavailableReasons.AlreadyHasLogic);
+                return reasons;
+            }
+
+            // Check if tile is not occupied
+            var deployedItemsManager = GameManager.Instance?.DeployedItemsManager;
+            if (deployedItemsManager != null && deployedItemsManager.IsTileOccupied(tile))
+            {
+                reasons.Add(CommandsAvailabilityChecker.TileAnavailableReasons.ItemAlreadyDeployedThere);
+                return reasons;
+            }
+
+            // Store the selection for ApplyCommand
+            _selectedTurretInfo = matchingTurret;
+
+            return reasons;
         }
 
-        public Enumerations.TypeOfTileForCommand GetTypeOfTile()
+        public TypeOfTileForCommand GetTypeOfTile()
         {
-            // Return None to allow targeting any tile (the IsTileValid method will determine which specific tiles are valid)
-            return Enumerations.TypeOfTileForCommand.None;
+            // Return None - we'll inject tiles via patch on SetCardPicked
+            return TypeOfTileForCommand.None;
         }
 
         public void ApplyCommand()
         {
+            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 1");
             if (!ModularDesign.Instance.IsActive || _selectedUnit == null || _selectedTile == null)
                 return;
 
-            if (_selectedTurretInfo == null)
+            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 2");
+
+            _selectedTurretInfo ??= TurretRedeploymentTracker.DestroyedTurrets
+                .FirstOrDefault(t => t.Tile == _selectedTile);
+
+            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 3");
+
+            // Find an existing MoveToSpecificLocationForActionCommandDataSO from the database that uses SetTurretCommandDataSO
+            var database = Singleton<SpaceCommander.Database.AssetsDatabase>.Instance;
+            var existingMoveToActionCommand = database.Commands
+                .OfType<MoveToSpecificLocationForActionCommandDataSO>()
+                .FirstOrDefault(cmd => cmd.ActionCommandDataSO == _selectedTurretInfo.TurretCommandData);
+
+            if (existingMoveToActionCommand == null)
+            {
+                MelonLogger.Error("RedeployTurretActionCard: Could not find existing MoveToSpecificLocationForActionCommandDataSO with SetTurretCommandDataSO");
                 return;
+            }
 
-            // Create a MoveToSpecificLocationForActionCommandDataSO that wraps the turret deployment
-            var moveToActionCommandData = ScriptableObject.CreateInstance<MoveToSpecificLocationForActionCommandDataSO>();
+            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 4");
 
-            // Use reflection to set the private _actionCommandDataSO field
+            // Clone the existing command data and swap the turret command
+            var moveToActionCommandData = ScriptableObject.Instantiate(existingMoveToActionCommand);
+
+            // Use reflection to set the private _actionCommandDataSO field to our specific turret command
             var actionCommandDataSOField = typeof(MoveToSpecificLocationForActionCommandDataSO)
-                .GetField("_actionCommandDataSO", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                .GetField("_actionCommandDataSO", BindingFlags.NonPublic | BindingFlags.Instance);
             actionCommandDataSOField?.SetValue(moveToActionCommandData, _selectedTurretInfo.TurretCommandData);
+
+            MelonLogger.Msg($"RedeployTurretActionCard: Applying redeployment command 5 {_selectedTurretInfo.TurretCommandData.CommandName}");
 
             // Create the move-to-action command
             var moveToAction = new MoveToSpecificLocationForAction(_selectedUnit, _selectedTile);
             moveToAction.SetCostOfActionCard(GetCostOfActionCard());
             moveToAction.InitializeValues(moveToActionCommandData);
 
+            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 6");
             // Override current command with the turret redeployment
             _selectedUnit.CommandsManager.OverrideCurrentCommandFromActionCard(moveToAction, GetCostOfActionCard());
 
+
+            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 7");
             // Remove this turret from the destroyed list
             TurretRedeploymentTracker.RemoveRedeployedTurret(_selectedTurretInfo);
         }
@@ -333,10 +390,9 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     /// </summary>
     public class RedeployTurretActionCardInfo : ActionCardInfo
     {
-        public string CustomCardName => "Redeploy Turret";
+        public string CustomCardName => L("engineer.modular_design.action_card_name");
 
-        public string CustomCardDescription =>
-            "Quickly redeploy a destroyed turret at its original location.";
+        public string CustomCardDescription => L("engineer.modular_design.action_card_description");
     }
 
     /// <summary>
@@ -370,6 +426,83 @@ namespace XenopurgeRougeLike.EngineerReinforcements
                 return false;
             }
             return true;
+        }
+    }
+
+    /// <summary>
+    /// Custom SpecialTile for destroyed turret locations
+    /// </summary>
+    public class DestroyedTurretTile : SpecialTile
+    {
+        public override string Name => L("engineer.modular_design.destroyed_turret_tile_name");
+
+        public override bool ShowNameOnGridForSelector => true;
+
+        public DestroyedTurretTile(Tile tile) : base(tile)
+        {
+            _isVisible = true;
+        }
+    }
+
+    [HarmonyPatch(typeof(CommandsAvailabilityChecker), "CheckCardsAvailability")]
+    public static class ModularDesign_CheckCardsAvailability_Patch
+    {
+        public static bool Prefix(ActionCard actionCard, bool isDeploymentPhase, ref IEnumerable<CommandsAvailabilityChecker.CardUnavailableReason> __result)
+        {
+            if (!ModularDesign.Instance.IsActive)
+                return true;
+
+            // If the action card is RedeployTurretActionCard, check if there are destroyed turrets
+            if (actionCard is RedeployTurretActionCard)
+            {
+                if (!TurretRedeploymentTracker.HasDestroyedTurrets())
+                {
+                    __result = [CommandsAvailabilityChecker.CardUnavailableReason.NoUsesLeft];
+                }
+                else
+                {
+                    __result = [];
+                }
+                return false;
+            }
+            return true;
+        }
+    }
+
+
+    /// <summary>
+    /// Patch to inject destroyed turret tiles when RedeployTurretActionCard is picked
+    /// </summary>
+    [HarmonyPatch(typeof(SpaceCommander.BattleManagement.UI.ChooseTileForCard_BattleManagementDirectory), "SetCardPicked")]
+    public static class ModularDesign_InjectTurretTiles_Patch
+    {
+        private static readonly AccessTools.FieldRef<SpaceCommander.BattleManagement.UI.ChooseTileForCard_BattleManagementDirectory, List<SpecialTile>> _specialTilesRef =
+            AccessTools.FieldRefAccess<SpaceCommander.BattleManagement.UI.ChooseTileForCard_BattleManagementDirectory, List<SpecialTile>>("_specialTiles");
+
+        private static readonly AccessTools.FieldRef<CardPickedInfo, ActionCard> _cardRef =
+            AccessTools.FieldRefAccess<CardPickedInfo, ActionCard>("_card");
+
+        public static void Postfix(SpaceCommander.BattleManagement.UI.ChooseTileForCard_BattleManagementDirectory __instance, CardPickedInfo cardPickedInfo)
+        {
+            if (!ModularDesign.Instance.IsActive)
+                return;
+
+            // Get the private _card field using reflection
+            var card = _cardRef(cardPickedInfo);
+
+            // Check if this is our RedeployTurretActionCard
+            if (card is RedeployTurretActionCard)
+            {
+                // Get the _specialTiles list
+                var specialTiles = _specialTilesRef(__instance);
+
+                // Add destroyed turret tiles
+                foreach (var turretInfo in TurretRedeploymentTracker.DestroyedTurrets)
+                {
+                    var destroyedTurretTile = new DestroyedTurretTile(turretInfo.Tile);
+                    specialTiles.Add(destroyedTurretTile);
+                }
+            }
         }
     }
 

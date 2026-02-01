@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace XenopurgeRougeLike
 {
+    using static ModLocalization;
     public enum Rarity
     {
         Standard,
@@ -31,11 +32,11 @@ namespace XenopurgeRougeLike
             { Rarity.Elite, Color.cyan },
             { Rarity.Expert, Color.yellow }
         };
-        public static Dictionary<Rarity, string> RarityNames = new()
+        public static Dictionary<Rarity, LocalizedString> RarityNames = new()
         {
-            { Rarity.Standard, "Standard" },
-            { Rarity.Elite, "Elite" },
-            { Rarity.Expert, "Expert" }
+            { Rarity.Standard, L("ui.rarity.standard") },
+            { Rarity.Elite, L("ui.rarity.elite") },
+            { Rarity.Expert, L("ui.rarity.expert") }
         };
         public static Dictionary<Rarity, string> RarityNamesShort = new()
         {
@@ -125,7 +126,7 @@ Effects: {Description}
         public ReinforcementPreview GetNextLevelPreview()
         {
             int nextStacks = stackable ? Math.Min(currentStacks + 1, maxStacks) : currentStacks;
-            string nextName = stackable ? $"{Name} ({nextStacks}/{maxStacks})" : Name;
+            string nextName = stackable ? $"{L(name)} ({nextStacks}/{maxStacks})" : Name;
             string nextDescription = GetDescriptionForStacks(nextStacks);
 
             return new ReinforcementPreview

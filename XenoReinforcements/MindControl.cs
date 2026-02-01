@@ -508,7 +508,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
     [HarmonyPatch(typeof(ChooseUnitForCard_BattleManagementDirectory), "Initialize")]
     public static class MindControl_ChooseUnitForCard_Patch
     {
-        private static List<BattleUnit> removedUnits = new();
+        private static List<BattleUnit> removedUnits = [];
 
         public static void Prefix(ChooseUnitForCard_BattleManagementDirectory __instance)
         {

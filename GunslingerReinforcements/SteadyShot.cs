@@ -34,18 +34,18 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
     [HarmonyPatch(typeof(StandAndFight), nameof(StandAndFight.InitializeValues))]
     public static class SteadyShot_StandAndFight_Patch
     {
-        public static void Postfix(StandAndFight __instance, BattleUnit ___battleUnit)
+        public static void Postfix(StandAndFight __instance, BattleUnit ____battleUnit)
         {
             if (!SteadyShot.Instance.IsActive)
                 return;
 
             // Only apply to player units
-            if (___battleUnit.Team != Enumerations.Team.Player)
+            if (____battleUnit.Team != Enumerations.Team.Player)
                 return;
 
             // Apply accuracy bonus via GUID-based stat change
-            string guid = "SteadyShot_StandAndFight_" + ___battleUnit.UnitId;
-            ___battleUnit.ChangeStat(
+            string guid = "SteadyShot_StandAndFight_" + ____battleUnit.UnitId;
+            ____battleUnit.ChangeStat(
                 Enumerations.UnitStats.Accuracy,
                 SteadyShot.AccuracyBonus,
                 guid
@@ -54,7 +54,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
             // Subscribe to command finished to remove the bonus
             void RemoveBonus()
             {
-                ___battleUnit.ReverseChangeOfStat(guid);
+                ____battleUnit.ReverseChangeOfStat(guid);
                 __instance.OnCommandFinished -= RemoveBonus;
             }
 
@@ -69,18 +69,18 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
     [HarmonyPatch(typeof(SuppressiveFire), nameof(SuppressiveFire.InitializeValues))]
     public static class SteadyShot_SuppressiveFire_Patch
     {
-        public static void Postfix(SuppressiveFire __instance, BattleUnit ___battleUnit)
+        public static void Postfix(SuppressiveFire __instance, BattleUnit ____battleUnit)
         {
             if (!SteadyShot.Instance.IsActive)
                 return;
 
             // Only apply to player units
-            if (___battleUnit.Team != Enumerations.Team.Player)
+            if (____battleUnit.Team != Enumerations.Team.Player)
                 return;
 
             // Apply accuracy bonus via GUID-based stat change
-            string guid = "SteadyShot_SuppressiveFire_" + ___battleUnit.UnitId;
-            ___battleUnit.ChangeStat(
+            string guid = "SteadyShot_SuppressiveFire_" + ____battleUnit.UnitId;
+            ____battleUnit.ChangeStat(
                 Enumerations.UnitStats.Accuracy,
                 SteadyShot.AccuracyBonus,
                 guid
@@ -89,7 +89,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
             // Subscribe to command finished to remove the bonus
             void RemoveBonus()
             {
-                ___battleUnit.ReverseChangeOfStat(guid);
+                ____battleUnit.ReverseChangeOfStat(guid);
                 __instance.OnCommandFinished -= RemoveBonus;
             }
 

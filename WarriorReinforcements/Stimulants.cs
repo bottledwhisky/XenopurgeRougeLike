@@ -6,6 +6,7 @@ using SpaceCommander.Area;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TimeSystem;
 using UnityEngine;
 using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
@@ -177,7 +178,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             else if (unit.CurrentHealth <= Stimulants.MinHealthRequired)
             {
                 // Not enough health
-                reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.UnitIsDead);
+                reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.InsufficientUnits);
             }
 
             return reasons;
@@ -241,12 +242,12 @@ namespace XenopurgeRougeLike.WarriorReinforcements
     }
 
     /// <summary>
-    /// Patch to update stimulants timers and remove buffs when they expire
+    /// Patch to subscribe to OnDeath event for player units
     /// </summary>
-    [HarmonyPatch(typeof(BattleUnit), "Update")]
-    public static class Stimulants_BattleUnit_Update_Patch
+    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor, [typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
+    public class Stimulants_BattleUnit_Constructor_Patch
     {
-        public static void Postfix(BattleUnit __instance)
+        public static void OnUpdate(BattleUnit __instance, float deltaTime)
         {
             if (!Stimulants.Instance.IsActive)
                 return;
@@ -256,7 +257,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
 
             // Decrease timer
             var effect = Stimulants.activeEffects[__instance];
-            effect.remainingTime -= Time.deltaTime;
+            effect.remainingTime -= deltaTime;
 
             // Check if stimulants expired or unit died
             if (effect.remainingTime <= 0 || !__instance.IsAlive)
@@ -283,14 +284,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
                 MelonLogger.Msg($"Stimulants: Effect ended for {unit.UnitNameNoNumber}.");
             }
         }
-    }
 
-    /// <summary>
-    /// Patch to subscribe to OnDeath event for player units
-    /// </summary>
-    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
-    public class Stimulants_BattleUnit_Constructor_Patch
-    {
         public static void Postfix(BattleUnit __instance, Team team)
         {
             if (!Stimulants.Instance.IsActive)
@@ -298,15 +292,22 @@ namespace XenopurgeRougeLike.WarriorReinforcements
 
             if (team == Team.Player)
             {
-                Action action = null;
-                action = () =>
+                void onUpdateAction(float deltaTime)
+                {
+                    OnUpdate(__instance, deltaTime);
+                }
+                TempSingleton<TimeManager>.Instance.OnTimeUpdated += onUpdateAction;
+
+                void action()
                 {
                     if (Stimulants.activeEffects.ContainsKey(__instance))
                     {
                         Stimulants.activeEffects.Remove(__instance);
                     }
                     __instance.OnDeath -= action;
-                };
+                    TempSingleton<TimeManager>.Instance.OnTimeUpdated -= onUpdateAction;
+                }
+
                 __instance.OnDeath += action;
             }
         }

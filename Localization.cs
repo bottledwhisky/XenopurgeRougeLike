@@ -91,23 +91,7 @@ namespace XenopurgeRougeLike
 
         public static LocalizedString L(string key, params object[] args)
         {
-            if (_translations.ContainsKey(key) &&
-                _translations[key].ContainsKey(_currentLanguage))
-            {
-                string text = _translations[key][_currentLanguage];
-                return new LocalizedString(text, args);
-            }
-
-            // Fallback to English
-            if (_currentLanguage != "en" &&
-                _translations.ContainsKey(key) &&
-                _translations[key].ContainsKey("en"))
-            {
-                string text = _translations[key]["en"];
-                return new LocalizedString(text, args);
-            }
-
-            return new LocalizedString(key);
+            return new LocalizedString(key, args);
         }
 
         public static string CurrentLanguage => _currentLanguage;

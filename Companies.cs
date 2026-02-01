@@ -243,7 +243,7 @@ namespace XenopurgeRougeLike
     public class CompanyAffinity : Activatable
     {
         public int unlockLevel;
-        public string description;
+        public LocalizedString description;
         public Company company;
 
         public override string ToString()

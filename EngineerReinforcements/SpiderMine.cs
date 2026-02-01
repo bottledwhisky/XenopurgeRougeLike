@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander.Commands;
 using static XenopurgeRougeLike.ModLocalization;
 
@@ -7,7 +7,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     // 蜘蛛雷：地雷部署时间加快（可叠加2）
     public class SpiderMine : Reinforcement
     {
-        public static readonly float[] DeployTimeMultiplier = [0.7f, 0.5f];
+        public static readonly float[] DeployTimeMultiplier = [0.5f, 0.1f];
 
         public SpiderMine()
         {

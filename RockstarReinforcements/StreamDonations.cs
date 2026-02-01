@@ -206,7 +206,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         }
     }
 
-    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
+    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor, [typeof(UnitData), typeof(Team), typeof(GridManager)])]
     public class BattleUnit_Constructor_Patch
     {
         public static void Postfix(BattleUnit __instance, Team team)
@@ -217,12 +217,12 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             }
             if (team == Team.EnemyAI)
             {
-                Action action = null;
-                action = () =>
+                void action()
                 {
                     StreamDonations.OnEnemyDeath(__instance);
                     __instance.OnDeath -= action;
-                };
+                }
+
                 __instance.OnDeath += action;
             }
         }

@@ -32,8 +32,7 @@ namespace XenopurgeRougeLike
 
         public static bool IsAvailable()
         {
-            // TODO: Define availability conditions
-            return true;
+            return false;
         }
     }
 }

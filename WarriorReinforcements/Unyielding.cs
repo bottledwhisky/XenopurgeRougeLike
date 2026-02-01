@@ -1,5 +1,6 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander;
+using SpaceCommander.Area;
 using System.Collections.Generic;
 using UnityEngine;
 using static XenopurgeRougeLike.ModLocalization;
@@ -80,7 +81,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
     /// <summary>
     /// Initialize uses for each unit at battle start
     /// </summary>
-    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
+    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor, [typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
     public static class Unyielding_InitializeUses_Patch
     {
         public static void Postfix(BattleUnit __instance, Enumerations.Team team)

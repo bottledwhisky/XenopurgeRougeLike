@@ -184,7 +184,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
     }
 
     // Patch BattleUnit constructor to add OnDeath listener
-    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
+    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor, [typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
     public static class XenoAffinity6_BattleUnit_Constructor_Patch
     {
         public static void Postfix(BattleUnit __instance, Team team)

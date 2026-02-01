@@ -36,7 +36,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
     /// <summary>
     /// Patch RangedWeapon constructor to subscribe to OnAfterAttackWithOneBullet event
     /// </summary>
-    [HarmonyPatch(typeof(RangedWeapon), MethodType.Constructor)]
+    [HarmonyPatch(typeof(RangedWeapon), MethodType.Constructor, [typeof(RangedWeaponDataSO), typeof(float), typeof(float), typeof(BattleUnit)])]
     public static class Ricochet_RangedWeapon_Constructor_Patch
     {
         public static void Postfix(RangedWeapon __instance)

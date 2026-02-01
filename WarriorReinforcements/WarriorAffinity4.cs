@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander;
 using System;
 using System.Collections.Generic;
@@ -197,7 +197,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
     /// <summary>
     /// Patch to clean up health regen tracking when battle ends
     /// </summary>
-    [HarmonyPatch(typeof(GameManager), "EndBattle")]
+    [HarmonyPatch(typeof(TestGame), "EndGame")]
     public static class WarriorAffinity4_ClearHealthRegenTracking_Patch
     {
         public static void Postfix()

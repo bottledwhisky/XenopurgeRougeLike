@@ -1,6 +1,7 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Abilities;
+using SpaceCommander.Area;
 using SpaceCommander.Commands;
 using System;
 using System.Collections.Generic;
@@ -84,42 +85,9 @@ namespace XenopurgeRougeLike.WarriorReinforcements
     }
 
     /// <summary>
-    /// Patch to detect when a melee attack command changes to hook into the attack events
+    /// Patch BattleUnit constructor to subscribe to melee attack events and set up cleanup on death
     /// </summary>
-    [HarmonyPatch(typeof(BattleUnit), "ChangeCommandCategory")]
-    public static class WhirlwindSlash_ChangeCommandCategory_Patch
-    {
-        private static Dictionary<BattleUnit, IMeleeAttackCommand> _trackedMeleeCommands = new();
-
-        public static void Postfix(BattleUnit __instance, ChangedCommandInfo changedCommandInfo)
-        {
-            if (!WhirlwindSlash.Instance.IsActive)
-                return;
-
-            // Only track player units
-            if (__instance.Team != Enumerations.Team.Player)
-                return;
-
-            // Remove old listener if exists
-            if (_trackedMeleeCommands.TryGetValue(__instance, out var oldCommand))
-            {
-                oldCommand.OnAfterAttack -= WhirlwindSlash.OnMeleeAttackHit;
-                _trackedMeleeCommands.Remove(__instance);
-            }
-
-            // Add new listener for melee commands
-            if (changedCommandInfo.Command is IMeleeAttackCommand meleeAttackCommand)
-            {
-                meleeAttackCommand.OnAfterAttack += WhirlwindSlash.OnMeleeAttackHit;
-                _trackedMeleeCommands[__instance] = meleeAttackCommand;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Patch to subscribe to OnDeath event for player units to clean up listeners
-    /// </summary>
-    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor)]
+    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor, [typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
     public static class WhirlwindSlash_BattleUnit_Constructor_Patch
     {
         public static void Postfix(BattleUnit __instance, Enumerations.Team team)
@@ -127,26 +95,44 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             if (!WhirlwindSlash.Instance.IsActive)
                 return;
 
-            if (team == Enumerations.Team.Player)
+            // Only track player units
+            if (team != Enumerations.Team.Player)
+                return;
+
+            // Get the commands from CommandsManager
+            var commandsManager = __instance.CommandsManager;
+            if (commandsManager == null)
+                return;
+
+            // Subscribe to melee attack events for all melee commands
+            var commands = commandsManager.Commands;
+            foreach (var command in commands)
             {
-                void action()
+                if (command is IMeleeAttackCommand meleeAttackCommand)
                 {
-                    // Clean up listeners when unit dies
-                    var trackedCommands = AccessTools.Field(
-                        typeof(WhirlwindSlash_ChangeCommandCategory_Patch),
-                        "_trackedMeleeCommands"
-                    ).GetValue(null) as Dictionary<BattleUnit, IMeleeAttackCommand>;
-
-                    if (trackedCommands != null && trackedCommands.TryGetValue(__instance, out var command))
-                    {
-                        command.OnAfterAttack -= WhirlwindSlash.OnMeleeAttackHit;
-                        trackedCommands.Remove(__instance);
-                    }
-                    __instance.OnDeath -= action;
+                    meleeAttackCommand.OnAfterAttack += WhirlwindSlash.OnMeleeAttackHit;
                 }
-
-                __instance.OnDeath += action;
             }
+
+            // Set up cleanup when unit dies
+            void action()
+            {
+                // Clean up listeners when unit dies
+                var cmds = __instance.CommandsManager?.Commands;
+                if (cmds != null)
+                {
+                    foreach (var command in cmds)
+                    {
+                        if (command is IMeleeAttackCommand meleeAttackCommand)
+                        {
+                            meleeAttackCommand.OnAfterAttack -= WhirlwindSlash.OnMeleeAttackHit;
+                        }
+                    }
+                }
+                __instance.OnDeath -= action;
+            }
+
+            __instance.OnDeath += action;
         }
     }
 }

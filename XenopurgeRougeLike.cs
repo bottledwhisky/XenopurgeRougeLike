@@ -1,7 +1,14 @@
-﻿using MelonLoader;
+﻿using HarmonyLib;
+using MelonLoader;
 using MelonLoader.Utils;
+using SpaceCommander;
+using SpaceCommander.ActionCards;
+using SpaceCommander.Commands;
+using SpaceCommander.Database;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 
@@ -39,7 +46,61 @@ namespace XenopurgeRougeLike
             }
             OnUpdateEvent?.Invoke();
         }
+        private static Queue<(BattleUnit unit, ICommand command)> _pendingCommands = new Queue<(BattleUnit, ICommand)>();
 
+        public static void QueueCommand(BattleUnit bu, ICommand command)
+        {
+            _pendingCommands.Enqueue((bu, command));
+        }
+
+        static OverrideCommands_UnitAndTileAsTarget_CardSO _OverrideCommands_UnitAndTileTarget_CardSO_Collect;
+        public static OverrideCommands_UnitAndTileAsTarget_CardSO OverrideCommands_UnitAndTileTarget_CardSO_Collect
+        {
+            get
+            {
+                if (_OverrideCommands_UnitAndTileTarget_CardSO_Collect == null)
+                {
+                    _OverrideCommands_UnitAndTileTarget_CardSO_Collect = AssetsDatabase.Instance.ActionCards.First(c =>
+                    {
+                        if (c is OverrideCommands_UnitAndTileAsTarget_CardSO cc)
+                        {
+                            var _commandDataSO = AccessTools.Field(typeof(OverrideCommands_UnitAndTileAsTarget_CardSO), "_commandDataSO").GetValue(c) as MoveToSpecificLocationForActionCommandDataSO;
+                            if (_commandDataSO != null && _commandDataSO.ActionCommandDataSO is CollectCommandDataSO)
+                            {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }) as OverrideCommands_UnitAndTileAsTarget_CardSO;
+                }
+                return _OverrideCommands_UnitAndTileTarget_CardSO_Collect;
+            }
+        }
+
+        public static void ReplaceCommandActual(BattleUnit bu, ICommand command)
+        {
+            MelonLogger.Msg($"ReplaceCommandActual: {bu.UnitName} {command.CommandName}");
+            if (command is CollectCommand)
+            {
+                ActionCard.CostOfActionCard costOfActionCard = default;
+                costOfActionCard.ActionCardId = OverrideCommands_UnitAndTileTarget_CardSO_Collect.Info.Id;
+                bu.CommandsManager.OverrideCurrentCommandFromActionCard(command, costOfActionCard);
+            }
+            else
+            {
+                bu.CommandsManager.ReplaceCommand(command);
+            }
+        }
+
+        public override void OnLateUpdate()
+        {
+            while (_pendingCommands.Count > 0)
+            {
+                var (unit, command) = _pendingCommands.Dequeue();
+                ReplaceCommandActual(unit, command);
+            }
+        }
+        
         public static Sprite LoadCustomSpriteAsset(string path)
         {
             try
