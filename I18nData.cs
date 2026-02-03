@@ -23,6 +23,7 @@ namespace XenopurgeRougeLike
         public static Dictionary<string, Dictionary<string, string>> _translations =
             new Dictionary<string, Dictionary<string, string>>()
                 .Concat(GetAffinityTranslations())
+                .Concat(GetCommonTranslations())
                 .Concat(GetCompanyTranslations())
                 .Concat(GetEngineerTranslations())
                 .Concat(GetGunslingerTranslations())

@@ -12,6 +12,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using XenopurgeRougeLike.CommonReinforcements;
 
 namespace XenopurgeRougeLike
 {
@@ -153,12 +154,15 @@ namespace XenopurgeRougeLike
                 }
                 MelonLogger.Msg("Finished adding reinforcement choice buttons.");
                 // Add a "Reroll" button
-                int rerollCost = AwardSystem.currentRerollCost;
-                bool canAffordReroll = PlayerWalletHelper.GetCoins() >= rerollCost;
+                int freeRerollsAvailable = Reconsider.GetFreeRerollsAvailable();
+                int rerollCost = freeRerollsAvailable > 0 ? 0 : AwardSystem.currentRerollCost;
+                bool canAffordReroll = rerollCost == 0 || PlayerWalletHelper.GetCoins() >= rerollCost;
 
                 ButtonData rerollButtonData = new ButtonData
                 {
-                    MainText = L("ui.reroll_button", rerollCost, PlayerWalletHelper.GetCoins()),
+                    MainText = freeRerollsAvailable > 0
+                        ? L("ui.reroll_button_free", freeRerollsAvailable)
+                        : L("ui.reroll_button", rerollCost, PlayerWalletHelper.GetCoins()),
                     IsDisabled = !canAffordReroll,
                     IgnoreClickCount = true,
                 };
@@ -166,26 +170,37 @@ namespace XenopurgeRougeLike
                 // Set the callback after creating the button so we can capture a reference to it
                 rerollButtonData.onClickCallback = () =>
                 {
-                    int currentRerollCost = AwardSystem.currentRerollCost;
+                    int freeRerolls = Reconsider.GetFreeRerollsAvailable();
+                    bool isFreeReroll = freeRerolls > 0;
+                    int currentRerollCost = isFreeReroll ? 0 : AwardSystem.currentRerollCost;
 
-                    // Check if player can afford reroll
+                    // Check if player can afford reroll (free rerolls always succeed)
                     int currentCoins = PlayerWalletHelper.GetCoins();
-                    if (currentCoins < currentRerollCost)
+                    if (!isFreeReroll && currentCoins < currentRerollCost)
                     {
                         MelonLogger.Warning($"Cannot afford reroll - costs {currentRerollCost}, have {currentCoins}");
                         return;
                     }
 
-                    MelonLoader.MelonLogger.Msg("Player chose to reroll reinforcement choices.");
+                    MelonLoader.MelonLogger.Msg($"Player chose to reroll reinforcement choices. Free: {isFreeReroll}");
                     try
                     {
-                        // Deduct reroll cost
-                        PlayerWalletHelper.ChangeCoins(-currentRerollCost);
-                        MelonLogger.Msg($"Spent {currentRerollCost} coins on reroll, {PlayerWalletHelper.GetCoins()} remaining");
+                        if (isFreeReroll)
+                        {
+                            // Use a free reroll
+                            Reconsider.UseFreeReroll();
+                            MelonLogger.Msg($"Used free reroll, {Reconsider.GetFreeRerollsAvailable()} free rerolls remaining");
+                        }
+                        else
+                        {
+                            // Deduct reroll cost
+                            PlayerWalletHelper.ChangeCoins(-currentRerollCost);
+                            MelonLogger.Msg($"Spent {currentRerollCost} coins on reroll, {PlayerWalletHelper.GetCoins()} remaining");
 
-                        // Increase reroll cost for next reroll
-                        AwardSystem.currentRerollCost++;
-                        MelonLogger.Msg($"Reroll cost increased to {AwardSystem.currentRerollCost}");
+                            // Increase reroll cost for next reroll
+                            AwardSystem.currentRerollCost++;
+                            MelonLogger.Msg($"Reroll cost increased to {AwardSystem.currentRerollCost}");
+                        }
 
                         // Logic to reroll choices
                         GameManager_GiveEndGameRewards_Patch.Prefix(true);
@@ -193,12 +208,16 @@ namespace XenopurgeRougeLike
                         EndGameWindowView_SetResultText_Patch.PopulateChoices(AwardSystem.choices, buttonDataList);
 
                         // Update reroll button text and state (we have a direct reference)
-                        int newRerollCost = AwardSystem.currentRerollCost;
-                        bool canAffordNewReroll = PlayerWalletHelper.GetCoins() >= newRerollCost;
-                        rerollButtonData.MainText = L("ui.reroll_button", newRerollCost, PlayerWalletHelper.GetCoins());
+                        int newFreeRerolls = Reconsider.GetFreeRerollsAvailable();
+                        int newRerollCost = newFreeRerolls > 0 ? 0 : AwardSystem.currentRerollCost;
+                        bool canAffordNewReroll = newRerollCost == 0 || PlayerWalletHelper.GetCoins() >= newRerollCost;
+
+                        rerollButtonData.MainText = newFreeRerolls > 0
+                            ? L("ui.reroll_button_free", newFreeRerolls)
+                            : L("ui.reroll_button", newRerollCost, PlayerWalletHelper.GetCoins());
                         rerollButtonData.IsDisabled = !canAffordNewReroll;
                         rerollButtonData.ChangeInteractionState(rerollButtonData.IsDisabled);
-                        MelonLogger.Msg($"Updated reroll button: cost={newRerollCost}, disabled={!canAffordNewReroll}");
+                        MelonLogger.Msg($"Updated reroll button: cost={newRerollCost}, free={newFreeRerolls}, disabled={!canAffordNewReroll}");
                     }
                     catch (Exception ex)
                     {
@@ -269,6 +288,7 @@ namespace XenopurgeRougeLike
 
                 // Reset reroll cost at the start of a new reward session
                 AwardSystem.currentRerollCost = 1;
+                Reconsider.ResetFreeRerolls();
                 MelonLogger.Msg("Starting new reward session, reset reroll cost to 1");
 
                 // Get reference text for styling

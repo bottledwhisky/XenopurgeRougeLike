@@ -17,7 +17,8 @@ namespace XenopurgeRougeLike
         Warrior,
         Gunslinger,
         Scavenger,
-        Clone
+        Clone,
+        Common
     }
 
     public class Company
@@ -49,7 +50,8 @@ namespace XenopurgeRougeLike
                         { CompanyType.Warrior, Warrior },
                         { CompanyType.Gunslinger, Gunslinger },
                         { CompanyType.Scavenger, Scavenger },
-                        { CompanyType.Clone, Clone }
+                        { CompanyType.Clone, Clone },
+                        { CompanyType.Common, Common }
                     };
                     return companies;
                 }
@@ -202,6 +204,20 @@ namespace XenopurgeRougeLike
             IconPath = "acheron-biogen.png",
             Sprite = null,
             BorderColor = new Color32(100, 100, 140, 255),
+        };
+
+        private static Company _common;
+        public static Company Common => _common ??= new()
+        {
+            ClassType = typeof(Common),
+            Type = CompanyType.Common,
+            Name = "M.A.C.E.",
+            ShortName = "M.A.C.E.",
+            Slogan = "Does M.A.C.E. have a slogan? Hmm thats a good question. I guess they don't",
+            Description = "Mercer's Advanced Combat Enterprises. A.k.a. your employer.",
+            IconPath = "mace.png",
+            Sprite = null,
+            BorderColor = new Color32(100, 100, 100, 255),
         };
     }
 

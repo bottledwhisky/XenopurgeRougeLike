@@ -57,6 +57,22 @@ namespace XenopurgeRougeLike
                     ["ja"] = "リロール ({0}/{1} <sprite name=\"CoinIcon\">)",
                     ["ko"] = "다시 굴리기 ({0}/{1} <sprite name=\"CoinIcon\">)",
                 },
+                ["ui.reroll_button_free"] = new Dictionary<string, string>
+                {
+                    ["en"] = "Reroll (FREE - {0} left)",
+                    ["el"] = "Επανάληψη (ΔΩΡΕΑΝ - απομένουν {0})",
+                    ["fr"] = "Relancer (GRATUIT - {0} restants)",
+                    ["zh"] = "重新选择（免费 - 剩余 {0} 次）",
+                    ["zh-TW"] = "重新選擇（免費 - 剩餘 {0} 次）",
+                    ["de"] = "Neu würfeln (KOSTENLOS - {0} übrig)",
+                    ["pl"] = "Losuj ponownie (DARMOWE - {0} pozostałe)",
+                    ["pt"] = "Rolar novamente (GRÁTIS - {0} restantes)",
+                    ["ru"] = "Перебросить (БЕСПЛАТНО - осталось {0})",
+                    ["es"] = "Volver a tirar (GRATIS - {0} restantes)",
+                    ["uk"] = "Перекинути (БЕЗКОШТОВНО - залишилось {0})",
+                    ["ja"] = "リロール（無料 - 残り {0}）",
+                    ["ko"] = "다시 굴리기 (무료 - {0}번 남음)",
+                },
                 ["ui.skip_button"] = new Dictionary<string, string>
                 {
                     ["en"] = "Skip (+3 <sprite name=\"CoinIcon\">)",
