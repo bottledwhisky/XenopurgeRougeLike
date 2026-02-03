@@ -41,6 +41,13 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             company = Company.Warrior;
             rarity = Rarity.Elite;
             name = L("warrior.stimulants.name");
+            description = L("warrior.stimulants.description",
+                (int)MinHealthRequired,
+                (int)HealthCost,
+                (int)SpeedBonus,
+                (int)PowerBonus,
+                (int)(AccuracyPenalty * 100),
+                (int)Duration);
             flavourText = L("warrior.stimulants.flavour");
         }
 

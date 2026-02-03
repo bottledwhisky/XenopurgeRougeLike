@@ -80,13 +80,23 @@ namespace XenopurgeRougeLike
 
         public virtual string Description
         {
-            get { return description.ToString(); }
+            get
+            {
+                // If description is not set (null), use GetDescriptionForStacks instead
+                // This handles reinforcements that only define GetDescriptionForStacks
+                if (stackable)
+                {
+                    return GetDescriptionForStacks(currentStacks);
+                }
+                return description;
+            }
             protected set { description = new LocalizedString(value); }
         }
 
         public virtual string GetDescriptionForStacks(int stacks)
         {
-            return Description;
+            // Subclasses should override this method if stackable
+            throw new NotImplementedException();
         }
 
         public override string ToString()
@@ -111,8 +121,8 @@ namespace XenopurgeRougeLike
             string colorHex = ColorUtility.ToHtmlStringRGB(company.BorderColor);
             string rarityColorHex = ColorUtility.ToHtmlStringRGB(RarityColors[rarity]);
             return $@"<color=#{colorHex}>{Name}</color>
-Rarity: <color=#{rarityColorHex}>{RarityNames[rarity]}</color>
-Effects: {Description}
+{L("ui.rarity_label")} <color=#{rarityColorHex}>{RarityNames[rarity]}</color>
+{L("ui.effects_label")} {Description}
 <i>{flavourText}</i>";
         }
 

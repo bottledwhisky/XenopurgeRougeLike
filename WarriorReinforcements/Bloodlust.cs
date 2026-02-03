@@ -22,6 +22,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             rarity = Rarity.Expert;
             stackable = false;
             name = L("warrior.bloodlust.name");
+            description = L("warrior.bloodlust.description", (int)(HealthThreshold * 100), (int)HealAmount);
             flavourText = L("warrior.bloodlust.flavour");
         }
 

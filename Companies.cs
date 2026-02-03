@@ -25,10 +25,10 @@ namespace XenopurgeRougeLike
     {
         public Type ClassType { get; set; }
         public CompanyType Type { get; set; }
-        public string Name { get; set; }
-        public string ShortName { get; set; }
-        public string Slogan { get; set; }
-        public string Description { get; set; }
+        public LocalizedString Name { get; set; }
+        public LocalizedString ShortName { get; set; }
+        public LocalizedString Slogan { get; set; }
+        public LocalizedString Description { get; set; }
         public string IconPath { get; set; }
         public Sprite Sprite { get; set; }
         public Color BorderColor { get; set; } = Color.white;
@@ -211,10 +211,10 @@ namespace XenopurgeRougeLike
         {
             ClassType = typeof(Common),
             Type = CompanyType.Common,
-            Name = "M.A.C.E.",
-            ShortName = "M.A.C.E.",
-            Slogan = "Does M.A.C.E. have a slogan? Hmm thats a good question. I guess they don't",
-            Description = "Mercer's Advanced Combat Enterprises. A.k.a. your employer.",
+            Name = L("company.common.name"),
+            ShortName = L("company.common.short_name"),
+            Slogan = L("company.common.slogan"),
+            Description = L("company.common.description"),
             IconPath = "mace.png",
             Sprite = null,
             BorderColor = new Color32(100, 100, 100, 255),

@@ -18,7 +18,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
             rarity = Rarity.Expert;
             stackable = false;
             name = L("xeno.intimidation.name");
-            description = L("xeno.intimidation.description");
+            description = L("xeno.intimidation.description", SpeedReduction);
             flavourText = L("xeno.intimidation.flavour");
         }
 

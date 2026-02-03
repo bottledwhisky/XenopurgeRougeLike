@@ -28,7 +28,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
         {
             company = Company.Xeno;
             name = L("xeno.scent_camouflage.name");
-            description = L("xeno.scent_camouflage.description");
+            description = L("xeno.scent_camouflage.description", GetDuration(), Uses);
             flavourText = L("xeno.scent_camouflage.flavour");
         }
 

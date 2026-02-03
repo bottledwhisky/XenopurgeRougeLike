@@ -81,20 +81,23 @@ namespace XenopurgeRougeLike
                                         break;
                                     }
                                 }
-                                if (affinityToEnable == null)
+                                if (affinityToEnable == null && choice.company.Affinities.Count > 0)
                                 {
                                     affinityToEnable = choice.company.Affinities.Last();
                                 }
-                                string nextUnlockAffinyText = affinityToEnable.ToString();
+                                string progressLabel = "";
+                                if (affinityToEnable != null)
+                                {
+                                    string nextUnlockAffinyText = affinityToEnable.ToString();
 
-                                string progressLabel = affinityToEnable.unlockLevel < nExsitingCompanyReinforces
-                                    ? L("ui.max_level_reached")
-                                    : L("ui.next_unlock");
-                                string nextUnlockProgress = progressLabel + $": ({nExsitingCompanyReinforces}/{affinityToEnable.unlockLevel}) ";
+                                    progressLabel = affinityToEnable.unlockLevel < nExsitingCompanyReinforces
+                                        ? L("ui.max_level_reached")
+                                        : L("ui.next_unlock") + $": ({nExsitingCompanyReinforces}/{affinityToEnable.unlockLevel}) " + nextUnlockAffinyText;
+                                }
 
                                 EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = capturedIndex;
                                 // Update description text when selected
-                                EndGameWindowView_SetResultText_Patch._descriptionText.text = preview.FullString + "\n" + nextUnlockProgress + nextUnlockAffinyText;
+                                EndGameWindowView_SetResultText_Patch._descriptionText.text = preview.FullString + "\n" + progressLabel;
 
                                 // Update border highlights
                                 for (int j = 0; j < EndGameWindowView_SetResultText_Patch._choiceOutlines.Length; j++)

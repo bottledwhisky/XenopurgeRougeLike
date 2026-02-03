@@ -23,6 +23,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             stackable = false;
             maxStacks = 1;
             name = L("warrior.whirlwind_slash.name");
+            description = L("warrior.whirlwind_slash.description", (int)(DamageMultiplier * 100));
             flavourText = L("warrior.whirlwind_slash.flavour");
         }
 

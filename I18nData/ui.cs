@@ -266,6 +266,38 @@ namespace XenopurgeRougeLike
                     ["ja"] = "エキスパート",
                     ["ko"] = "전문가",
                 },
+                ["ui.rarity_label"] = new Dictionary<string, string>
+                {
+                    ["en"] = "Rarity:",
+                    ["el"] = "Σπανιότητα:",
+                    ["fr"] = "Rareté :",
+                    ["zh"] = "稀有度：",
+                    ["zh-TW"] = "稀有度：",
+                    ["de"] = "Seltenheit:",
+                    ["pl"] = "Rzadkość:",
+                    ["pt"] = "Raridade:",
+                    ["ru"] = "Редкость:",
+                    ["es"] = "Rareza:",
+                    ["uk"] = "Рідкість:",
+                    ["ja"] = "レアリティ：",
+                    ["ko"] = "희귀도:",
+                },
+                ["ui.effects_label"] = new Dictionary<string, string>
+                {
+                    ["en"] = "Effects:",
+                    ["el"] = "Εφέ:",
+                    ["fr"] = "Effets :",
+                    ["zh"] = "效果：",
+                    ["zh-TW"] = "效果：",
+                    ["de"] = "Effekte:",
+                    ["pl"] = "Efekty:",
+                    ["pt"] = "Efeitos:",
+                    ["ru"] = "Эффекты:",
+                    ["es"] = "Efectos:",
+                    ["uk"] = "Ефекти:",
+                    ["ja"] = "効果：",
+                    ["ko"] = "효과:",
+                },
                 // Company affinity
             };
         }

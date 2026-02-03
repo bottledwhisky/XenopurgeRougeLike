@@ -22,7 +22,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
             rarity = Rarity.Elite;
             stackable = false;
             name = L("xeno.fear_instinct.name");
-            description = L("xeno.fear_instinct.description");
+            description = L("xeno.fear_instinct.description", DelayPerKill);
             flavourText = L("xeno.fear_instinct.flavour");
         }
 

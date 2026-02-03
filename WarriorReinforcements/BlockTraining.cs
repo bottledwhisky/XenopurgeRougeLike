@@ -18,6 +18,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             stackable = false;
             maxStacks = 1;
             name = L("warrior.block_training.name");
+            description = L("warrior.block_training.description", ArmorMultiplier);
             flavourText = L("warrior.block_training.flavour");
         }
 

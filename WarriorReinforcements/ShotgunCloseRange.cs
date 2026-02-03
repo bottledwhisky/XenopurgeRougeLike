@@ -19,6 +19,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             rarity = Rarity.Standard;
             stackable = false;
             name = L("warrior.shotgun_close_range.name");
+            description = L("warrior.shotgun_close_range.description", (int)(AccuracyBonus * 100), TriggerDistance);
             flavourText = L("warrior.shotgun_close_range.flavour");
         }
 

@@ -22,7 +22,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
             rarity = Rarity.Elite;
             stackable = false;
             name = L("xeno.devour_will.name");
-            description = L("xeno.devour_will.description");
+            description = L("xeno.devour_will.description", HealAmount);
             flavourText = L("xeno.devour_will.flavour");
         }
 

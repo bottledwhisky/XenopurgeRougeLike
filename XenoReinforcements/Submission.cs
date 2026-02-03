@@ -24,7 +24,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
             rarity = Rarity.Expert;
             stackable = false;
             name = L("xeno.submission.name");
-            description = L("xeno.submission.description");
+            description = L("xeno.submission.description", (int)(ConversionChance * 100));
             flavourText = L("xeno.submission.flavour");
         }
 
