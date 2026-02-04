@@ -19,7 +19,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
         public PenetratingRounds()
         {
             company = Company.Gunslinger;
-            rarity = Rarity.Elite;
+            rarity = Rarity.Expert;
             stackable = false;
             name = L("gunslinger.penetrating_rounds.name");
             flavourText = L("gunslinger.penetrating_rounds.flavour");

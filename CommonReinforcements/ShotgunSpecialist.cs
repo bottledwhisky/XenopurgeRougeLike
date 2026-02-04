@@ -1,3 +1,4 @@
+using HarmonyLib;
 using SpaceCommander;
 using static XenopurgeRougeLike.ModLocalization;
 
@@ -25,17 +26,10 @@ namespace XenopurgeRougeLike.CommonReinforcements
 
         public override void OnActivate()
         {
-            // Register conditional stat changes for units using shotguns
+            // Register Speed bonus for units using shotguns
             UnitStatsTools.InBattleUnitStatChanges["ShotgunSpecialist_Speed"] = new UnitStatChange(
                 Enumerations.UnitStats.Speed,
                 SpeedBonus,
-                Enumerations.Team.Player,
-                (unit, team) => WeaponCategories.IsUsingShotgun(unit)
-            );
-
-            UnitStatsTools.InBattleUnitStatChanges["ShotgunSpecialist_Armor"] = new UnitStatChange(
-                Enumerations.UnitStats.Armor,
-                ArmorBonus,
                 Enumerations.Team.Player,
                 (unit, team) => WeaponCategories.IsUsingShotgun(unit)
             );
@@ -44,7 +38,40 @@ namespace XenopurgeRougeLike.CommonReinforcements
         public override void OnDeactivate()
         {
             UnitStatsTools.InBattleUnitStatChanges.Remove("ShotgunSpecialist_Speed");
-            UnitStatsTools.InBattleUnitStatChanges.Remove("ShotgunSpecialist_Armor");
+        }
+
+        /// <summary>
+        /// Apply armor to all player units using shotguns when battle starts.
+        /// Called from TestGame.StartGame postfix.
+        /// </summary>
+        public static void ApplyShotgunArmor()
+        {
+            if (!Instance.IsActive)
+                return;
+
+            var gameManager = GameManager.Instance;
+            var tm = gameManager.GetTeamManager(Enumerations.Team.Player);
+
+            // Apply armor to player units using shotguns
+            foreach (var unit in tm.BattleUnits)
+            {
+                if (WeaponCategories.IsUsingShotgun(unit))
+                {
+                    UnitStatsTools.AddArmorToUnit(unit, ArmorBonus);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Patch to apply shotgun armor bonus when battle starts
+    /// </summary>
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
+    public static class ShotgunSpecialist_StartGame_Patch
+    {
+        public static void Postfix()
+        {
+            ShotgunSpecialist.ApplyShotgunArmor();
         }
     }
 }

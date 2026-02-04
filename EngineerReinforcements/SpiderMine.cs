@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using SpaceCommander.Commands;
 using static XenopurgeRougeLike.ModLocalization;
 
@@ -22,7 +23,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
 
         public override string GetDescriptionForStacks(int stacks)
         {
-            int reductionPercent = (int)((1f - DeployTimeMultiplier[stacks - 1]) * 100);
+            int reductionPercent = (int)Math.Round((1f - DeployTimeMultiplier[stacks - 1]) * 100);
             return L("engineer.spider_mine.description", reductionPercent);
         }
 

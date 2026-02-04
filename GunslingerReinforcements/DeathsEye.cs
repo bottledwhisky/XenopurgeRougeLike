@@ -20,7 +20,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
         public DeathsEye()
         {
             company = Company.Gunslinger;
-            rarity = Rarity.Elite;
+            rarity = Rarity.Expert;
             name = L("gunslinger.deaths_eye.name");
             flavourText = L("gunslinger.deaths_eye.flavour");
             description = L("gunslinger.deaths_eye.description", (int)Duration);

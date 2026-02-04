@@ -12,6 +12,8 @@ namespace XenopurgeRougeLike
         public static List<CompanyAffinity> Affinities => _affinities ??=
         [
             GunslingerAffinity2.Instance,
+            GunslingerAffinity4.Instance,
+            GunslingerAffinity6.Instance,
         ];
 
         public static Dictionary<Type, Reinforcement> _reinforcements;
@@ -30,7 +32,7 @@ namespace XenopurgeRougeLike
 
         public static bool IsAvailable()
         {
-            return false;
+            return true;
         }
     }
 }

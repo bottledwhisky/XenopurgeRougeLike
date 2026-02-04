@@ -1,3 +1,4 @@
+using HarmonyLib;
 using SpaceCommander;
 using static XenopurgeRougeLike.ModLocalization;
 
@@ -25,14 +26,7 @@ namespace XenopurgeRougeLike.CommonReinforcements
 
         public override void OnActivate()
         {
-            // Register conditional stat changes for units using blunt weapons
-            UnitStatsTools.InBattleUnitStatChanges["BluntWeaponSpecialist_Armor"] = new UnitStatChange(
-                Enumerations.UnitStats.Armor,
-                ArmorBonus,
-                Enumerations.Team.Player,
-                (unit, team) => WeaponCategories.IsUsingBluntWeapon(unit)
-            );
-
+            // Register Power bonus for units using blunt weapons
             UnitStatsTools.InBattleUnitStatChanges["BluntWeaponSpecialist_Power"] = new UnitStatChange(
                 Enumerations.UnitStats.Power,
                 PowerBonus,
@@ -43,8 +37,41 @@ namespace XenopurgeRougeLike.CommonReinforcements
 
         public override void OnDeactivate()
         {
-            UnitStatsTools.InBattleUnitStatChanges.Remove("BluntWeaponSpecialist_Armor");
             UnitStatsTools.InBattleUnitStatChanges.Remove("BluntWeaponSpecialist_Power");
+        }
+
+        /// <summary>
+        /// Apply armor to all player units using blunt weapons when battle starts.
+        /// Called from TestGame.StartGame postfix.
+        /// </summary>
+        public static void ApplyBluntWeaponArmor()
+        {
+            if (!Instance.IsActive)
+                return;
+
+            var gameManager = GameManager.Instance;
+            var tm = gameManager.GetTeamManager(Enumerations.Team.Player);
+
+            // Apply armor to player units using blunt weapons
+            foreach (var unit in tm.BattleUnits)
+            {
+                if (WeaponCategories.IsUsingBluntWeapon(unit))
+                {
+                    UnitStatsTools.AddArmorToUnit(unit, ArmorBonus);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Patch to apply blunt weapon armor bonus when battle starts
+    /// </summary>
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
+    public static class BluntWeaponSpecialist_StartGame_Patch
+    {
+        public static void Postfix()
+        {
+            BluntWeaponSpecialist.ApplyBluntWeaponArmor();
         }
     }
 }

@@ -74,11 +74,17 @@ namespace XenopurgeRougeLike.EngineerReinforcements
         public static void TrackDestroyedTurret(Turret turret, BattleUnit ownerUnit)
         {
             if (turret == null || turret.Tile == null)
+            {
+                MelonLogger.Warning("TrackDestroyedTurret: Turret or Tile is null");
                 return;
+            }
 
             // Get the turret command data from our tracking map
             if (!_turretCommandDataMap.TryGetValue(turret, out var turretCommandData))
+            {
+                MelonLogger.Warning("TrackDestroyedTurret: No command data found for turret");
                 return;
+            }
 
             var destroyedTurret = new DestroyedTurretInfo(
                 turret.Tile,
@@ -334,16 +340,11 @@ namespace XenopurgeRougeLike.EngineerReinforcements
 
         public void ApplyCommand()
         {
-            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 1");
             if (!ModularDesign.Instance.IsActive || _selectedUnit == null || _selectedTile == null)
                 return;
 
-            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 2");
-
             _selectedTurretInfo ??= TurretRedeploymentTracker.DestroyedTurrets
                 .FirstOrDefault(t => t.Tile == _selectedTile);
-
-            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 3");
 
             // Find an existing MoveToSpecificLocationForActionCommandDataSO from the database that uses SetTurretCommandDataSO
             var database = Singleton<SpaceCommander.Database.AssetsDatabase>.Instance;
@@ -357,8 +358,6 @@ namespace XenopurgeRougeLike.EngineerReinforcements
                 return;
             }
 
-            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 4");
-
             // Clone the existing command data and swap the turret command
             var moveToActionCommandData = ScriptableObject.Instantiate(existingMoveToActionCommand);
 
@@ -367,19 +366,14 @@ namespace XenopurgeRougeLike.EngineerReinforcements
                 .GetField("_actionCommandDataSO", BindingFlags.NonPublic | BindingFlags.Instance);
             actionCommandDataSOField?.SetValue(moveToActionCommandData, _selectedTurretInfo.TurretCommandData);
 
-            MelonLogger.Msg($"RedeployTurretActionCard: Applying redeployment command 5 {_selectedTurretInfo.TurretCommandData.CommandName}");
-
             // Create the move-to-action command
             var moveToAction = new MoveToSpecificLocationForAction(_selectedUnit, _selectedTile);
             moveToAction.SetCostOfActionCard(GetCostOfActionCard());
             moveToAction.InitializeValues(moveToActionCommandData);
 
-            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 6");
             // Override current command with the turret redeployment
             _selectedUnit.CommandsManager.OverrideCurrentCommandFromActionCard(moveToAction, GetCostOfActionCard());
 
-
-            MelonLogger.Msg("RedeployTurretActionCard: Applying redeployment command 7");
             // Remove this turret from the destroyed list
             TurretRedeploymentTracker.RemoveRedeployedTurret(_selectedTurretInfo);
         }
@@ -434,12 +428,15 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     /// </summary>
     public class DestroyedTurretTile : SpecialTile
     {
-        public override string Name => L("engineer.modular_design.destroyed_turret_tile_name");
+        private readonly int _turretIndex;
+
+        public override string Name => L("engineer.modular_design.destroyed_turret_tile_name") + _turretIndex;
 
         public override bool ShowNameOnGridForSelector => true;
 
-        public DestroyedTurretTile(Tile tile) : base(tile)
+        public DestroyedTurretTile(Tile tile, int turretIndex) : base(tile)
         {
+            _turretIndex = turretIndex;
             _isVisible = true;
         }
     }
@@ -482,7 +479,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
         private static readonly AccessTools.FieldRef<CardPickedInfo, ActionCard> _cardRef =
             AccessTools.FieldRefAccess<CardPickedInfo, ActionCard>("_card");
 
-        public static void Postfix(SpaceCommander.BattleManagement.UI.ChooseTileForCard_BattleManagementDirectory __instance, CardPickedInfo cardPickedInfo)
+        public static void Postfix(SpaceCommander.BattleManagement.UI.ChooseTileForCard_BattleManagementDirectory __instance, CardPickedInfo cardPickedInfo, ref bool ____canChooseCurrentUnitPositionTile)
         {
             if (!ModularDesign.Instance.IsActive)
                 return;
@@ -493,14 +490,20 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             // Check if this is our RedeployTurretActionCard
             if (card is RedeployTurretActionCard)
             {
+                // Since GetTypeOfTile returns None, the SetCardPicked method returns early
+                // without initializing _canChooseCurrentUnitPositionTile, so we manually set it to false
+                ____canChooseCurrentUnitPositionTile = false;
+
                 // Get the _specialTiles list
                 var specialTiles = _specialTilesRef(__instance);
 
                 // Add destroyed turret tiles
+                int turretIndex = 1;
                 foreach (var turretInfo in TurretRedeploymentTracker.DestroyedTurrets)
                 {
-                    var destroyedTurretTile = new DestroyedTurretTile(turretInfo.Tile);
+                    var destroyedTurretTile = new DestroyedTurretTile(turretInfo.Tile, turretIndex);
                     specialTiles.Add(destroyedTurretTile);
+                    turretIndex++;
                 }
             }
         }

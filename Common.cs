@@ -39,7 +39,7 @@ namespace XenopurgeRougeLike
         public static bool IsAvailable()
         {
             // Common reinforcements are always available
-            return true;
+            return false;
         }
     }
 }

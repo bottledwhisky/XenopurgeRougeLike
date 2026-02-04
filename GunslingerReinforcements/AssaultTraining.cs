@@ -13,7 +13,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
         public AssaultTraining()
         {
             company = Company.Gunslinger;
-            rarity = Rarity.Standard;
+            rarity = Rarity.Elite;
             stackable = false;
             maxStacks = 1;
             name = L("gunslinger.assault_training.name");

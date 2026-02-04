@@ -137,7 +137,7 @@ namespace XenopurgeRougeLike
         {
             int nextStacks = stackable ? Math.Min(currentStacks + 1, maxStacks) : currentStacks;
             string nextName = stackable ? $"{L(name)} ({nextStacks}/{maxStacks})" : Name;
-            string nextDescription = GetDescriptionForStacks(nextStacks);
+            string nextDescription = stackable ? GetDescriptionForStacks(nextStacks) : Description;
 
             return new ReinforcementPreview
             {

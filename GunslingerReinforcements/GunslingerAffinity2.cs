@@ -63,6 +63,10 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
             else if (GunslingerAffinity6.Instance.IsActive)
                 critChance = GunslingerAffinity6.CritChance;
 
+            // Add TargetingWeakspots bonus
+            if (TargetingWeakspots.Instance.IsActive)
+                critChance += TargetingWeakspots.CritChanceBonus;
+
             return critChance;
         }
 

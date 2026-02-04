@@ -17,7 +17,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
         public QuickDraw()
         {
             company = Company.Gunslinger;
-            rarity = Rarity.Standard;
+            rarity = Rarity.Expert;
             stackable = false;
             name = L("gunslinger.quick_draw.name");
             flavourText = L("gunslinger.quick_draw.flavour");
