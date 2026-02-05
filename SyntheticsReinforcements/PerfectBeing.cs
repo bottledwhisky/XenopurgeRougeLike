@@ -1,9 +1,6 @@
 using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Area;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements

@@ -1,7 +1,8 @@
 using MelonLoader;
-using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Database;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -89,6 +90,76 @@ namespace XenopurgeRougeLike
             }
 
             sb.AppendLine("----------------------------------------");
+        }
+
+
+        public static void DebugPrintAllReinforcementToString()
+        {
+            MelonLogger.Msg("========== DEBUG: All Reinforcement ToString() ==========");
+
+            foreach (var companyEntry in Company.Companies)
+            {
+                var companyType = companyEntry.Key;
+                var company = companyEntry.Value;
+
+                MelonLogger.Msg($"\n--- Company: {companyType} ---");
+
+                try
+                {
+                    // Get the Reinforcements property using reflection
+                    var reinforcementsProperty = company.ClassType.GetProperty("Reinforcements",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+
+                    if (reinforcementsProperty != null)
+                    {
+                        var reinforcements = reinforcementsProperty.GetValue(null) as Dictionary<Type, Reinforcement>;
+
+                        if (reinforcements != null)
+                        {
+                            foreach (var reinforcementEntry in reinforcements)
+                            {
+                                var reinforcementType = reinforcementEntry.Key;
+                                var reinforcement = reinforcementEntry.Value;
+
+                                try
+                                {
+                                    // For stackable reinforcements with currentStacks = 0, iterate through all possible stacks
+                                    if (reinforcement.stackable && reinforcement.currentStacks == 0)
+                                    {
+                                        for (int stack = 1; stack <= reinforcement.maxStacks; stack++)
+                                        {
+                                            string description = reinforcement.GetDescriptionForStacks(stack);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        string toStringResult = reinforcement.ToString();
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    MelonLogger.Error($"  ✗ {reinforcementType.Name}: ERROR - {ex.Message}");
+                                    MelonLogger.Error($"    Stack trace: {ex.StackTrace}");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            MelonLogger.Msg($"  (No reinforcements dictionary found)");
+                        }
+                    }
+                    else
+                    {
+                        MelonLogger.Msg($"  (No Reinforcements property found)");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Error($"  Error accessing company {companyType}: {ex.Message}");
+                }
+            }
+
+            MelonLogger.Msg("\n========== END DEBUG ==========");
         }
     }
 }

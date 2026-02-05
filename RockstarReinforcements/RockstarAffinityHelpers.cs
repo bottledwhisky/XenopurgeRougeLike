@@ -5,7 +5,6 @@ using SpaceCommander.Audio;
 using SpaceCommander.Commands;
 using SpaceCommander.Database;
 using SpaceCommander.EndGame;
-using SpaceCommander.PartyCustomization;
 using SpaceCommander.Weapons;
 using System;
 using System.Collections.Generic;

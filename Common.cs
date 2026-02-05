@@ -1,4 +1,3 @@
-using SpaceCommander;
 using System;
 using System.Collections.Generic;
 using XenopurgeRougeLike.CommonReinforcements;
@@ -38,7 +37,6 @@ namespace XenopurgeRougeLike
 
         public static bool IsAvailable()
         {
-            // Common reinforcements are always available
             return false;
         }
     }

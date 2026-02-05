@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using XenopurgeRougeLike.XenoReinforcements;
 
 namespace XenopurgeRougeLike

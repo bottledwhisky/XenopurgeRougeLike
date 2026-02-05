@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using MelonLoader;
@@ -9,8 +8,6 @@ using SpaceCommander.Area;
 using SpaceCommander.BattleManagement;
 using SpaceCommander.BattleManagement.UI;
 using SpaceCommander.Database;
-using SpaceCommander.EndGame;
-using SpaceCommander.GameFlow;
 using SpaceCommander.UI;
 using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;

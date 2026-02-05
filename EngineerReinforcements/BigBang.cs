@@ -6,7 +6,6 @@ using SpaceCommander.Area;
 using SpaceCommander.Weapons;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Traptics.EventsSystem;
 using static XenopurgeRougeLike.ModLocalization;
 

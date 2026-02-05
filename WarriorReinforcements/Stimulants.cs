@@ -3,11 +3,8 @@ using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using TimeSystem;
-using UnityEngine;
 using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 
@@ -115,6 +112,8 @@ namespace XenopurgeRougeLike.WarriorReinforcements
         public StimulantsActionCard(ActionCardInfo actionCardInfo)
         {
             Info = actionCardInfo;
+            // Set to 0 for unlimited uses
+            _usesLeft = 0;
         }
 
         public override ActionCard GetCopy()

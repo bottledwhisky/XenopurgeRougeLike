@@ -1,6 +1,5 @@
 using HarmonyLib;
 using SpaceCommander.ActionCards;
-using SpaceCommander.Area;
 using System.Collections.Generic;
 using static XenopurgeRougeLike.ModLocalization;
 

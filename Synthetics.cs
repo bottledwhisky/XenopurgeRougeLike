@@ -1,7 +1,6 @@
 ﻿using SpaceCommander;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using XenopurgeRougeLike.SyntheticsReinforcements;
 
 namespace XenopurgeRougeLike

@@ -1,10 +1,7 @@
 ﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
-using SpaceCommander.Abilities;
 using SpaceCommander.Commands;
-using System;
-using UnityEngine;
 using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 

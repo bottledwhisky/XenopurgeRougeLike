@@ -2,10 +2,8 @@ using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Database;
 using SpaceCommander.EndGame;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements

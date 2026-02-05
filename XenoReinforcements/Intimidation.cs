@@ -1,5 +1,4 @@
-﻿using SpaceCommander;
-using static SpaceCommander.Enumerations;
+﻿using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.XenoReinforcements

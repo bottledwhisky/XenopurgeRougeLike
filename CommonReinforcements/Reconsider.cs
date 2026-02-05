@@ -1,4 +1,3 @@
-using SpaceCommander;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.CommonReinforcements

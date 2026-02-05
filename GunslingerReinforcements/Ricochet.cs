@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
-using SpaceCommander.Abilities;
 using SpaceCommander.Area;
 using SpaceCommander.Weapons;
 using System.Collections.Generic;

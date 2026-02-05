@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using SpaceCommander;
-using System;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.EngineerReinforcements

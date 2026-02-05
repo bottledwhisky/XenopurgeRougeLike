@@ -1,6 +1,4 @@
-﻿using HarmonyLib;
-using SpaceCommander;
-using static XenopurgeRougeLike.ModLocalization;
+﻿using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.GunslingerReinforcements
 {

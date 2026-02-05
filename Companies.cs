@@ -1,7 +1,5 @@
-﻿using Harmony;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using static XenopurgeRougeLike.ModLocalization;
 

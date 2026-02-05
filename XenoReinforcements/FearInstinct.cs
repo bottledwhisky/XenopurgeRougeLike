@@ -2,7 +2,6 @@
 using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.Area;
-using System;
 using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 

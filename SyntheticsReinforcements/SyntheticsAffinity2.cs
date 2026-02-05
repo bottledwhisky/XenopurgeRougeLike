@@ -1,8 +1,4 @@
-using HarmonyLib;
 using SpaceCommander;
-using SpaceCommander.Area;
-using System;
-using UnityEngine;
 using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 

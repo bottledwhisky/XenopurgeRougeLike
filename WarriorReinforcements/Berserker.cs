@@ -3,14 +3,8 @@ using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
-using SpaceCommander.Audio;
-using SpaceCommander.BattleManagement.UI;
-using SpaceCommander.Commands;
-using SpaceCommander.GameFlow;
-using System;
 using System.Collections.Generic;
 using TimeSystem;
-using UnityEngine;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.WarriorReinforcements
@@ -89,6 +83,8 @@ namespace XenopurgeRougeLike.WarriorReinforcements
         public BerserkerActionCard(ActionCardInfo actionCardInfo)
         {
             Info = actionCardInfo;
+            // Set uses to 1 (one-time use per mission)
+            _usesLeft = 1;
         }
 
         public override ActionCard GetCopy()

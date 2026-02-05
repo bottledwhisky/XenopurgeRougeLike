@@ -4,8 +4,6 @@ using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.Abilities;
 using SpaceCommander.Area;
-using SpaceCommander.Database;
-using SpaceCommander.Weapons;
 using UnityEngine;
 using static XenopurgeRougeLike.ModLocalization;
 

@@ -5,7 +5,6 @@ using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
 using SpaceCommander.BattleManagement;
 using SpaceCommander.Commands;
-using SpaceCommander.Weapons;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -232,6 +231,8 @@ namespace XenopurgeRougeLike.EngineerReinforcements
         public RedeployTurretActionCard(ActionCardInfo actionCardInfo)
         {
             Info = actionCardInfo;
+            // Uses are dynamically calculated, set to unlimited
+            _usesLeft = 0;
         }
 
         public override ActionCard GetCopy()

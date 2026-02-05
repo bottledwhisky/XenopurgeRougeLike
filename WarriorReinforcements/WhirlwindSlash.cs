@@ -3,9 +3,7 @@ using SpaceCommander;
 using SpaceCommander.Abilities;
 using SpaceCommander.Area;
 using SpaceCommander.Commands;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.WarriorReinforcements

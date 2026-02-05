@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
-using SpaceCommander.BattleManagement.UI;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;

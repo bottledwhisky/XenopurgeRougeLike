@@ -3,10 +3,8 @@ using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.Area;
 using SpaceCommander.Area.Drawers;
-using SpaceCommander.Audio;
 using SpaceCommander.BattleManagement.UI;
 using SpaceCommander.Commands;
-using SpaceCommander.Database;
 using SpaceCommander.GameFlow;
 using SpaceCommander.Objectives;
 using System;
@@ -125,7 +123,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         static HuntCommandDataSO huntCommand;
 
-        public static HuntCommandDataSO HuntCommandDataSO => (huntCommand ??= UnityEngine.Resources.FindObjectsOfTypeAll<HuntCommandDataSO>().FirstOrDefault());
+        public static HuntCommandDataSO HuntCommandDataSO => huntCommand ??= UnityEngine.Resources.FindObjectsOfTypeAll<HuntCommandDataSO>().FirstOrDefault();
 
         public static List<BattleUnit> fans = [];
 

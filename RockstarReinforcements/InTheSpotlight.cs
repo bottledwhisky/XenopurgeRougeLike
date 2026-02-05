@@ -1,9 +1,7 @@
 using HarmonyLib;
 using SpaceCommander;
-using SpaceCommander.Abilities;
 using SpaceCommander.Commands;
 using SpaceCommander.EndGame;
-using SpaceCommander.GameFlow;
 using SpaceCommander.Weapons;
 using System.Linq;
 using static SpaceCommander.Enumerations;

@@ -1,12 +1,10 @@
 ﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
-using SpaceCommander.GameFlow;
 using System.Collections.Generic;
 using System.Linq;
 using TimeSystem;
 using static SpaceCommander.Enumerations;
-using static UnityEngine.UI.CanvasScaler;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements

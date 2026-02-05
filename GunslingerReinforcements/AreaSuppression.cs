@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
-using SpaceCommander.Area;
 using SpaceCommander.Commands;
 using System;
 using System.Collections.Generic;

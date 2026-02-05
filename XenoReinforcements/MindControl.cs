@@ -7,7 +7,6 @@ using SpaceCommander.Area.Drawers;
 using SpaceCommander.Audio;
 using SpaceCommander.BattleManagement.UI;
 using SpaceCommander.Commands;
-using SpaceCommander.GameFlow;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

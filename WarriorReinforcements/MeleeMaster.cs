@@ -1,6 +1,5 @@
 using SpaceCommander;
 using SpaceCommander.Database;
-using System.Linq;
 using UnityEngine;
 using static XenopurgeRougeLike.ModLocalization;
 

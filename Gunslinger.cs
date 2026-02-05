@@ -1,5 +1,4 @@
-﻿using SpaceCommander;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using XenopurgeRougeLike.GunslingerReinforcements;
 
@@ -32,7 +31,7 @@ namespace XenopurgeRougeLike
 
         public static bool IsAvailable()
         {
-            return true;
+            return false;
         }
     }
 }

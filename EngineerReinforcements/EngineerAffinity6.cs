@@ -1,7 +1,4 @@
-﻿using HarmonyLib;
-using SpaceCommander;
-using SpaceCommander.ActionCards;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using static XenopurgeRougeLike.ModLocalization;
 

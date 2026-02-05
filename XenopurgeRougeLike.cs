@@ -5,6 +5,7 @@ using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Commands;
 using SpaceCommander.Database;
+using SpaceCommander.GameFlow;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,83 +46,56 @@ namespace XenopurgeRougeLike
         {
             if (Input.GetKeyUp(KeyCode.F11))
             {
-                DebugPrintAllReinforcementToString();
+                LoggingUtils.DebugPrintAllReinforcementToString();
             }
             else if (Input.GetKeyUp(KeyCode.F10))
             {
                 LoggingUtils.LogAllDatabaseActionCards();
             }
+            else if (Input.GetKeyUp(KeyCode.F9))
+            {
+                TriggerNextWaveImmediately();
+            }
             OnUpdateEvent?.Invoke();
         }
 
-        private static void DebugPrintAllReinforcementToString()
+        private static void TriggerNextWaveImmediately()
         {
-            MelonLogger.Msg("========== DEBUG: All Reinforcement ToString() ==========");
-
-            foreach (var companyEntry in Company.Companies)
+            try
             {
-                var companyType = companyEntry.Key;
-                var company = companyEntry.Value;
-
-                MelonLogger.Msg($"\n--- Company: {companyType} ---");
-
-                try
+                var gameManager = GameManager.Instance;
+                if (gameManager == null)
                 {
-                    // Get the Reinforcements property using reflection
-                    var reinforcementsProperty = company.ClassType.GetProperty("Reinforcements",
-                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-
-                    if (reinforcementsProperty != null)
-                    {
-                        var reinforcements = reinforcementsProperty.GetValue(null) as Dictionary<Type, Reinforcement>;
-
-                        if (reinforcements != null)
-                        {
-                            foreach (var reinforcementEntry in reinforcements)
-                            {
-                                var reinforcementType = reinforcementEntry.Key;
-                                var reinforcement = reinforcementEntry.Value;
-
-                                try
-                                {
-                                    // For stackable reinforcements with currentStacks = 0, iterate through all possible stacks
-                                    if (reinforcement.stackable && reinforcement.currentStacks == 0)
-                                    {
-                                        for (int stack = 1; stack <= reinforcement.maxStacks; stack++)
-                                        {
-                                            string description = reinforcement.GetDescriptionForStacks(stack);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        string toStringResult = reinforcement.ToString();
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    MelonLogger.Error($"  ✗ {reinforcementType.Name}: ERROR - {ex.Message}");
-                                    MelonLogger.Error($"    Stack trace: {ex.StackTrace}");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            MelonLogger.Msg($"  (No reinforcements dictionary found)");
-                        }
-                    }
-                    else
-                    {
-                        MelonLogger.Msg($"  (No Reinforcements property found)");
-                    }
+                    MelonLogger.Warning("GameManager not available");
+                    return;
                 }
-                catch (Exception ex)
+
+                var spawner = gameManager.EnemiesSpawnerInBattle;
+                if (spawner == null)
                 {
-                    MelonLogger.Error($"  Error accessing company {companyType}: {ex.Message}");
+                    MelonLogger.Warning("EnemiesSpawnerInBattle not available");
+                    return;
+                }
+
+                // Use reflection to access private _remainingTimeToSpawn field
+                var remainingTimeField = AccessTools.Field(typeof(SpawnEnemiesManager), "_remainingTimeToSpawn");
+                if (remainingTimeField != null)
+                {
+                    // Set remaining time to 0 to trigger immediate spawn
+                    remainingTimeField.SetValue(spawner, 0f);
+                    MelonLogger.Msg($"F9: Triggering next wave immediately (Wave {spawner.CurrentWaveIndex + 1})");
+                }
+                else
+                {
+                    MelonLogger.Error("Could not access _remainingTimeToSpawn field");
                 }
             }
-
-            MelonLogger.Msg("\n========== END DEBUG ==========");
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Error triggering next wave: {ex}");
+            }
         }
+
         private static Queue<(BattleUnit unit, ICommand command)> _pendingCommands = new Queue<(BattleUnit, ICommand)>();
 
         public static void QueueCommand(BattleUnit bu, ICommand command)
