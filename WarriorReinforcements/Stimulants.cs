@@ -4,6 +4,7 @@ using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
 using System.Collections.Generic;
+using System.Reflection;
 using TimeSystem;
 using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
@@ -16,6 +17,9 @@ namespace XenopurgeRougeLike.WarriorReinforcements
     /// </summary>
     public class Stimulants : Reinforcement
     {
+        // Reflection field to access BattleUnit's private _currentHealth field
+        internal static readonly FieldInfo _currentHealthField = AccessTools.Field(typeof(BattleUnit), "_currentHealth");
+
         // Damage cost to use stimulants
         public const float HealthCost = 10f;
 
@@ -139,19 +143,25 @@ namespace XenopurgeRougeLike.WarriorReinforcements
         private void ApplyStimulantsEffect(BattleUnit unit)
         {
             // Check if effect is already active (non-stackable)
+            // This should never happen due to IsUnitValid check, but keep as safety
             if (Stimulants.activeEffects.ContainsKey(unit))
             {
-                // Refresh duration instead of stacking
-                var effect = Stimulants.activeEffects[unit];
-                effect.remainingTime = Stimulants.Duration;
-                Stimulants.activeEffects[unit] = effect;
-                MelonLogger.Msg($"Stimulants: Refreshed effect duration for unit {unit.UnitId} to {Stimulants.Duration}s");
+                MelonLogger.Warning($"Stimulants: Attempted to apply effect to unit {unit.UnitId} that already has the effect");
                 return;
             }
 
-            // Deal damage cost
-            unit.Damage(Stimulants.HealthCost);
-            MelonLogger.Msg($"Stimulants: Unit {unit.UnitId} took {Stimulants.HealthCost} damage. Current health: {unit.CurrentHealth}");
+            // Deal damage cost - directly reduce health to bypass armor using reflection
+            float currentHealth = (float)Stimulants._currentHealthField.GetValue(unit);
+            float newHealth = currentHealth - Stimulants.HealthCost;
+            if (newHealth < 0f) newHealth = 0f;
+            Stimulants._currentHealthField.SetValue(unit, newHealth);
+
+            // Trigger health changed event manually using reflection
+            var onHealthChangedField = AccessTools.Field(typeof(BattleUnit), "OnHealthChanged");
+            var onHealthChanged = onHealthChangedField.GetValue(unit) as System.Action<float>;
+            onHealthChanged?.Invoke(newHealth);
+
+            MelonLogger.Msg($"Stimulants: Unit {unit.UnitId} took {Stimulants.HealthCost} direct health damage (bypassing armor). Current health: {newHealth}");
 
             // Apply stat changes
             unit.ChangeStat(UnitStats.Speed, Stimulants.SpeedBonus, "Stimulants_Speed");
@@ -185,6 +195,11 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             {
                 // Not enough health
                 reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.InsufficientUnits);
+            }
+            else if (Stimulants.activeEffects.ContainsKey(unit))
+            {
+                // Unit already has stimulants effect active
+                reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.AlreadyHasEffect);
             }
 
             return reasons;

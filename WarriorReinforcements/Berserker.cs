@@ -3,7 +3,10 @@ using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
+using SpaceCommander.BattleManagement;
+using SpaceCommander.Commands;
 using System.Collections.Generic;
+using System.Linq;
 using TimeSystem;
 using static XenopurgeRougeLike.ModLocalization;
 
@@ -120,7 +123,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             MelonLogger.Msg($"Berserker: {unit.UnitNameNoNumber} entered rage mode!");
 
             // Stop current commands
-            unit.StopCommandsExecution();
+            XenopurgeRougeLike.QueueCommand(unit, RockstarReinforcements.UnitsPlacementPhasePatch.HuntCommandDataSO.CreateCommand(unit));
         }
 
         IEnumerable<CommandsAvailabilityChecker.UnitAnavailableReasons> IUnitTargetable.IsUnitValid(BattleUnit unit)
@@ -199,6 +202,27 @@ namespace XenopurgeRougeLike.WarriorReinforcements
     }
 
     /// <summary>
+    /// Patch CommandsAvailabilityChecker to mark berserked units as unavailable for other commands
+    /// </summary>
+    [HarmonyPatch(typeof(CommandsAvailabilityChecker), "CheckUnitForCardAvailability")]
+    public static class Berserker_CheckUnitAvailability_Patch
+    {
+        public static void Postfix(BattleUnit battleUnit, CardPickedInfo cardPickedInfo, ref IEnumerable<CommandsAvailabilityChecker.UnitAnavailableReasons> __result)
+        {
+            if (!Berserker.Instance.IsActive)
+                return;
+
+            // If unit is currently berserked, mark it as unavailable
+            if (Berserker.BerserkedUnits.Contains(battleUnit))
+            {
+                var reasons = __result.ToList();
+                reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.AlreadyHasLogic);
+                __result = reasons;
+            }
+        }
+    }
+
+    /// <summary>
     /// Patch to subscribe to OnDeath event for player units
     /// </summary>
     [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor, [typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
@@ -222,6 +246,9 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             }
         }
 
+        static ReconCommandDataSO reconCommand;
+        public static ReconCommandDataSO ReconCommandDataSO => reconCommand ??= UnityEngine.Resources.FindObjectsOfTypeAll<ReconCommandDataSO>().FirstOrDefault();
+
         private static void RemoveBerserkMode(BattleUnit unit)
         {
             Berserker.BerserkedUnits.Remove(unit);
@@ -231,8 +258,8 @@ namespace XenopurgeRougeLike.WarriorReinforcements
             unit.ReverseChangeOfStat("Berserker_MeleeDamage");
             unit.ReverseChangeOfStat("Berserker_Speed");
 
-            // Restart commands execution
-            unit.StartCommandsExecution();
+            // Replace Hunt with Recon (both are Move category, so ReplaceCommand will swap them)
+            XenopurgeRougeLike.QueueCommand(unit, ReconCommandDataSO.CreateCommand(unit));
 
             MelonLogger.Msg($"Berserker: {unit.UnitNameNoNumber} rage mode ended.");
         }
