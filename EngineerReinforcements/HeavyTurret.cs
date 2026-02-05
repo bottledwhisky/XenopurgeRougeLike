@@ -41,7 +41,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
                 return;
 
             // Check if the unit being damaged is a turret
-            if (__instance.UnitTag != SpaceCommander.Enumerations.UnitTag.Turret)
+            if (__instance.UnitTag != Enumerations.UnitTag.Turret)
                 return;
 
             // Check if this damage is from a ranged weapon

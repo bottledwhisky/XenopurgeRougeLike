@@ -212,7 +212,7 @@ namespace XenopurgeRougeLike
 
                 if (Singleton<Player>.Instance.PlayerData.BioweaveSystemEnabled && string.IsNullOrEmpty(priorityCard))
                 {
-                    availableCardIds = weightedChoices.Select(wc => wc.Item2).ToList();
+                    availableCardIds = [.. weightedChoices.Select(wc => wc.Item2)];
                     var bioweaveCards = allCards
                         .Where(card => card.Info.Group == SpaceCommander.ActionCards.ActionCardInfo.ActionCardGroup.bioweavePoints &&
                                       availableCardIds.Contains(card.Id))

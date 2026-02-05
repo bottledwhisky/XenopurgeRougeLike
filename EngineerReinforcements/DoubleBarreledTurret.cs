@@ -48,7 +48,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
 
             // Check if this weapon belongs to a turret
             BattleUnit owner = _battleUnit.GetValue(__instance) as BattleUnit;
-            if (owner == null || owner.UnitTag != SpaceCommander.Enumerations.UnitTag.Turret)
+            if (owner == null || owner.UnitTag != Enumerations.UnitTag.Turret)
                 return true; // Not a turret, run original method
 
             // Call Shoot twice

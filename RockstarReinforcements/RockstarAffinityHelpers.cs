@@ -22,7 +22,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         public static FanUnitDataSO Create(UnitData unitData)
         {
-            var instance = UnityEngine.ScriptableObject.CreateInstance<FanUnitDataSO>();
+            var instance = CreateInstance<FanUnitDataSO>();
             instance._preparedUnitData = unitData;
             return instance;
         }
@@ -299,7 +299,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             SetShootingCommand(ud);
             var cmdList = ud.CommandsDataSOList.ToList();
             cmdList.Insert(2, UnitsPlacementPhasePatch.HuntCommandDataSO);
-            ud.CommandsDataSOList = cmdList.ToArray();
+            ud.CommandsDataSOList = [.. cmdList];
             SetFanUnitStats(ud);
 
             return ud;

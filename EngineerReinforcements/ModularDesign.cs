@@ -360,7 +360,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             }
 
             // Clone the existing command data and swap the turret command
-            var moveToActionCommandData = ScriptableObject.Instantiate(existingMoveToActionCommand);
+            var moveToActionCommandData = Object.Instantiate(existingMoveToActionCommand);
 
             // Use reflection to set the private _actionCommandDataSO field to our specific turret command
             var actionCommandDataSOField = typeof(MoveToSpecificLocationForActionCommandDataSO)

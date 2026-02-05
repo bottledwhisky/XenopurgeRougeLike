@@ -183,7 +183,7 @@ namespace XenopurgeRougeLike
                         return;
                     }
 
-                    MelonLoader.MelonLogger.Msg($"Player chose to reroll reinforcement choices. Free: {isFreeReroll}");
+                    MelonLogger.Msg($"Player chose to reroll reinforcement choices. Free: {isFreeReroll}");
                     try
                     {
                         if (isFreeReroll)
@@ -233,7 +233,7 @@ namespace XenopurgeRougeLike
                     MainText = L("ui.skip_button"),
                     onClickCallback = () =>
                     {
-                        MelonLoader.MelonLogger.Msg("Player chose to skip reinforcement selection.");
+                        MelonLogger.Msg("Player chose to skip reinforcement selection.");
 
                         // Grant +3 coins
                         PlayerWalletHelper.ChangeCoins(3);
