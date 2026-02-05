@@ -4,7 +4,6 @@ using SpaceCommander;
 using SpaceCommander.ActionCards;
 using System.Collections.Generic;
 using UnityEngine;
-using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.GunslingerReinforcements
@@ -54,9 +53,19 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
 
         public static void DeactivateBuff()
         {
+            if (IsBuffActive)
+            {
+                MelonLogger.Msg("DeathsEye: Effect ended.");
+            }
             IsBuffActive = false;
             RemainingTime = 0;
-            MelonLogger.Msg("DeathsEye: Effect ended.");
+        }
+
+        // Silent reset for mission start/end cleanup
+        internal static void ResetState()
+        {
+            IsBuffActive = false;
+            RemainingTime = 0;
         }
     }
 
@@ -66,7 +75,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
     {
         public static void Postfix()
         {
-            DeathsEye.DeactivateBuff();
+            DeathsEye.ResetState();
         }
     }
 
@@ -102,6 +111,8 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
         public DeathsEyeActionCard(ActionCardInfo actionCardInfo)
         {
             Info = actionCardInfo;
+            // Set uses to 1 (one-time use)
+            _usesLeft = 1;
         }
 
         public override ActionCard GetCopy()
@@ -233,7 +244,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
     {
         public static void Postfix()
         {
-            DeathsEye.DeactivateBuff();
+            DeathsEye.ResetState();
         }
     }
 }
