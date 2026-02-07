@@ -311,16 +311,14 @@ namespace XenopurgeRougeLike.XenoReinforcements
             state.CurrentPower = (float)_currentPowerField.GetValue(unit);
 
             // Capture stat changes (buffs/debuffs)
-            var statChanges = _statChangesField.GetValue(unit) as Dictionary<string, (Enumerations.UnitStats, float)>;
-            state.StatChanges = statChanges != null
+            state.StatChanges = _statChangesField.GetValue(unit) is Dictionary<string, (Enumerations.UnitStats, float)> statChanges
                 ? new Dictionary<string, (Enumerations.UnitStats, float)>(statChanges)
-                : new Dictionary<string, (Enumerations.UnitStats, float)>();
+                : [];
 
             // Capture permanent stat changes
-            var permanentChanges = _permanentStatChangesField.GetValue(unit) as List<(Enumerations.UnitStats, float)>;
-            state.PermanentStatChanges = permanentChanges != null
-                ? new List<(Enumerations.UnitStats, float)>(permanentChanges)
-                : new List<(Enumerations.UnitStats, float)>();
+            state.PermanentStatChanges = _permanentStatChangesField.GetValue(unit) is List<(Enumerations.UnitStats, float)> permanentChanges
+                ? [.. permanentChanges]
+                : [];
 
             return state;
         }

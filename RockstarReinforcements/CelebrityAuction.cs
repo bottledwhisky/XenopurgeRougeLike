@@ -21,7 +21,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public static bool IsSellMode { get; set; } = false;
 
         // Track battle counts for equipment (equipment ID -> battle count)
-        public static Dictionary<string, int> EquipmentBattleCounts { get; set; } = new Dictionary<string, int>();
+        public static Dictionary<string, int> EquipmentBattleCounts { get; set; } = [];
 
         public CelebrityAuction()
         {

@@ -56,9 +56,9 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     /// </summary>
     public static class TurretRedeploymentTracker
     {
-        private static readonly List<DestroyedTurretInfo> _destroyedTurrets = new List<DestroyedTurretInfo>();
+        private static readonly List<DestroyedTurretInfo> _destroyedTurrets = [];
         // Map from turret instance to its SetTurretCommandDataSO
-        private static readonly Dictionary<Turret, SetTurretCommandDataSO> _turretCommandDataMap = new Dictionary<Turret, SetTurretCommandDataSO>();
+        private static readonly Dictionary<Turret, SetTurretCommandDataSO> _turretCommandDataMap = [];
 
         public static IEnumerable<DestroyedTurretInfo> DestroyedTurrets => _destroyedTurrets;
 

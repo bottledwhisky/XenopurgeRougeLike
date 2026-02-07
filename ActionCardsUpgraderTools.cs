@@ -17,7 +17,7 @@ namespace XenopurgeRougeLike
         /// <summary>
         /// List of action card IDs to boost
         /// </summary>
-        public List<string> CardIds { get; set; } = new();
+        public List<string> CardIds { get; set; } = [];
 
         /// <summary>
         /// Number of additional copies to add to the pool (increases probability)
@@ -31,7 +31,7 @@ namespace XenopurgeRougeLike
 
         public ActionCardProbabilityModifier(List<string> cardIds, int additionalCopies, Func<bool> isActive = null)
         {
-            CardIds = cardIds ?? new();
+            CardIds = cardIds ?? [];
             AdditionalCopies = additionalCopies;
             IsActive = isActive ?? (() => true);
         }
@@ -44,7 +44,7 @@ namespace XenopurgeRougeLike
         /// Key: Unique identifier for the modifier
         /// Value: ActionCardProbabilityModifier configuration
         /// </summary>
-        public static Dictionary<string, ActionCardProbabilityModifier> ProbabilityModifiers = new();
+        public static Dictionary<string, ActionCardProbabilityModifier> ProbabilityModifiers = [];
 
         /// <summary>
         /// Register a new probability modifier for specific action cards

@@ -36,7 +36,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
     {
         // Maps a SuppressiveFire instance to a dictionary of BattleUnit -> GUID
         private static Dictionary<SuppressiveFire, Dictionary<BattleUnit, string>> _instanceDebuffs =
-            new Dictionary<SuppressiveFire, Dictionary<BattleUnit, string>>();
+            [];
 
         public static void ApplyAreaDebuffs(SuppressiveFire instance, BattleUnit primaryTarget, float speedDebuff)
         {
@@ -61,7 +61,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
                 // Create tracking dictionary for this instance if needed
                 if (!_instanceDebuffs.ContainsKey(instance))
                 {
-                    _instanceDebuffs[instance] = new Dictionary<BattleUnit, string>();
+                    _instanceDebuffs[instance] = [];
                 }
 
                 // Apply the same debuff to all other enemy units on the tile

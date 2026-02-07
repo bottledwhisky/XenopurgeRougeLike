@@ -88,7 +88,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
     public class FanListHelper
     {
         public List<BattleUnit> buList;
-        public List<int> fanIndexes = new();
+        public List<int> fanIndexes = [];
 
         public static FanListHelper RemoveFans(List<BattleUnit> list)
         {

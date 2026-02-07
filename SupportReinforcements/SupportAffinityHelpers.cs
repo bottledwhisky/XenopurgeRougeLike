@@ -1,7 +1,7 @@
 using HarmonyLib;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
-using System.Reflection;
+using System.Collections.Generic;
 
 namespace XenopurgeRougeLike.SupportReinforcements
 {
@@ -119,12 +119,58 @@ namespace XenopurgeRougeLike.SupportReinforcements
                    cardId == "3b1ee954-9aec-45fe-afa0-46fbc9fc99a0" || // Flash Grenade
                    cardId == "8daa3d58-73aa-4c26-a20f-954686777d1f";   // Setup Mine
         }
+
+        /// <summary>
+        /// Shared helper to add bonus uses to action cards at mission start
+        /// </summary>
+        /// <param name="reinforcementName">Name of the reinforcement for logging</param>
+        /// <param name="bonusUses">Number of bonus uses to add</param>
+        /// <param name="shouldProcessCard">Function to check if a card should be processed</param>
+        public static void AddBonusUsesAtMissionStart(string reinforcementName, int bonusUses, System.Func<string, bool> shouldProcessCard)
+        {
+            MelonLoader.MelonLogger.Msg($"[DEBUG] {reinforcementName}: Processing action cards");
+
+            var gainedActionCards = InBattleActionCardsManager.Instance.InBattleActionCards;
+            MelonLoader.MelonLogger.Msg($"[DEBUG] {reinforcementName}: Found {gainedActionCards.Count} total action cards");
+
+            int processedCount = 0;
+            foreach (var card in gainedActionCards)
+            {
+                if (card?.Info == null)
+                {
+                    MelonLoader.MelonLogger.Msg($"[DEBUG] {reinforcementName}: Skipping card with null Info");
+                    continue;
+                }
+
+                string cardId = card.Info.Id;
+                string cardName = card.Info.CardName;
+
+                // Check if this card should be processed
+                if (!shouldProcessCard(cardId))
+                    continue;
+
+                // Get current uses
+                int currentUses = card.UsesLeft;
+
+                // Add bonus uses (only if card has limited uses)
+                if (currentUses > 0)
+                {
+                    int newUses = currentUses + bonusUses;
+                    AccessTools.Field(typeof(ActionCard), "_usesLeft").SetValue(card, newUses);
+
+                    MelonLoader.MelonLogger.Msg($"{reinforcementName}: Added +{bonusUses} use to {cardName} ({currentUses} -> {newUses} uses)");
+                    processedCount++;
+                }
+            }
+
+            MelonLoader.MelonLogger.Msg($"[DEBUG] {reinforcementName}: Processed {processedCount} cards");
+        }
     }
 
     /// <summary>
     /// Patch to boost injection card duration (ChangeStat_Card)
     /// </summary>
-    [HarmonyPatch(typeof(ChangeStat_Card), MethodType.Constructor, new[] { typeof(ActionCardInfo), typeof(UnitStatChange[]), typeof(Enumerations.Team), typeof(float), typeof(bool) })]
+    [HarmonyPatch(typeof(ChangeStat_Card), MethodType.Constructor, new[] { typeof(ActionCardInfo), typeof(IEnumerable<StatChange>), typeof(Enumerations.Team), typeof(float), typeof(bool) })]
     public static class Support_InjectionDuration_Patch
     {
         public static void Postfix(ChangeStat_Card __instance)
@@ -164,33 +210,21 @@ namespace XenopurgeRougeLike.SupportReinforcements
     /// <summary>
     /// Patch to add bonus uses to injection and heal item cards (for SupportAffinity6)
     /// </summary>
-    [HarmonyPatch(typeof(ActionCard), MethodType.Constructor)]
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
     public static class SupportAffinity6_BonusUses_Patch
     {
-        public static void Postfix(ActionCard __instance)
+        public static void Postfix()
         {
-            // Only apply if SupportAffinity6 is active
             if (!SupportAffinity6.Instance.IsActive)
                 return;
 
-            if (__instance?.Info == null)
-                return;
-
-            string cardId = __instance.Info.Id;
-
-            // Only boost uses for injection and heal item cards
-            if (!SupportAffinityHelpers.IsInjectionCard(cardId) && !SupportAffinityHelpers.IsHealItemCard(cardId))
-                return;
-
-            // Get current uses
-            int currentUses = __instance.UsesLeft;
-
-            // Add bonus uses (only if card has limited uses)
-            if (currentUses > 0)
-            {
-                int newUses = currentUses + SupportAffinity6.BonusUses;
-                AccessTools.Field(typeof(ActionCard), "_usesLeft").SetValue(__instance, newUses);
-            }
+            // Add bonus uses to injection and heal item cards
+            SupportAffinityHelpers.AddBonusUsesAtMissionStart(
+                "SupportAffinity6",
+                SupportAffinity6.BonusUses,
+                (cardId) => SupportAffinityHelpers.IsInjectionCard(cardId) ||
+                           SupportAffinityHelpers.IsHealItemCard(cardId)
+            );
         }
     }
 
@@ -223,7 +257,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
         private static bool _isProcessingFirstAidKit = false;
         private static float _originalHealAmount = 0f;
 
-        public static void Prefix(ref float value)
+        public static void Prefix(ref float heal)
         {
             // Check if we should boost healing
             float multiplier = SupportAffinityHelpers.GetHealEffectivenessMultiplier();
@@ -232,11 +266,11 @@ namespace XenopurgeRougeLike.SupportReinforcements
 
             // Check if this is likely from First Aid Kit (40 HP is the signature amount)
             // We use a simple heuristic: if heal amount is 40, it's likely First Aid Kit
-            if (value == 40f && !_isProcessingFirstAidKit)
+            if (heal == 40f && !_isProcessingFirstAidKit)
             {
                 _isProcessingFirstAidKit = true;
-                _originalHealAmount = value;
-                value *= multiplier;
+                _originalHealAmount = heal;
+                heal *= multiplier;
             }
         }
 

@@ -1,11 +1,8 @@
 ﻿using HarmonyLib;
 using MelonLoader;
-using SpaceCommander;
 using SpaceCommander.ActionCards;
-using SpaceCommander.BattleManagement;
 using SpaceCommander.Database;
 using System.Linq;
-using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SupportReinforcements
@@ -80,6 +77,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
     /// Patch to add Health Stim card when mission starts
     /// </summary>
     [HarmonyPatch(typeof(TestGame), "StartGame")]
+    [HarmonyPriority(Priority.High)]
     public static class HealthStim_StartGame_Patch
     {
         public static void Postfix()

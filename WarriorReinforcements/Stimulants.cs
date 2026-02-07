@@ -35,7 +35,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
         public const float Duration = 30f;
 
         // Dictionary to track active stimulant effects per unit
-        public static Dictionary<BattleUnit, StimulantsEffect> activeEffects = new Dictionary<BattleUnit, StimulantsEffect>();
+        public static Dictionary<BattleUnit, StimulantsEffect> activeEffects = [];
 
         public Stimulants()
         {

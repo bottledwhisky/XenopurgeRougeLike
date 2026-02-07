@@ -75,7 +75,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
     /// </summary>
     public static class WarriorHealthRegenManager
     {
-        private static readonly Dictionary<BattleUnit, WarriorHealthRegenTracker> _trackedUnits = new();
+        private static readonly Dictionary<BattleUnit, WarriorHealthRegenTracker> _trackedUnits = [];
         private static bool _isSubscribed = false;
 
         public static void StartTracking(BattleUnit unit)
@@ -123,7 +123,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
                 return;
 
             // Clean up dead units
-            List<BattleUnit> toRemove = new();
+            List<BattleUnit> toRemove = [];
             foreach (var tracker in _trackedUnits.Values)
             {
                 if (tracker.Unit == null || !tracker.Unit.IsAlive)

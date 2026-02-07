@@ -50,7 +50,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
     /// </summary>
     public static class ScentCamouflageSystem
     {
-        private static Dictionary<BattleUnit, float> _camouflagedUnits = new Dictionary<BattleUnit, float>();
+        private static Dictionary<BattleUnit, float> _camouflagedUnits = [];
         private static bool _isRegistered = false;
 
         public static void ActivateCamouflage(BattleUnit unit, float duration)

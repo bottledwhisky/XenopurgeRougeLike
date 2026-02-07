@@ -21,14 +21,14 @@ namespace XenopurgeRougeLike.EngineerReinforcements
         }
 
         // Action card IDs for Engineer-related equipment
-        public static readonly List<string> EngineerActionCards = new()
-        {
+        public static readonly List<string> EngineerActionCards =
+        [
             "bfb700d8-5fa2-4bd0-b1dd-94842f66c031", // Frag Grenade
             "3b1ee954-9aec-45fe-afa0-46fbc9fc99a0", // Flash Grenade
             "8daa3d58-73aa-4c26-a20f-954686777d1f", // Setup Mine
             "3e9b1bb6-b377-49cd-af43-9c10dee7e81c", // Setup Turret (RAT)
             "8b9dc11f-7e75-4295-92b8-1eb9417896f6", // Setup Turret (BANG)
-        };
+        ];
 
         public static EngineerAffinity2 _instance;
 

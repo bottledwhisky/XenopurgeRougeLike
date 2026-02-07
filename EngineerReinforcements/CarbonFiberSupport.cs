@@ -11,11 +11,11 @@ namespace XenopurgeRougeLike.EngineerReinforcements
         public static readonly int BonusTurretUses = 1;
 
         // Turret action card IDs
-        public static readonly List<string> TurretActionCards = new()
-        {
+        public static readonly List<string> TurretActionCards =
+        [
             "3e9b1bb6-b377-49cd-af43-9c10dee7e81c", // Setup Turret (RAT)
             "8b9dc11f-7e75-4295-92b8-1eb9417896f6", // Setup Turret (BANG)
-        };
+        ];
 
         public CarbonFiberSupport()
         {
@@ -32,36 +32,40 @@ namespace XenopurgeRougeLike.EngineerReinforcements
         public static CarbonFiberSupport Instance => instance ??= new();
     }
 
-    /// <summary>
-    /// Patch ActionCard constructor to add bonus uses for turret cards when CarbonFiberSupport is active
-    /// </summary>
-    [HarmonyPatch(typeof(ActionCard), MethodType.Constructor)]
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
     public static class CarbonFiberSupport_ActionCard_Constructor_Patch
     {
-        public static void Postfix(ActionCard __instance)
+        public static void Postfix()
         {
             // Check if CarbonFiberSupport is active
             if (!CarbonFiberSupport.Instance.IsActive)
                 return;
 
-            // Check if the card is valid
-            if (__instance?.Info == null)
-                return;
+            var gainedActionCards = InBattleActionCardsManager.Instance.InBattleActionCards;
 
-            string cardId = __instance.Info.Id;
-
-            // Only boost uses for Turret action cards
-            if (!CarbonFiberSupport.TurretActionCards.Contains(cardId))
-                return;
-
-            // Get current uses
-            int currentUses = __instance.UsesLeft;
-
-            // Add bonus uses (only if card has limited uses)
-            if (currentUses > 0)
+            foreach (var card in gainedActionCards)
             {
-                int newUses = currentUses + CarbonFiberSupport.BonusTurretUses;
-                AccessTools.Field(typeof(ActionCard), "_usesLeft").SetValue(__instance, newUses);
+                if (card?.Info == null)
+                {
+                    continue;
+                }
+
+                string cardId = card.Info.Id;
+                string cardName = card.Info.CardName;
+
+                // Check if this card should be processed
+                if (!CarbonFiberSupport.TurretActionCards.Contains(cardId))
+                    continue;
+
+                // Get current uses
+                int currentUses = card.UsesLeft;
+
+                // Add bonus uses (only if card has limited uses)
+                if (currentUses > 0)
+                {
+                    int newUses = currentUses + CarbonFiberSupport.BonusTurretUses;
+                    AccessTools.Field(typeof(ActionCard), "_usesLeft").SetValue(card, newUses);
+                }
             }
         }
     }

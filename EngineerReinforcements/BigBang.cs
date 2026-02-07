@@ -39,22 +39,23 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     public static class BigBangHelpers
     {
         // Action card IDs that should have extended range
-        public static readonly HashSet<string> ExtendedRangeCards = new()
-        {
+        public static readonly HashSet<string> ExtendedRangeCards =
+        [
             "bfb700d8-5fa2-4bd0-b1dd-94842f66c031", // Frag Grenade
             "3b1ee954-9aec-45fe-afa0-46fbc9fc99a0", // Flash Grenade
             "8daa3d58-73aa-4c26-a20f-954686777d1f", // Setup Mine
-        };
+        ];
 
         /// <summary>
         /// Gets all units within range (center tile + adjacent tiles if Big Bang is active)
         /// </summary>
         public static List<BattleUnit> GetUnitsInExtendedArea(Tile centerTile)
         {
-            List<BattleUnit> units = new List<BattleUnit>();
-
-            // Always include units on the center tile
-            units.AddRange(centerTile.CurrentStateOfTile.UnitsOnTile);
+            List<BattleUnit> units =
+            [
+                // Always include units on the center tile
+                .. centerTile.CurrentStateOfTile.UnitsOnTile,
+            ];
 
             // If Big Bang is active, also include units on adjacent tiles
             if (BigBang.Instance.IsActive)
@@ -106,7 +107,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
             var changeValueField = AccessTools.Field(typeof(ChangeCurrentHealthArea_Card), "_changeValue");
             float changeValue = (float)changeValueField.GetValue(__instance);
 
-            List<BattleUnit> killedUnits = new List<BattleUnit>();
+            List<BattleUnit> killedUnits = [];
 
             // Apply damage/healing to all affected units
             foreach (BattleUnit affectedUnit in affectedUnits)
@@ -218,13 +219,13 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     /// </summary>
     public static class BigBang_StatChangeTracker
     {
-        private static readonly Dictionary<ChangeStatArea_Card, List<(BattleUnit unit, string guid)>> _trackedChanges = new();
+        private static readonly Dictionary<ChangeStatArea_Card, List<(BattleUnit unit, string guid)>> _trackedChanges = [];
 
         public static void TrackStatChange(ChangeStatArea_Card card, BattleUnit unit, string guid)
         {
             if (!_trackedChanges.ContainsKey(card))
             {
-                _trackedChanges[card] = new List<(BattleUnit, string)>();
+                _trackedChanges[card] = [];
             }
             _trackedChanges[card].Add((unit, guid));
         }

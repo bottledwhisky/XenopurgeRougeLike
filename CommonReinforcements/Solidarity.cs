@@ -38,7 +38,7 @@ namespace XenopurgeRougeLike.CommonReinforcements
     public static class SolidaritySystem
     {
         // Track which units currently have Unity buffs active
-        private static HashSet<BattleUnit> _unitsWithBuffs = new();
+        private static HashSet<BattleUnit> _unitsWithBuffs = [];
         private static bool _isRegistered = false;
         private const float CHECK_INTERVAL = 0.5f; // Check every 0.5 seconds
         private static float _timeSinceLastCheck = 0f;

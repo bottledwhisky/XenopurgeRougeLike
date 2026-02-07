@@ -203,7 +203,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
     /// </summary>
     public static class EnhancedHacking_StunSystem
     {
-        private static Dictionary<BattleUnit, float> _stunnedEnemies = new Dictionary<BattleUnit, float>();
+        private static Dictionary<BattleUnit, float> _stunnedEnemies = [];
 
         public static void StunAllEnemies()
         {

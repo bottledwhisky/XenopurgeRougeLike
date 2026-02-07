@@ -14,7 +14,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
         public static readonly int[] UsesPerBattle = [1, 2];
 
         // Track remaining uses per unit during the current battle
-        private static Dictionary<BattleUnit, int> _unitRemainingUses = new();
+        private static Dictionary<BattleUnit, int> _unitRemainingUses = [];
 
         public Unyielding()
         {

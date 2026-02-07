@@ -1,3 +1,4 @@
+using System;
 using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
@@ -75,6 +76,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
             // Convert overflow to armor
             if (overflow > 0)
             {
+                overflow = (float)Math.Floor(overflow);
                 UnitStatsTools.AddArmorToUnit(__instance, overflow);
                 MelonLogger.Msg($"Overdose: {__instance.UnitName} received {actualHeal:F1} healing and {overflow:F1} armor from overflow healing");
             }

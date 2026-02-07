@@ -41,7 +41,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
         public static Berserker Instance => instance ??= new();
 
         public static HashSet<BattleUnit> BerserkedUnits = [];
-        public static Dictionary<BattleUnit, float> BerserkTimers = new();
+        public static Dictionary<BattleUnit, float> BerserkTimers = [];
     }
 
     // Patch to clear state when mission starts

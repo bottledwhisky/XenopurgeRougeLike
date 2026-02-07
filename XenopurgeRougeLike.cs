@@ -181,8 +181,6 @@ namespace XenopurgeRougeLike
                 // But we need to prevent garbage collection
                 iconTexture.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
-                MelonLogger.Msg($"Loaded texture: {iconTexture.width}x{iconTexture.height}, format: {iconTexture.format}");
-
                 // Create the sprite with proper pivot and pixels per unit
                 Sprite sprite = Sprite.Create(
                     iconTexture,
@@ -196,7 +194,6 @@ namespace XenopurgeRougeLike
                 // Prevent garbage collection of the sprite
                 sprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
-                MelonLogger.Msg($"Created sprite: {sprite.name}, rect: {sprite.rect}");
                 return sprite;
             }
             catch (System.Exception ex)

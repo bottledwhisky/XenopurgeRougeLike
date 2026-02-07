@@ -1,8 +1,4 @@
 ﻿using HarmonyLib;
-using MelonLoader;
-using SpaceCommander;
-using SpaceCommander.ActionCards;
-using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SupportReinforcements
@@ -34,39 +30,24 @@ namespace XenopurgeRougeLike.SupportReinforcements
     }
 
     /// <summary>
-    /// Patch to add bonus uses to all medicine, heal item, and explosive cards
+    /// Patch to add bonus uses when mission starts (after cards are created)
     /// </summary>
-    [HarmonyPatch(typeof(ActionCard), MethodType.Constructor)]
-    public static class BiggerBackpack_BonusUses_Patch
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
+    public static class BiggerBackpack_StartGame_Patch
     {
-        public static void Postfix(ActionCard __instance)
+        public static void Postfix()
         {
-            // Only apply if BiggerBackpack is active
             if (!BiggerBackpack.Instance.IsActive)
                 return;
 
-            if (__instance?.Info == null)
-                return;
-
-            string cardId = __instance.Info.Id;
-
-            // Boost uses for injection, heal item, AND explosive cards
-            if (!SupportAffinityHelpers.IsInjectionCard(cardId) &&
-                !SupportAffinityHelpers.IsHealItemCard(cardId) &&
-                !SupportAffinityHelpers.IsExplosiveCard(cardId))
-                return;
-
-            // Get current uses
-            int currentUses = __instance.UsesLeft;
-
-            // Add bonus uses (only if card has limited uses)
-            if (currentUses > 0)
-            {
-                int newUses = currentUses + BiggerBackpack.BonusUses;
-                AccessTools.Field(typeof(ActionCard), "_usesLeft").SetValue(__instance, newUses);
-
-                MelonLogger.Msg($"BiggerBackpack: Added +{BiggerBackpack.BonusUses} use to {__instance.Info.CardName} (now {newUses} uses)");
-            }
+            // Add bonus uses to injection, heal item, and explosive cards
+            SupportAffinityHelpers.AddBonusUsesAtMissionStart(
+                "BiggerBackpack",
+                BiggerBackpack.BonusUses,
+                (cardId) => SupportAffinityHelpers.IsInjectionCard(cardId) ||
+                           SupportAffinityHelpers.IsHealItemCard(cardId) ||
+                           SupportAffinityHelpers.IsExplosiveCard(cardId)
+            );
         }
     }
 }

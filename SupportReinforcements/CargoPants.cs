@@ -1,8 +1,4 @@
 ﻿using HarmonyLib;
-using MelonLoader;
-using SpaceCommander;
-using SpaceCommander.ActionCards;
-using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SupportReinforcements
@@ -34,37 +30,22 @@ namespace XenopurgeRougeLike.SupportReinforcements
     }
 
     /// <summary>
-    /// Patch to add bonus uses to all medicine cards (injections and heal items)
+    /// Patch to add bonus uses when mission starts (after cards are created)
     /// </summary>
-    [HarmonyPatch(typeof(ActionCard), MethodType.Constructor)]
-    public static class CargoPants_BonusUses_Patch
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
+    public static class CargoPants_StartGame_Patch
     {
-        public static void Postfix(ActionCard __instance)
+        public static void Postfix()
         {
-            // Only apply if CargoPants is active
             if (!CargoPants.Instance.IsActive)
                 return;
 
-            if (__instance?.Info == null)
-                return;
-
-            string cardId = __instance.Info.Id;
-
-            // Only boost uses for injection and heal item cards
-            if (!SupportAffinityHelpers.IsInjectionCard(cardId) && !SupportAffinityHelpers.IsHealItemCard(cardId))
-                return;
-
-            // Get current uses
-            int currentUses = __instance.UsesLeft;
-
-            // Add bonus uses (only if card has limited uses)
-            if (currentUses > 0)
-            {
-                int newUses = currentUses + CargoPants.BonusUses;
-                AccessTools.Field(typeof(ActionCard), "_usesLeft").SetValue(__instance, newUses);
-
-                MelonLogger.Msg($"CargoPants: Added +{CargoPants.BonusUses} use to {__instance.Info.CardName} (now {newUses} uses)");
-            }
+            // Add bonus uses to injection and heal item cards
+            SupportAffinityHelpers.AddBonusUsesAtMissionStart(
+                "CargoPants",
+                CargoPants.BonusUses,
+                SupportAffinityHelpers.IsInjectionCard
+            );
         }
     }
 }

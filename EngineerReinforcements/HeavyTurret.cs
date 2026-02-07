@@ -33,7 +33,7 @@ namespace XenopurgeRougeLike.EngineerReinforcements
     public static class HeavyTurret_RangedImmunity_Patch
     {
         // Track which units are currently being shot by ranged weapons
-        private static readonly HashSet<BattleUnit> _unitsBeingShotByRangedWeapon = new();
+        private static readonly HashSet<BattleUnit> _unitsBeingShotByRangedWeapon = [];
 
         public static void Prefix(BattleUnit __instance, ref float damage)
         {

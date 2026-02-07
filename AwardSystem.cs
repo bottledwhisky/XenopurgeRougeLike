@@ -175,7 +175,7 @@ namespace XenopurgeRougeLike
                 }
 
                 // Serialize the reinforcements list with stacks and custom state
-                List<Dictionary<string, object>> reinforcementData = new List<Dictionary<string, object>>();
+                List<Dictionary<string, object>> reinforcementData = [];
                 foreach (Reinforcement reinforcement in AwardSystem.acquiredReinforcements)
                 {
                     if (reinforcement != null)
@@ -206,7 +206,7 @@ namespace XenopurgeRougeLike
                 MelonLogger.Msg($"[SaveFile_Patch] Successfully saved {reinforcementData.Count} reinforcements to {reinforcementsFilePath}");
 
                 // Save affinity states
-                List<Dictionary<string, object>> affinityData = new List<Dictionary<string, object>>();
+                List<Dictionary<string, object>> affinityData = [];
                 foreach (var company in Company.Companies.Values)
                 {
                     if (company.Affinities != null)

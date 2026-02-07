@@ -27,7 +27,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public const int FanPerDuraction = 2000;
 
         // Dictionary to track active buff timers for each fan
-        private static Dictionary<string, float> activeFanBuffs = new Dictionary<string, float>();
+        private static Dictionary<string, float> activeFanBuffs = [];
 
         public FanCheer()
         {

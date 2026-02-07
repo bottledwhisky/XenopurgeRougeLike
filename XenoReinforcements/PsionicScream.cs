@@ -176,7 +176,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
     /// </summary>
     public static class PsionicScream_StunSystem
     {
-        private static Dictionary<BattleUnit, float> _stunnedEnemies = new Dictionary<BattleUnit, float>();
+        private static Dictionary<BattleUnit, float> _stunnedEnemies = [];
 
         public static void StunUnit(BattleUnit unit, float duration)
         {
@@ -268,7 +268,7 @@ namespace XenopurgeRougeLike.XenoReinforcements
             }
         }
 
-        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<System.Type, System.Reflection.FieldInfo> _fieldCache = new();
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<System.Type, System.Reflection.FieldInfo> _fieldCache = [];
 
         [HarmonyPrefix]
         public static bool Prefix(object __instance, ref float __0)

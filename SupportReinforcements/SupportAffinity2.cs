@@ -23,14 +23,14 @@ namespace XenopurgeRougeLike.SupportReinforcements
         // Action card IDs for Support-related cards
         // 药剂 (Injections): Brutadyne (Power), Kinetra (Speed), Optivex (Accuracy)
         // 回复品 (Heal Items): Health Stim, First Aid Kit
-        public static readonly List<string> SupportActionCards = new()
-        {
+        public static readonly List<string> SupportActionCards =
+        [
             "86cafd8b-9e28-4fd1-9e44-4ccdabb00137", // Inject Brutadyne (BuffPower)
             "82a8cd80-af72-4785-b4c9-eab1a498a125", // Inject Kinetra (BuffSpeed)
             "b51454f9-5641-4b07-94bf-93312555e860", // Inject Optivex (BuffAccuracy)
             "6569d382-07ef-4db5-86ac-bac9eb249889", // Inject Health Stim (Heal)
             "90793211-9445-4ac1-9d06-fc94e547b416", // Apply First Aid Kit (FirstAidKit)
-        };
+        ];
 
         public static SupportAffinity2 _instance;
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using HarmonyLib;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SupportReinforcements
@@ -63,6 +64,27 @@ namespace XenopurgeRougeLike.SupportReinforcements
                     choices[i] = new Tuple<int, Reinforcement>(newWeight, choices[i].Item2);
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Patch to add bonus uses when mission starts (after cards are created)
+    /// </summary>
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
+    public static class SupportAffinity6_StartGame_Patch
+    {
+        public static void Postfix()
+        {
+            if (!SupportAffinity6.Instance.IsActive)
+                return;
+
+            // Add bonus uses to injection and heal item cards
+            SupportAffinityHelpers.AddBonusUsesAtMissionStart(
+                "SupportAffinity6",
+                SupportAffinity6.BonusUses,
+                (cardId) => SupportAffinityHelpers.IsInjectionCard(cardId) ||
+                           SupportAffinityHelpers.IsHealItemCard(cardId)
+            );
         }
     }
 }

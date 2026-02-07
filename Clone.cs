@@ -13,10 +13,7 @@ namespace XenopurgeRougeLike
         ];
 
         public static Dictionary<Type, Reinforcement> _reinforcements;
-        public static Dictionary<Type, Reinforcement> Reinforcements => _reinforcements ??= new()
-        {
-            // TODO: Register clone reinforcements here
-        };
+        public static Dictionary<Type, Reinforcement> Reinforcements => _reinforcements ??= [];
 
         public static bool IsAvailable()
         {

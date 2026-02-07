@@ -26,8 +26,12 @@ namespace XenopurgeRougeLike.SupportReinforcements
         public const float WithdrawalPowerPenalty = -1f;
 
         // Track units with injection buffs and withdrawal debuffs
-        public static HashSet<BattleUnit> unitsWithInjection = new HashSet<BattleUnit>();
-        public static HashSet<BattleUnit> unitsWithWithdrawal = new HashSet<BattleUnit>();
+        public static HashSet<BattleUnit> unitsWithInjection = [];
+        public static HashSet<BattleUnit> unitsWithWithdrawal = [];
+
+        // Track which GUIDs belong to injection effects for each unit
+        // Key: BattleUnit, Value: HashSet of GUIDs from injection cards
+        public static Dictionary<BattleUnit, HashSet<string>> injectionGuidsByUnit = [];
 
         public Addict()
         {
@@ -67,6 +71,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
         {
             Addict.unitsWithInjection.Clear();
             Addict.unitsWithWithdrawal.Clear();
+            Addict.injectionGuidsByUnit.Clear();
         }
     }
 
@@ -80,11 +85,13 @@ namespace XenopurgeRougeLike.SupportReinforcements
         {
             Addict.unitsWithInjection.Clear();
             Addict.unitsWithWithdrawal.Clear();
+            Addict.injectionGuidsByUnit.Clear();
         }
     }
 
     /// <summary>
     /// Patch ChangeStat_Card.ApplyCommand to apply bonuses when injections are used
+    /// and track the GUIDs of injection stat changes
     /// </summary>
     [HarmonyPatch(typeof(ChangeStat_Card), "ApplyCommand")]
     public static class Addict_InjectionApplied_Patch
@@ -103,6 +110,25 @@ namespace XenopurgeRougeLike.SupportReinforcements
             // Only apply if this is an injection card
             if (!SupportAffinityHelpers.IsInjectionCard(__instance.Info.Id))
                 return;
+
+            // Get the GUIDs that were just created by this injection card
+            var guidToReverseChangesField = AccessTools.Field(typeof(ChangeStat_Card), "_guidToReverseChanges");
+            var guidToReverseChanges = guidToReverseChangesField.GetValue(__instance) as System.Collections.Generic.List<string>;
+
+            if (guidToReverseChanges != null && guidToReverseChanges.Count > 0)
+            {
+                // Track these GUIDs for this unit
+                if (!Addict.injectionGuidsByUnit.ContainsKey(unit))
+                {
+                    Addict.injectionGuidsByUnit[unit] = [];
+                }
+
+                // Add all GUIDs from this injection card
+                foreach (var guid in guidToReverseChanges)
+                {
+                    Addict.injectionGuidsByUnit[unit].Add(guid);
+                }
+            }
 
             // Remove withdrawal debuff if present
             if (Addict.unitsWithWithdrawal.Contains(unit))
@@ -173,6 +199,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
                     // Clean up on death
                     Addict.unitsWithInjection.Remove(__instance);
                     Addict.unitsWithWithdrawal.Remove(__instance);
+                    Addict.injectionGuidsByUnit.Remove(__instance);
                     __instance.OnDeath -= action;
                 }
 
@@ -188,7 +215,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
     [HarmonyPatch(typeof(BattleUnit), "ReverseChangeOfStat")]
     public static class Addict_InjectionExpired_Patch
     {
-        public static void Postfix(BattleUnit __instance, string id)
+        public static void Postfix(BattleUnit __instance, string guidOfChangeToReverseIt)
         {
             if (!Addict.Instance.IsActive)
                 return;
@@ -196,58 +223,45 @@ namespace XenopurgeRougeLike.SupportReinforcements
             if (__instance == null || !__instance.IsAlive || __instance.Team != Team.Player)
                 return;
 
-            // Check if this is an injection stat change expiring
-            // Injection cards create stat changes with specific IDs related to the card
-            // Common patterns: BuffPower, BuffSpeed, BuffAccuracy
-            if (id == null)
+            if (guidOfChangeToReverseIt == null)
                 return;
 
-            // Check if this is one of the injection card stat changes
-            bool isInjectionStatChange = id.Contains("BuffPower") ||
-                                        id.Contains("BuffSpeed") ||
-                                        id.Contains("BuffAccuracy");
-
-            if (!isInjectionStatChange)
+            // Only proceed if we're tracking injection GUIDs for this unit
+            if (!Addict.injectionGuidsByUnit.ContainsKey(__instance))
                 return;
 
-            // Only proceed if unit has active injection bonus
-            if (!Addict.unitsWithInjection.Contains(__instance))
+            // Check if this GUID belongs to an injection effect
+            var injectionGuids = Addict.injectionGuidsByUnit[__instance];
+            if (!injectionGuids.Contains(guidOfChangeToReverseIt))
                 return;
 
-            // Check if ALL injection bonuses have expired by checking if any remain
-            var temporaryStatChangesField = AccessTools.Field(typeof(BattleUnit), "_temporaryStatChanges");
-            var temporaryStatChanges = temporaryStatChangesField.GetValue(__instance) as Dictionary<string, float>;
+            // Remove this GUID from tracking
+            injectionGuids.Remove(guidOfChangeToReverseIt);
 
-            if (temporaryStatChanges == null)
-                return;
-
-            // Count remaining injection stat changes
-            int remainingInjectionStats = 0;
-            foreach (var key in temporaryStatChanges.Keys)
+            // If no injection GUIDs remain, the injection has fully expired
+            if (injectionGuids.Count == 0)
             {
-                if (key.Contains("BuffPower") || key.Contains("BuffSpeed") || key.Contains("BuffAccuracy"))
+                // Clean up tracking
+                Addict.injectionGuidsByUnit.Remove(__instance);
+
+                // Only apply withdrawal if unit had injection bonuses
+                if (Addict.unitsWithInjection.Contains(__instance))
                 {
-                    remainingInjectionStats++;
-                }
-            }
+                    // Remove injection bonuses
+                    __instance.ReverseChangeOfStat("Addict_Injection_Speed");
+                    __instance.ReverseChangeOfStat("Addict_Injection_Power");
+                    __instance.ReverseChangeOfStat("Addict_Injection_Accuracy");
+                    Addict.unitsWithInjection.Remove(__instance);
 
-            // If no injection stats remain, the injection has fully expired
-            if (remainingInjectionStats == 0)
-            {
-                // Remove injection bonuses
-                __instance.ReverseChangeOfStat("Addict_Injection_Speed");
-                __instance.ReverseChangeOfStat("Addict_Injection_Power");
-                __instance.ReverseChangeOfStat("Addict_Injection_Accuracy");
-                Addict.unitsWithInjection.Remove(__instance);
+                    // Apply withdrawal debuff
+                    if (!Addict.unitsWithWithdrawal.Contains(__instance))
+                    {
+                        __instance.ChangeStat(UnitStats.Speed, Addict.WithdrawalSpeedPenalty, "Addict_Withdrawal_Speed");
+                        __instance.ChangeStat(UnitStats.Power, Addict.WithdrawalPowerPenalty, "Addict_Withdrawal_Power");
+                        Addict.unitsWithWithdrawal.Add(__instance);
 
-                // Apply withdrawal debuff
-                if (!Addict.unitsWithWithdrawal.Contains(__instance))
-                {
-                    __instance.ChangeStat(UnitStats.Speed, Addict.WithdrawalSpeedPenalty, "Addict_Withdrawal_Speed");
-                    __instance.ChangeStat(UnitStats.Power, Addict.WithdrawalPowerPenalty, "Addict_Withdrawal_Power");
-                    Addict.unitsWithWithdrawal.Add(__instance);
-
-                    MelonLogger.Msg($"Addict: Unit {__instance.UnitNameNoNumber} entered withdrawal ({Addict.WithdrawalSpeedPenalty} Speed, {Addict.WithdrawalPowerPenalty} Power)");
+                        MelonLogger.Msg($"Addict: Unit {__instance.UnitNameNoNumber} entered withdrawal ({Addict.WithdrawalSpeedPenalty} Speed, {Addict.WithdrawalPowerPenalty} Power)");
+                    }
                 }
             }
         }

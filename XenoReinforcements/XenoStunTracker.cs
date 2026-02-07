@@ -11,8 +11,8 @@ namespace XenopurgeRougeLike.XenoReinforcements
     /// </summary>
     public static class XenoStunTracker
     {
-        private static HashSet<BattleUnit> _stunnedUnits = new HashSet<BattleUnit>();
-        private static HashSet<BattleUnit> _mindControlledUnits = new HashSet<BattleUnit>();
+        private static HashSet<BattleUnit> _stunnedUnits = [];
+        private static HashSet<BattleUnit> _mindControlledUnits = [];
 
         /// <summary>
         /// Mark a unit as stunned (called by individual stun systems)

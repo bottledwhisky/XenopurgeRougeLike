@@ -2,21 +2,20 @@ using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
-using SpaceCommander.Area;
 using SpaceCommander.Commands;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
-using TimeSystem;
 using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.SupportReinforcements
 {
     /// <summary>
-    /// 战地急救：获得战地急救指令，恢复一名生命值小于20的队友10点生命值。
-    /// Field Medic: Gain a Field Medic action card that restores 10 HP to an ally with less than 20 HP.
-    /// 实现细节：需要花费时间，可无限使用
-    /// Implementation: Takes time, unlimited uses
+    /// 战地急救：获得战地急救指令，恢复一名生命值低于50%的队友10点生命值。
+    /// Field Medic: Gain a Field Medic action card that restores 10 HP to an ally with less than 50% HP.
+    /// 实现细节：作为覆盖指令，显示计时器，无限使用
+    /// Implementation: Works as override command, shows timer, unlimited uses
     /// </summary>
     public class FieldMedic : Reinforcement
     {
@@ -27,35 +26,23 @@ namespace XenopurgeRougeLike.SupportReinforcements
         // Healing amount
         public const float HealAmount = 10f;
 
-        // Maximum health threshold to use this card
-        public const float MaxHealthThreshold = 20f;
+        // Health threshold percentage (0.5 = 50%)
+        public const float HealthThresholdPercent = 0.5f;
 
         // Duration of the healing process (in seconds) - same as Apply First Aid Kit
         public const float HealDuration = 7.4f;
-
-        // Dictionary to track units currently being healed
-        public static Dictionary<BattleUnit, FieldMedicHealingState> activeHealing = new Dictionary<BattleUnit, FieldMedicHealingState>();
 
         public FieldMedic()
         {
             company = Company.Support;
             rarity = Rarity.Standard;
             name = L("support.field_medic.name");
-            description = L("support.field_medic.description", (int)HealAmount, (int)MaxHealthThreshold);
+            description = L("support.field_medic.description", (int)HealAmount, (int)(HealthThresholdPercent * 100));
             flavourText = L("support.field_medic.flavour");
         }
 
         private static FieldMedic _instance;
         public static FieldMedic Instance => _instance ??= new();
-
-        /// <summary>
-        /// Struct to track active healing state
-        /// </summary>
-        public struct FieldMedicHealingState
-        {
-            public float remainingTime;
-            public float totalDuration;
-        }
 
         /// <summary>
         /// Apply healing to a unit
@@ -79,20 +66,10 @@ namespace XenopurgeRougeLike.SupportReinforcements
 
             // Trigger health changed event manually using reflection
             var onHealthChangedField = AccessTools.Field(typeof(BattleUnit), "OnHealthChanged");
-            var onHealthChanged = onHealthChangedField.GetValue(unit) as System.Action<float>;
+            var onHealthChanged = onHealthChangedField.GetValue(unit) as Action<float>;
             onHealthChanged?.Invoke(newHealth);
 
             MelonLogger.Msg($"FieldMedic: Healed unit {unit.UnitNameNoNumber} for {HealAmount} HP. Current health: {newHealth}/{maxHealth}");
-        }
-    }
-
-    // Patch to clear state when mission starts
-    [HarmonyPatch(typeof(TestGame), "StartGame")]
-    public class FieldMedic_TestGame_StartGame_Patch
-    {
-        public static void Postfix()
-        {
-            FieldMedic.activeHealing.Clear();
         }
     }
 
@@ -110,30 +87,34 @@ namespace XenopurgeRougeLike.SupportReinforcements
             var actionCardInfo = new FieldMedicActionCardInfo();
             actionCardInfo.SetId("FieldMedic");
 
-            var fieldMedicCard = new FieldMedicActionCard(actionCardInfo);
+            var fieldMedicCard = new FieldMedicOuterCard(actionCardInfo, new FieldMedicDelayCommandDataSO());
 
             __instance.InBattleActionCards.Add(fieldMedicCard);
         }
     }
 
     /// <summary>
-    /// Field Medic action card - heals a unit with low health over time
-    /// Implements IUnitTargetable to target player units
+    /// The outer action card that appears in the card list
+    /// Uses OverrideCommands_UnitAsTarget_Card pattern to create DelayActionCardCommand
     /// </summary>
-    public class FieldMedicActionCard : ActionCard, IUnitTargetable
+    public class FieldMedicOuterCard : ActionCard, IUnitTargetable
     {
+        private static readonly FieldInfo _currentMaxHealthField = AccessTools.Field(typeof(BattleUnit), "_currentMaxHealth");
+        private readonly DelayCardCommandDataSO _commandDataSO;
+
         public Team TeamToAffect => Team.Player;
 
-        public FieldMedicActionCard(ActionCardInfo actionCardInfo)
+        public FieldMedicOuterCard(ActionCardInfo actionCardInfo, DelayCardCommandDataSO commandDataSO)
         {
             Info = actionCardInfo;
+            _commandDataSO = commandDataSO;
             // Set to 0 for unlimited uses
             _usesLeft = 0;
         }
 
         public override ActionCard GetCopy()
         {
-            return new FieldMedicActionCard(Info);
+            return new FieldMedicOuterCard(Info, _commandDataSO);
         }
 
         public void ApplyCommand(BattleUnit unit)
@@ -144,33 +125,20 @@ namespace XenopurgeRougeLike.SupportReinforcements
             if (unit == null || !unit.IsAlive || unit.Team != Team.Player)
                 return;
 
-            // Check if unit's health is below threshold
-            if (unit.CurrentHealth >= FieldMedic.MaxHealthThreshold)
+            // Check if unit's health is below threshold (50% max HP)
+            float maxHealth = (float)_currentMaxHealthField.GetValue(unit);
+            float healthThreshold = maxHealth * FieldMedic.HealthThresholdPercent;
+            if (unit.CurrentHealth >= healthThreshold)
                 return;
 
-            // Check if unit is already being healed
-            if (FieldMedic.activeHealing.ContainsKey(unit))
-            {
-                MelonLogger.Warning($"FieldMedic: Unit {unit.UnitNameNoNumber} is already being healed");
-                return;
-            }
+            // Create DelayActionCardCommand using the game's built-in system
+            DelayActionCardCommand delayCommand = new DelayActionCardCommand(unit);
+            delayCommand.InitializeValues(_commandDataSO);
 
-            StartHealingProcess(unit);
-        }
-
-        private void StartHealingProcess(BattleUnit unit)
-        {
-            // Calculate actual duration based on unit's speed (same formula as DelayActionCardCommand)
-            float actualDuration = BattleUnitStatsExpressions.GetCommandDurationBasedOnSpeed(FieldMedic.HealDuration, unit.Speed);
-
-            // Track the healing state
-            FieldMedic.activeHealing[unit] = new FieldMedic.FieldMedicHealingState
-            {
-                remainingTime = actualDuration,
-                totalDuration = actualDuration
-            };
-
-            MelonLogger.Msg($"FieldMedic: Started healing unit {unit.UnitNameNoNumber} for {actualDuration}s (base: {FieldMedic.HealDuration}s, speed: {unit.Speed})");
+            // Override current command with heal command
+            ActionCard.CostOfActionCard costOfActionCard = default;
+            costOfActionCard.ActionCardId = Info.Id;
+            unit.CommandsManager.OverrideCurrentCommandFromActionCard(delayCommand, costOfActionCard);
         }
 
         IEnumerable<CommandsAvailabilityChecker.UnitAnavailableReasons> IUnitTargetable.IsUnitValid(BattleUnit unit)
@@ -187,15 +155,24 @@ namespace XenopurgeRougeLike.SupportReinforcements
             {
                 reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.UnitIsDead);
             }
-            // Can only target units with less than MaxHealthThreshold HP
-            else if (unit.CurrentHealth >= FieldMedic.MaxHealthThreshold)
+            // Can only target units with less than 50% HP
+            else if (unit.CurrentHealth >= (float)FieldMedic._currentMaxHealthField.GetValue(unit) * FieldMedic.HealthThresholdPercent)
             {
                 reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.InsufficientUnits);
             }
-            // Can't target units already being healed
-            else if (FieldMedic.activeHealing.ContainsKey(unit))
+            // Can't target units in close combat
+            else if (unit.CommandsManager.IsEngagedInCloseCombat)
             {
-                reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.AlreadyHasEffect);
+                reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.UnitIsEngagedInCloseCombat);
+            }
+            // Can't target units already being healed by this command
+            else if (unit.CommandsManager.CurrentCommand is DelayActionCardCommand delayCmd)
+            {
+                var cmdData = delayCmd.CommandData as DelayCardCommandDataSO;
+                if (cmdData is FieldMedicDelayCommandDataSO)
+                {
+                    reasons.Add(CommandsAvailabilityChecker.UnitAnavailableReasons.AlreadyHasEffect);
+                }
             }
 
             return reasons;
@@ -203,7 +180,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
     }
 
     /// <summary>
-    /// Custom ActionCardInfo for FieldMedic
+    /// Custom ActionCardInfo for FieldMedic outer card
     /// </summary>
     public class FieldMedicActionCardInfo : ActionCardInfo
     {
@@ -211,7 +188,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
 
         public string CustomCardDescription => L("support.field_medic.card_description",
             (int)FieldMedic.HealAmount,
-            (int)FieldMedic.MaxHealthThreshold);
+            (int)(FieldMedic.HealthThresholdPercent * 100));
 
         public FieldMedicActionCardInfo()
         {
@@ -255,69 +232,131 @@ namespace XenopurgeRougeLike.SupportReinforcements
     }
 
     /// <summary>
-    /// Patch to subscribe to time updates and OnDeath event for player units
-    /// This handles the delayed healing process
+    /// DelayCardCommandDataSO that references the inner heal action card
+    /// This is used by DelayActionCardCommand to know what to execute after the delay
     /// </summary>
-    [HarmonyPatch(typeof(BattleUnit), MethodType.Constructor, [typeof(UnitData), typeof(Enumerations.Team), typeof(GridManager)])]
-    public class FieldMedic_BattleUnit_Constructor_Patch
+    public class FieldMedicDelayCommandDataSO : DelayCardCommandDataSO
     {
-        public static void OnUpdate(BattleUnit __instance, float deltaTime)
+        private static FieldMedicInnerActionCardSO _actionCardSO;
+
+        public string CustomCommandName => L("support.field_medic.command_name");
+        public string CustomCommandDescription => L("support.field_medic.command_description", (int)FieldMedic.HealAmount);
+
+        public FieldMedicDelayCommandDataSO()
         {
-            if (!FieldMedic.Instance.IsActive)
-                return;
-
-            if (!FieldMedic.activeHealing.ContainsKey(__instance))
-                return;
-
-            // Decrease timer
-            var healingState = FieldMedic.activeHealing[__instance];
-            healingState.remainingTime -= deltaTime;
-
-            // Check if healing completed or unit died
-            if (healingState.remainingTime <= 0f && __instance.IsAlive)
+            if (_actionCardSO == null)
             {
-                // Apply the healing effect
-                FieldMedic.ApplyHealing(__instance);
-                FieldMedic.activeHealing.Remove(__instance);
+                _actionCardSO = new FieldMedicInnerActionCardSO();
             }
-            else if (!__instance.IsAlive)
+
+            // Set the action card using reflection
+            AccessTools.Field(typeof(DelayCardCommandDataSO), "_actionCard").SetValue(this, _actionCardSO);
+
+            // Set command properties using reflection
+            AccessTools.Field(typeof(CommandDataSO), "_id").SetValue(this, Guid.NewGuid().ToString());
+            AccessTools.Field(typeof(CommandDataSO), "_commandDuration").SetValue(this, FieldMedic.HealDuration);
+            AccessTools.Field(typeof(CommandDataSO), "_marineState").SetValue(this, MarineState.Neutral);
+            AccessTools.Field(typeof(CommandDataSO), "_commandCategory").SetValue(this, CommandCategories.Move);
+            AccessTools.Field(typeof(CommandDataSO), "_showTimer").SetValue(this, true);
+            AccessTools.Field(typeof(CommandDataSO), "_isOverrideCommand").SetValue(this, true);
+        }
+    }
+
+    /// <summary>
+    /// Patch to intercept CommandName getter for FieldMedicDelayCommandDataSO
+    /// </summary>
+    [HarmonyPatch(typeof(CommandDataSO), "CommandName", MethodType.Getter)]
+    public static class FieldMedicDelayCommandDataSO_CommandName_Patch
+    {
+        public static bool Prefix(CommandDataSO __instance, ref string __result)
+        {
+            if (__instance is FieldMedicDelayCommandDataSO customData)
             {
-                // Unit died during healing - cancel it
-                FieldMedic.activeHealing.Remove(__instance);
-                MelonLogger.Msg($"FieldMedic: Healing cancelled for {__instance.UnitNameNoNumber} (unit died)");
+                __result = customData.CustomCommandName;
+                return false;
             }
-            else
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Patch to intercept CommandDescription getter for FieldMedicDelayCommandDataSO
+    /// </summary>
+    [HarmonyPatch(typeof(CommandDataSO), "CommandDescription", MethodType.Getter)]
+    public static class FieldMedicDelayCommandDataSO_CommandDescription_Patch
+    {
+        public static bool Prefix(CommandDataSO __instance, ref string __result)
+        {
+            if (__instance is FieldMedicDelayCommandDataSO customData)
             {
-                // Update the healing state
-                FieldMedic.activeHealing[__instance] = healingState;
+                __result = customData.CustomCommandDescription;
+                return false;
             }
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Inner ActionCardSO that represents what happens after the delay
+    /// This is the "effect" that DelayActionCardCommand will trigger
+    /// </summary>
+    public class FieldMedicInnerActionCardSO : ActionCardSO
+    {
+        public FieldMedicInnerActionCardSO()
+        {
+            // Initialize the _actionCardInfo field using reflection
+            var info = new FieldMedicInnerActionCardInfo();
+            info.SetId("FieldMedicInner");
+            AccessTools.Field(typeof(ActionCardSO), "_actionCardInfo").SetValue(this, info);
         }
 
-        public static void Postfix(BattleUnit __instance, Team team)
+        public override ActionCard CreateInstance()
         {
-            if (!FieldMedic.Instance.IsActive)
-                return;
+            return new FieldMedicInnerActionCard(Info);
+        }
+    }
 
-            if (team == Team.Player)
-            {
-                void onUpdateAction(float deltaTime)
-                {
-                    OnUpdate(__instance, deltaTime);
-                }
-                TempSingleton<TimeManager>.Instance.OnTimeUpdated += onUpdateAction;
+    /// <summary>
+    /// Inner action card info (not shown to user, just for internal use)
+    /// </summary>
+    public class FieldMedicInnerActionCardInfo : ActionCardInfo
+    {
+        public FieldMedicInnerActionCardInfo()
+        {
+            AccessTools.Field(typeof(ActionCardInfo), "_uses").SetValue(this, 0);
+            AccessTools.Field(typeof(ActionCardInfo), "canNotBeReplenished").SetValue(this, false);
+        }
+    }
 
-                void action()
-                {
-                    if (FieldMedic.activeHealing.ContainsKey(__instance))
-                    {
-                        FieldMedic.activeHealing.Remove(__instance);
-                    }
-                    __instance.OnDeath -= action;
-                    TempSingleton<TimeManager>.Instance.OnTimeUpdated -= onUpdateAction;
-                }
+    /// <summary>
+    /// Inner action card that applies the heal effect
+    /// This is triggered by DelayActionCardCommand after the timer
+    /// </summary>
+    public class FieldMedicInnerActionCard : ActionCard, IUnitTargetable
+    {
+        public Team TeamToAffect => Team.Player;
 
-                __instance.OnDeath += action;
-            }
+        public FieldMedicInnerActionCard(ActionCardInfo info)
+        {
+            Info = info;
+            _usesLeft = 0;
+        }
+
+        public override ActionCard GetCopy()
+        {
+            return new FieldMedicInnerActionCard(Info);
+        }
+
+        public void ApplyCommand(BattleUnit unit)
+        {
+            // This is called by DelayActionCardCommand when timer completes
+            FieldMedic.ApplyHealing(unit);
+        }
+
+        IEnumerable<CommandsAvailabilityChecker.UnitAnavailableReasons> IUnitTargetable.IsUnitValid(BattleUnit unit)
+        {
+            // Always valid when called from DelayActionCardCommand
+            return new List<CommandsAvailabilityChecker.UnitAnavailableReasons>();
         }
     }
 }
