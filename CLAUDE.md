@@ -1,6 +1,6 @@
 This is a game mod project.
 
-I am on Windows, but some of your commands are run in MinGW, IDK why. It is a bit confusing.
+I am on Windows, the "grep" tool with regex is not reliable. Try not use regex but plain string.
 
 You are encouraged to read the existing Reinforcement sub-classes to quickly get an example of what we are working on. Existing code already contains common patterns like how to run code upon a mission start/end, or how to change stats, or test unit type conditions.
 The decompiled source code of the original game is available here: D:\projects\xenopurge\old
@@ -12,7 +12,7 @@ Some important files:
     Reinforcement.cs: The base class of all Reinforcements.
     UnitStatsTools.cs: Some existing code to help mess with unit stats.
     ActionCardsUpgraderTools.cs: Some existing code to help mess with generating action cards in the action cards store.
-    (Higely recommended) XenopurgeRougeLike.txt: If you are looking for some existing examples of certain effects, you can check this file. Please be noted that not all reinforcements/affinities are implemented yet. But it's a good place to start.
+    (Higely recommended) XenopurgeRougeLike.txt: If you are looking for some existing examples of certain effects, you can check this file. Please be noted that not all reinforcements/affinities are implemented yet. To avoid duplicate efforts, you should read this file first.
 
 
 If you are working on localizing the mod. The data is stored in .\I18nData\ folder. But the files in it can be very large, so please restrain yourself to only read (grep) the part you are working on. I18nData\affinity.cs is a small file that you can use as an example.
@@ -72,13 +72,6 @@ All the below languages should be added:
 
 About this mod:
 This mod adds a rouge-like system to the game, allowing players to call for reinforcements after each mission. The reinforcements have unique attributes and abilities, making each playthrough different.
-
-Some important files:
-    Companies.cs: Contains all definitions of the companies (paths). And basic classes like Company/CompanyAffinity
-    Reinforcement.cs: The base class of all Reinforcements.
-    UnitStatsTools.cs: Some existing code to help mess with unit stats.
-    ActionCardsUpgraderTools.cs: Some existing code to help mess with generating action cards in the action cards store.
-    (Higely recommended) XenopurgeRougeLike.txt: If you are looking for some existing examples of certain effects, you can check this file. Please be noted that not all reinforcements/affinities are implemented yet. But it's a good place to start.
 
 Each run consists of many missions (a.k.a battles). If you use a mission-wide state, you should use this pattern to clear the state when the mission ends:
 
