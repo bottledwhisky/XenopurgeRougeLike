@@ -25,6 +25,22 @@ namespace XenopurgeRougeLike
                     ["ja"] = "増援を選択してください",
                     ["ko"] = "증원 선택",
                 },
+                ["ui.choose_reinforcement_button"] = new Dictionary<string, string>
+                {
+                    ["en"] = "Choose Reinforcement",
+                    ["el"] = "Επιλέξτε Ενίσχυση",
+                    ["fr"] = "Choisir un Renfort",
+                    ["zh"] = "选择增援",
+                    ["zh-TW"] = "選擇增援",
+                    ["de"] = "Verstärkung wählen",
+                    ["pl"] = "Wybierz Wzmocnienie",
+                    ["pt"] = "Escolher Reforço",
+                    ["ru"] = "Выбрать Подкрепление",
+                    ["es"] = "Elegir Refuerzo",
+                    ["uk"] = "Вибрати Підкріплення",
+                    ["ja"] = "増援を選択",
+                    ["ko"] = "증원 선택",
+                },
                 ["ui.hover_description"] = new Dictionary<string, string>
                 {
                     ["en"] = "Hover over an upgrade to see its description",

@@ -34,7 +34,7 @@ namespace XenopurgeRougeLike
         public static bool IsAvailable()
         {
             // Support company is always available (no special requirements)
-            return true;
+            return false;
         }
     }
 }

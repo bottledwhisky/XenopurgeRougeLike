@@ -23,6 +23,12 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             company = Company.Rockstar;
         }
 
+        public override void OnDeactivate()
+        {
+            RockstarAffinityHelpers.ResetStates();
+            UnitsPlacementPhasePatch.ResetStates();
+        }
+
         public override Dictionary<string, object> SaveState()
         {
             return new Dictionary<string, object>
@@ -128,6 +134,11 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public static List<BattleUnit> fans = [];
 
         public static bool IsFan(BattleUnit unit) => fans.Contains(unit);
+
+        public static void ResetStates()
+        {
+            fans.Clear();
+        }
 
         [HarmonyPatch("AddNPCsPhase")]
         [HarmonyPrefix]

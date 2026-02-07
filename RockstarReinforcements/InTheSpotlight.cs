@@ -29,6 +29,11 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         private static InTheSpotlight _instance;
         public static InTheSpotlight Instance => _instance ??= new();
 
+        public override void OnDeactivate()
+        {
+            IsTopStarAttacking = false;
+        }
+
         public static BattleUnit GetTopStar()
         {
             var gameManager = GameManager.Instance;

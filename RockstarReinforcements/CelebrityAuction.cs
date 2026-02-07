@@ -41,11 +41,18 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public override void OnDeactivate()
         {
             EventBus.Unsubscribe<GameExitEvent>(new Action<GameExitEvent>(this.OnGameExit));
+            ResetStates();
         }
 
         private void OnGameExit(GameExitEvent evt)
         {
             // Clear equipment battle counts on game exit
+            EquipmentBattleCounts.Clear();
+        }
+
+        public static void ResetStates()
+        {
+            IsSellMode = false;
             EquipmentBattleCounts.Clear();
         }
 

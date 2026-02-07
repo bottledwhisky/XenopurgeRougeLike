@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
+using SpaceCommander.BattleManagement;
 using SpaceCommander.BattleManagement.UI;
 using SpaceCommander.EndGame;
 using SpaceCommander.UI;
@@ -34,6 +35,297 @@ namespace XenopurgeRougeLike
         }
     }
 
+    // IDirectory implementation for reinforcement selection page
+    public class ReinforcementSelectionDirectory : IDirectory<DirectoryData>
+    {
+        private readonly EndGameWindowButtons_BattleManagementDirectory _originalDirectory;
+        private readonly DirectoryTextData _directoryTextData = new();
+        private readonly Guid _directoryId;
+        private List<ButtonData> _choiceButtonDataList = new();
+
+        public DirectoryTextData NameTextDataOfDirectory => _directoryTextData;
+
+        public ReinforcementSelectionDirectory(EndGameWindowButtons_BattleManagementDirectory originalDirectory)
+        {
+            _originalDirectory = originalDirectory;
+            _directoryId = Guid.NewGuid();
+            _directoryTextData.Reset();
+        }
+
+        public DirectoryData Initialize()
+        {
+            MelonLogger.Msg("Initializing reinforcement selection directory");
+            _choiceButtonDataList.Clear();
+
+            // Get the ProceedClicked method to invoke when selection is made
+            var ProceedClicked = AccessTools.Method(typeof(EndGameWindowButtons_BattleManagementDirectory), "ProceedClicked");
+
+            // Create choice buttons
+            for (int i = 0; i < AwardSystem.choices.Count; i++)
+            {
+                int capturedIndex = i;
+                var choice = AwardSystem.choices[i];
+                var preview = choice.GetNextLevelPreview();
+                int cost = Reinforcement.RarityCosts[preview.Rarity];
+                bool canAfford = PlayerWalletHelper.GetCoins() >= cost;
+
+                ButtonData buttonData = new()
+                {
+                    MainText = preview.MenuItem + $" ({L("ui.cost_format", cost)})",
+                    IsDisabled = !canAfford,
+                    onSelectCallback = () =>
+                    {
+                        ReinforcementSelectionUI.UpdateSelectionHighlight(capturedIndex);
+                    },
+                    onClickCallback = () =>
+                    {
+                        SelectReinforcement(capturedIndex, ProceedClicked);
+                    }
+                };
+                _choiceButtonDataList.Add(buttonData);
+            }
+
+            // Create reroll button
+            ButtonData rerollButtonData = CreateRerollButton();
+
+            // Create skip button
+            ButtonData skipButtonData = new()
+            {
+                MainText = L("ui.skip_button"),
+                onClickCallback = () =>
+                {
+                    MelonLogger.Msg("Player chose to skip reinforcement selection.");
+                    PlayerWalletHelper.ChangeCoins(3);
+                    MelonLogger.Msg($"Gained 3 coins from skip, total coins: {PlayerWalletHelper.GetCoins()}");
+                    AwardSystem.currentRerollCost = 1;
+                    EndGameWindowView_SetResultText_Patch.RestoreMissionCompletePanel();
+                    ProceedClicked.Invoke(_originalDirectory, null);
+                }
+            };
+
+            DirectoryData result = new(_directoryId)
+            {
+                ButtonData = [.. _choiceButtonDataList, rerollButtonData, skipButtonData],
+                ManuallySetFirstButtonSelectable = false
+            };
+
+            return result;
+        }
+
+        public void OnBackClicked()
+        {
+            // Optional: Handle back navigation
+        }
+
+        private void SelectReinforcement(int choiceIndex, System.Reflection.MethodInfo proceedMethod)
+        {
+            var choice = AwardSystem.choices[choiceIndex];
+            var preview = choice.GetNextLevelPreview();
+            int cost = Reinforcement.RarityCosts[preview.Rarity];
+
+            int currentCoins = PlayerWalletHelper.GetCoins();
+            if (currentCoins < cost)
+            {
+                MelonLogger.Warning($"Cannot afford reinforcement {choice.ToMenuItem()} - costs {cost}, have {currentCoins}");
+                return;
+            }
+
+            MelonLogger.Msg($"Player selected reinforcement: {choice.ToMenuItem()}");
+            PlayerWalletHelper.ChangeCoins(-cost);
+            MelonLogger.Msg($"Spent {cost} coins, {PlayerWalletHelper.GetCoins()} remaining");
+
+            AwardSystem.currentRerollCost = 1;
+            AwardSystem.AcquireReinforcement(choice);
+
+            EndGameWindowView_SetResultText_Patch.RestoreMissionCompletePanel();
+            proceedMethod.Invoke(_originalDirectory, null);
+        }
+
+        private ButtonData CreateRerollButton()
+        {
+            int freeRerollsAvailable = Reconsider.GetFreeRerollsAvailable();
+            int rerollCost = freeRerollsAvailable > 0 ? 0 : AwardSystem.currentRerollCost;
+            bool canAffordReroll = rerollCost == 0 || PlayerWalletHelper.GetCoins() >= rerollCost;
+
+            ButtonData rerollButtonData = new()
+            {
+                MainText = freeRerollsAvailable > 0
+                    ? L("ui.reroll_button_free", freeRerollsAvailable)
+                    : L("ui.reroll_button", rerollCost, PlayerWalletHelper.GetCoins()),
+                IsDisabled = !canAffordReroll,
+                IgnoreClickCount = true,
+            };
+
+            rerollButtonData.onClickCallback = () =>
+            {
+                PerformReroll(rerollButtonData);
+            };
+
+            return rerollButtonData;
+        }
+
+        private void PerformReroll(ButtonData rerollButtonData)
+        {
+            int freeRerolls = Reconsider.GetFreeRerollsAvailable();
+            bool isFreeReroll = freeRerolls > 0;
+            int currentRerollCost = isFreeReroll ? 0 : AwardSystem.currentRerollCost;
+
+            int currentCoins = PlayerWalletHelper.GetCoins();
+            if (!isFreeReroll && currentCoins < currentRerollCost)
+            {
+                MelonLogger.Warning($"Cannot afford reroll - costs {currentRerollCost}, have {currentCoins}");
+                return;
+            }
+
+            MelonLogger.Msg($"Player chose to reroll. Free: {isFreeReroll}");
+
+            try
+            {
+                if (isFreeReroll)
+                {
+                    Reconsider.UseFreeReroll();
+                    MelonLogger.Msg($"Used free reroll, {Reconsider.GetFreeRerollsAvailable()} free rerolls remaining");
+                }
+                else
+                {
+                    PlayerWalletHelper.ChangeCoins(-currentRerollCost);
+                    MelonLogger.Msg($"Spent {currentRerollCost} coins on reroll, {PlayerWalletHelper.GetCoins()} remaining");
+                    AwardSystem.currentRerollCost++;
+                    MelonLogger.Msg($"Reroll cost increased to {AwardSystem.currentRerollCost}");
+                }
+
+                // Reroll choices
+                GameManager_GiveEndGameRewards_Patch.Prefix(true);
+                EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = 0;
+                EndGameWindowView_SetResultText_Patch.PopulateChoices(AwardSystem.choices, _choiceButtonDataList);
+
+                // Update choice buttons with new choices
+                for (int i = 0; i < AwardSystem.choices.Count && i < _choiceButtonDataList.Count; i++)
+                {
+                    var choice = AwardSystem.choices[i];
+                    var preview = choice.GetNextLevelPreview();
+                    int cost = Reinforcement.RarityCosts[preview.Rarity];
+                    bool canAfford = PlayerWalletHelper.GetCoins() >= cost;
+
+                    _choiceButtonDataList[i].MainText = preview.MenuItem + $" ({L("ui.cost_format", cost)})";
+                    _choiceButtonDataList[i].IsDisabled = !canAfford;
+                    _choiceButtonDataList[i].ChangeInteractionState(!canAfford);
+                }
+
+                // Update reroll button
+                int newFreeRerolls = Reconsider.GetFreeRerollsAvailable();
+                int newRerollCost = newFreeRerolls > 0 ? 0 : AwardSystem.currentRerollCost;
+                bool canAffordNewReroll = newRerollCost == 0 || PlayerWalletHelper.GetCoins() >= newRerollCost;
+
+                rerollButtonData.MainText = newFreeRerolls > 0
+                    ? L("ui.reroll_button_free", newFreeRerolls)
+                    : L("ui.reroll_button", newRerollCost, PlayerWalletHelper.GetCoins());
+                rerollButtonData.IsDisabled = !canAffordNewReroll;
+                rerollButtonData.ChangeInteractionState(!canAffordNewReroll);
+
+                MelonLogger.Msg($"Reroll complete: cost={newRerollCost}, free={newFreeRerolls}");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Error during reroll: {ex}");
+                MelonLogger.Error(ex.StackTrace);
+            }
+        }
+    }
+
+    // Handles the reinforcement selection page UI
+    public static class ReinforcementSelectionUI
+    {
+        public static void ShowReinforcementSelectionPage(EndGameWindowButtons_BattleManagementDirectory buttonDirectoryInstance)
+        {
+            MelonLogger.Msg("Switching to reinforcement selection page");
+
+            // Find the DirectoriesFlowController from BattleManagementWindowController
+            var battleMgmtController = UnityEngine.Object.FindFirstObjectByType<BattleManagementWindowController>();
+            if (battleMgmtController == null)
+            {
+                MelonLogger.Error("Could not find BattleManagementWindowController");
+                return;
+            }
+
+            var flowControllerField = AccessTools.Property(typeof(BattleManagementWindowController), "DirectoriesFlowController");
+            var flowController = (DirectoriesFlowController)flowControllerField.GetValue(battleMgmtController);
+
+            if (flowController == null)
+            {
+                MelonLogger.Error("Could not get DirectoriesFlowController");
+                return;
+            }
+
+            // Create and navigate to the reinforcement selection directory
+            var selectionDirectory = new ReinforcementSelectionDirectory(buttonDirectoryInstance);
+            flowController.OnDirectoryChanged(selectionDirectory);
+
+            // Update visual selection UI to show first choice
+            UpdateSelectionHighlight(0);
+
+            MelonLogger.Msg("Reinforcement selection page displayed");
+        }
+
+        public static void UpdateSelectionHighlight(int choiceIndex)
+        {
+            try
+            {
+                var choice = AwardSystem.choices[choiceIndex];
+                var preview = choice.GetNextLevelPreview();
+                var company = choice.company.Type;
+                var nExistingCompanyReinforces = AwardSystem.acquiredReinforcements.Where(r => r.company.Type == company).Count() + 1;
+
+                CompanyAffinity affinityToEnable = null;
+                foreach (var affinity in choice.company.Affinities)
+                {
+                    if (affinity.unlockLevel >= nExistingCompanyReinforces)
+                    {
+                        affinityToEnable = affinity;
+                        break;
+                    }
+                }
+                if (affinityToEnable == null && choice.company.Affinities.Count > 0)
+                {
+                    affinityToEnable = choice.company.Affinities.Last();
+                }
+
+                string progressLabel = "";
+                if (affinityToEnable != null)
+                {
+                    string nextUnlockAffinityText = affinityToEnable.ToString();
+                    progressLabel = affinityToEnable.unlockLevel < nExistingCompanyReinforces
+                        ? L("ui.max_level_reached")
+                        : L("ui.next_unlock") + $": ({nExistingCompanyReinforces}/{affinityToEnable.unlockLevel}) " + nextUnlockAffinityText;
+                }
+
+                EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = choiceIndex;
+                EndGameWindowView_SetResultText_Patch._descriptionText.text = preview.FullString + "\n" + progressLabel;
+
+                // Update border highlights
+                for (int j = 0; j < EndGameWindowView_SetResultText_Patch._choiceOutlines.Length; j++)
+                {
+                    var outline = EndGameWindowView_SetResultText_Patch._choiceOutlines[j];
+                    if (j == choiceIndex)
+                    {
+                        outline.effectColor = Color.yellow;
+                    }
+                    else
+                    {
+                        outline.effectColor = Color.gray;
+                    }
+                    var graphic = outline.GetComponent<Graphic>();
+                    graphic?.SetVerticesDirty();
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Error updating selection highlight: {ex}");
+                MelonLogger.Error(ex.StackTrace);
+            }
+        }
+    }
+
     [HarmonyPatch(typeof(EndGameWindowButtons_BattleManagementDirectory), "Initialize")]
     public static class EndGameWindowButtons_BattleManagementDirectory_Initialize_Patch
     {
@@ -42,216 +334,29 @@ namespace XenopurgeRougeLike
         {
             try
             {
-                MelonLogger.Msg("Patching EndGameWindowButtons_BattleManagementDirectory.Initialize to add reinforcement choices.");
-                if (!EndGameWindowView_SetResultText_Patch.isGameContinue) return;
-                MelonLogger.Msg("Game is continuing, adding reinforcement choice buttons.");
-                var ProceedClicked = AccessTools.Method(typeof(EndGameWindowButtons_BattleManagementDirectory), "ProceedClicked");
-                List<ButtonData> buttonDataList = [];
-                // Add reinforcement choices as buttons
-                for (int i = 0; i < AwardSystem.choices.Count; i++)
+                MelonLogger.Msg("Patching EndGameWindowButtons_BattleManagementDirectory.Initialize");
+                if (!EndGameWindowView_SetResultText_Patch.isGameContinue)
                 {
-                    int capturedIndex = i; // Capture loop variable for closure
-                    MelonLogger.Msg($"Adding reinforcement choice button for index {i}");
-                    var choice = AwardSystem.choices[i];
-                    var preview = choice.GetNextLevelPreview();
-                    int cost = Reinforcement.RarityCosts[preview.Rarity];
-                    bool canAfford = PlayerWalletHelper.GetCoins() >= cost;
-
-                    ButtonData buttonData = new()
-                    {
-                        MainText = preview.MenuItem + $"({L("ui.cost_format", cost)})",
-                        IsDisabled = !canAfford,
-                        onSelectCallback = () =>
-                        {
-                            try
-                            {
-                                var choice = AwardSystem.choices[capturedIndex];
-                                var preview = choice.GetNextLevelPreview();
-                                var company = choice.company.Type;
-                                var nExsitingCompanyReinforces = AwardSystem.acquiredReinforcements.Where(r => r.company.Type == company).Count() + 1;
-                                CompanyAffinity affinityToEnable = null;
-                                foreach (var affiny in choice.company.Affinities)
-                                {
-                                    int requiredNReinforces = affiny.unlockLevel;
-                                    if (requiredNReinforces >= nExsitingCompanyReinforces)
-                                    {
-                                        affinityToEnable = affiny;
-                                        break;
-                                    }
-                                }
-                                if (affinityToEnable == null && choice.company.Affinities.Count > 0)
-                                {
-                                    affinityToEnable = choice.company.Affinities.Last();
-                                }
-                                string progressLabel = "";
-                                if (affinityToEnable != null)
-                                {
-                                    string nextUnlockAffinyText = affinityToEnable.ToString();
-
-                                    progressLabel = affinityToEnable.unlockLevel < nExsitingCompanyReinforces
-                                        ? L("ui.max_level_reached")
-                                        : L("ui.next_unlock") + $": ({nExsitingCompanyReinforces}/{affinityToEnable.unlockLevel}) " + nextUnlockAffinyText;
-                                }
-
-                                EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = capturedIndex;
-                                // Update description text when selected
-                                EndGameWindowView_SetResultText_Patch._descriptionText.text = preview.FullString + "\n" + progressLabel;
-
-                                // Update border highlights
-                                for (int j = 0; j < EndGameWindowView_SetResultText_Patch._choiceOutlines.Length; j++)
-                                {
-                                    var outline = EndGameWindowView_SetResultText_Patch._choiceOutlines[j];
-                                    if (j == capturedIndex)
-                                    {
-                                        outline.effectColor = Color.yellow;
-                                    }
-                                    else
-                                    {
-                                        outline.effectColor = Color.gray;
-                                    }
-                                    var graphic = outline.GetComponent<Graphic>();
-                                    if (graphic != null)
-                                    {
-                                        graphic.SetVerticesDirty();
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                MelonLogger.Error(ex);
-                                MelonLogger.Error(ex.StackTrace);
-                            }
-                        },
-                        onClickCallback = () =>
-                        {
-                            var choice = AwardSystem.choices[capturedIndex];
-                            var preview = choice.GetNextLevelPreview();
-                            int cost = Reinforcement.RarityCosts[preview.Rarity];
-
-                            // Check if player can afford this reinforcement
-                            int currentCoins = PlayerWalletHelper.GetCoins();
-                            if (currentCoins < cost)
-                            {
-                                MelonLogger.Warning($"Cannot afford reinforcement {choice.ToMenuItem()} - costs {cost}, have {currentCoins}");
-                                return;
-                            }
-
-                            // Logic to add the reinforcement to the player's roster
-                            MelonLogger.Msg($"Player selected reinforcement from {choice.ToMenuItem()}");
-
-                            // Deduct cost
-                            PlayerWalletHelper.ChangeCoins(-cost);
-                            MelonLogger.Msg($"Spent {cost} coins, {PlayerWalletHelper.GetCoins()} remaining");
-
-                            // Reset reroll cost for next session
-                            AwardSystem.currentRerollCost = 1;
-
-                            // Add reinforcement logic here
-                            AwardSystem.AcquireReinforcement(choice);
-                            ProceedClicked.Invoke(__instance, null);
-                        }
-                    };
-                    buttonDataList.Add(buttonData);
+                    MelonLogger.Msg("Game is not continuing, using default buttons");
+                    return;
                 }
-                MelonLogger.Msg("Finished adding reinforcement choice buttons.");
-                // Add a "Reroll" button
-                int freeRerollsAvailable = Reconsider.GetFreeRerollsAvailable();
-                int rerollCost = freeRerollsAvailable > 0 ? 0 : AwardSystem.currentRerollCost;
-                bool canAffordReroll = rerollCost == 0 || PlayerWalletHelper.GetCoins() >= rerollCost;
 
-                ButtonData rerollButtonData = new ButtonData
+                MelonLogger.Msg("Game is continuing, hijacking Proceed button for reinforcement selection");
+
+                // Hijack the Proceed button to show reinforcement selection page
+                ButtonData proceedButton = new()
                 {
-                    MainText = freeRerollsAvailable > 0
-                        ? L("ui.reroll_button_free", freeRerollsAvailable)
-                        : L("ui.reroll_button", rerollCost, PlayerWalletHelper.GetCoins()),
-                    IsDisabled = !canAffordReroll,
-                    IgnoreClickCount = true,
-                };
-
-                // Set the callback after creating the button so we can capture a reference to it
-                rerollButtonData.onClickCallback = () =>
-                {
-                    int freeRerolls = Reconsider.GetFreeRerollsAvailable();
-                    bool isFreeReroll = freeRerolls > 0;
-                    int currentRerollCost = isFreeReroll ? 0 : AwardSystem.currentRerollCost;
-
-                    // Check if player can afford reroll (free rerolls always succeed)
-                    int currentCoins = PlayerWalletHelper.GetCoins();
-                    if (!isFreeReroll && currentCoins < currentRerollCost)
-                    {
-                        MelonLogger.Warning($"Cannot afford reroll - costs {currentRerollCost}, have {currentCoins}");
-                        return;
-                    }
-
-                    MelonLogger.Msg($"Player chose to reroll reinforcement choices. Free: {isFreeReroll}");
-                    try
-                    {
-                        if (isFreeReroll)
-                        {
-                            // Use a free reroll
-                            Reconsider.UseFreeReroll();
-                            MelonLogger.Msg($"Used free reroll, {Reconsider.GetFreeRerollsAvailable()} free rerolls remaining");
-                        }
-                        else
-                        {
-                            // Deduct reroll cost
-                            PlayerWalletHelper.ChangeCoins(-currentRerollCost);
-                            MelonLogger.Msg($"Spent {currentRerollCost} coins on reroll, {PlayerWalletHelper.GetCoins()} remaining");
-
-                            // Increase reroll cost for next reroll
-                            AwardSystem.currentRerollCost++;
-                            MelonLogger.Msg($"Reroll cost increased to {AwardSystem.currentRerollCost}");
-                        }
-
-                        // Logic to reroll choices
-                        GameManager_GiveEndGameRewards_Patch.Prefix(true);
-                        EndGameWindowView_SetResultText_Patch.selectedChoiceIndex = 0;
-                        EndGameWindowView_SetResultText_Patch.PopulateChoices(AwardSystem.choices, buttonDataList);
-
-                        // Update reroll button text and state (we have a direct reference)
-                        int newFreeRerolls = Reconsider.GetFreeRerollsAvailable();
-                        int newRerollCost = newFreeRerolls > 0 ? 0 : AwardSystem.currentRerollCost;
-                        bool canAffordNewReroll = newRerollCost == 0 || PlayerWalletHelper.GetCoins() >= newRerollCost;
-
-                        rerollButtonData.MainText = newFreeRerolls > 0
-                            ? L("ui.reroll_button_free", newFreeRerolls)
-                            : L("ui.reroll_button", newRerollCost, PlayerWalletHelper.GetCoins());
-                        rerollButtonData.IsDisabled = !canAffordNewReroll;
-                        rerollButtonData.ChangeInteractionState(rerollButtonData.IsDisabled);
-                        MelonLogger.Msg($"Updated reroll button: cost={newRerollCost}, free={newFreeRerolls}, disabled={!canAffordNewReroll}");
-                    }
-                    catch (Exception ex)
-                    {
-                        MelonLogger.Error(ex);
-                        MelonLogger.Error(ex.StackTrace);
-                        throw ex;
-                    }
-                };
-                // Add a "Skip" button
-                ButtonData skipButtonData = new ButtonData
-                {
-                    MainText = L("ui.skip_button"),
+                    MainText = L("ui.choose_reinforcement_button"),
                     onClickCallback = () =>
                     {
-                        MelonLogger.Msg("Player chose to skip reinforcement selection.");
-
-                        // Grant +3 coins
-                        PlayerWalletHelper.ChangeCoins(3);
-                        MelonLogger.Msg($"Gained 3 coins from skip, total coins: {PlayerWalletHelper.GetCoins()}");
-
-                        // Reset reroll cost for next session
-                        AwardSystem.currentRerollCost = 1;
-
-                        // Logic to skip selection
-                        ProceedClicked.Invoke(__instance, null);
+                        MelonLogger.Msg("Proceed button clicked, switching to reinforcement selection page");
+                        EndGameWindowView_SetResultText_Patch.RenderUI();
+                        ReinforcementSelectionUI.ShowReinforcementSelectionPage(__instance);
                     }
                 };
-                MelonLogger.Msg("Adding Reroll and Skip buttons.");
-                __result.ButtonData = [.. buttonDataList,
-                rerollButtonData,
-                skipButtonData,
-            ];
-                MelonLogger.Msg("Finished patching EndGameWindowButtons_BattleManagementDirectory.Initialize.");
+
+                __result.ButtonData = [proceedButton];
+                MelonLogger.Msg("Proceed button hijacked successfully");
             }
             catch (Exception e)
             {
@@ -273,17 +378,21 @@ namespace XenopurgeRougeLike
         public static TextMeshProUGUI _descriptionText;
         public static bool isGameContinue = false;
         public static int selectedChoiceIndex = 0;
+        public static EndGameWindowView instance;
 
         [HarmonyPostfix]
         public static void Postfix(EndGameWindowView __instance, EndGameResultData endGameResultData)
         {
+            isGameContinue = endGameResultData.IsVictory;
+            instance = __instance;
+        }
+
+        public static void RenderUI()
+        {
             try
             {
-                isGameContinue = false;
-                if (endGameResultData.IsGameOver) return;
-
                 var missionCompletePanelField = AccessTools.Field(typeof(EndGameWindowView), "_missionCompletePanel");
-                var missionCompletePanel = (RectTransform)missionCompletePanelField.GetValue(__instance);
+                var missionCompletePanel = (RectTransform)missionCompletePanelField.GetValue(instance);
 
                 if (missionCompletePanel == null) return;
 
@@ -294,7 +403,7 @@ namespace XenopurgeRougeLike
 
                 // Get reference text for styling
                 var totalCoinsTextField = AccessTools.Field(typeof(EndGameWindowView), "_totalCoinsText");
-                var referenceText = (TextMeshProUGUI)totalCoinsTextField.GetValue(__instance);
+                var referenceText = (TextMeshProUGUI)totalCoinsTextField.GetValue(instance);
                 selectedChoiceIndex = 0;
 
                 // Create or update the chooser UI
@@ -306,7 +415,6 @@ namespace XenopurgeRougeLike
 
                 PopulateChoices(AwardSystem.choices);
                 _chooserContainer.SetActive(true);
-                isGameContinue = true;
             }
             catch (Exception ex)
             {
@@ -315,8 +423,36 @@ namespace XenopurgeRougeLike
             }
         }
 
+        public static void RestoreMissionCompletePanel()
+        {
+            try
+            {
+                var missionCompletePanelField = AccessTools.Field(typeof(EndGameWindowView), "_missionCompletePanel");
+                var missionCompletePanel = (RectTransform)missionCompletePanelField.GetValue(instance);
+
+                if (missionCompletePanel != null)
+                {
+                    // Reactivate all children that were hidden
+                    foreach (Transform child in missionCompletePanel)
+                    {
+                        child.gameObject.SetActive(true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Error restoring mission complete panel: {ex}");
+            }
+        }
+
         private static void CreateChooserUI(RectTransform parent, TextMeshProUGUI referenceText)
         {
+            // Hide all existing children of missionCompletePanel
+            foreach (Transform child in parent)
+            {
+                child.gameObject.SetActive(false);
+            }
+
             // Main container
             _chooserContainer = new GameObject("RoguelikeChooser");
             _chooserContainer.transform.SetParent(parent, false);
@@ -350,6 +486,7 @@ namespace XenopurgeRougeLike
 
             var headerLayout = headerGO.AddComponent<LayoutElement>();
             headerLayout.preferredHeight = 30f;
+            headerLayout.minHeight = 40f; // Add bottom margin by increasing min height
 
             // Horizontal container for the 3 choices
             var choicesRow = new GameObject("ChoicesRow");

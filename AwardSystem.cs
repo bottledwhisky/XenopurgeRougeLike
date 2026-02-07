@@ -132,6 +132,50 @@ namespace XenopurgeRougeLike
             }
         }
 
+        public static void ResetAllStates()
+        {
+            MelonLogger.Msg("[AwardSystem] Resetting all states for new run");
+
+            // Clear acquired reinforcements and reset their stacks
+            // Setting IsActive = false will trigger OnDeactivate() for each reinforcement
+            foreach (var reinforcement in acquiredReinforcements)
+            {
+                reinforcement.IsActive = false;
+                reinforcement.currentStacks = 0;
+            }
+            acquiredReinforcements.Clear();
+
+            // Reset all company affinities
+            // Setting IsActive = false will trigger OnDeactivate() for each affinity
+            foreach (var company in Company.Companies.Values)
+            {
+                if (company.Affinities != null)
+                {
+                    foreach (var affinity in company.Affinities)
+                    {
+                        affinity.IsActive = false;
+                    }
+                }
+            }
+
+            // Reset reroll cost
+            currentRerollCost = 1;
+
+            // Clear choices
+            choices = null;
+
+            MelonLogger.Msg("[AwardSystem] State reset complete");
+        }
+    }
+
+    [HarmonyPatch(typeof(InitializeGame), "InitializePlayer")]
+    public static class InitializeGame_InitializePlayer_Patch
+    {
+        public static void Postfix()
+        {
+            MelonLogger.Msg("[InitializeGame_InitializePlayer_Patch] InitializePlayer called - Resetting all states");
+            AwardSystem.ResetAllStates();
+        }
     }
 
     [HarmonyPatch(typeof(GameManager), "GiveEndGameRewards")]

@@ -304,6 +304,11 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
             return ud;
         }
+
+        public static void ResetStates()
+        {
+            fanCount = 0;
+        }
     }
 
     [HarmonyPatch(typeof(TestGame), "EndGame")]
