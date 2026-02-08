@@ -2,9 +2,7 @@ using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
 using SpaceCommander.ActionCards;
-using SpaceCommander.Commands;
 using System.Collections.Generic;
-using System.Linq;
 using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 
@@ -168,6 +166,7 @@ namespace XenopurgeRougeLike.ScavengerReinforcements
 
             // Deduct the cost
             playerWallet.ChangeCoinsByValue(-ShareLoot.CoinCost);
+            ScavengerSpendingTracker.AddSpending(ShareLoot.CoinCost);
             MelonLogger.Msg($"ShareLoot: Deducted {ShareLoot.CoinCost} coin(s). Remaining: {playerWallet.Coins}");
 
             ApplyBuffs(unit);

@@ -19,16 +19,6 @@ namespace XenopurgeRougeLike.ScavengerReinforcements
             return 1.0f;
         }
 
-        // Get the current active collection time multiplier based on which affinity is active
-        public static float GetCollectionTimeMultiplier()
-        {
-            if (ScavengerAffinity6.Instance.IsActive)
-                return ScavengerAffinity6.CollectionTimeMultiplier;
-            if (ScavengerAffinity4.Instance.IsActive)
-                return ScavengerAffinity4.CollectionTimeMultiplier;
-            return 1.0f;
-        }
-
         // Check if any Scavenger affinity that affects collectibles is active
         public static bool IsAnyScavengerAffinityActive()
         {
@@ -57,28 +47,6 @@ namespace XenopurgeRougeLike.ScavengerReinforcements
                 {
                     count = originalCount + 1;
                 }
-            }
-        }
-    }
-
-    // Patch CollectCommand.InitializeValues to reduce collection time
-    [HarmonyPatch(typeof(CollectCommand), "InitializeValues")]
-    public static class ScavengerAffinity_CollectCommand_Patch
-    {
-        public static void Postfix(CollectCommand __instance, CommandDataSO commandDataSO)
-        {
-            float timeMultiplier = ScavengerAffinityHelpers.GetCollectionTimeMultiplier();
-            if (timeMultiplier < 1.0f)
-            {
-                // Modify the _timeOfCommand field directly using reflection
-                var timeField = AccessTools.Field(typeof(CollectCommand), "_timeOfCommand");
-                float currentTime = (float)timeField.GetValue(__instance);
-                timeField.SetValue(__instance, currentTime * timeMultiplier);
-
-                // Also update _remainingTime to match
-                var remainingField = AccessTools.Field(typeof(CollectCommand), "_remainingTime");
-                float currentRemaining = (float)remainingField.GetValue(__instance);
-                remainingField.SetValue(__instance, currentRemaining * timeMultiplier);
             }
         }
     }

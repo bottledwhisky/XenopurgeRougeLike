@@ -96,9 +96,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
         /// </summary>
         public static bool IsInjectionCard(string cardId)
         {
-            return cardId == "86cafd8b-9e28-4fd1-9e44-4ccdabb00137" || // Inject Brutadyne
-                   cardId == "82a8cd80-af72-4785-b4c9-eab1a498a125" || // Inject Kinetra
-                   cardId == "b51454f9-5641-4b07-94bf-93312555e860";   // Inject Optivex
+            return ActionCardIds.IsInjectionCard(cardId);
         }
 
         /// <summary>
@@ -106,8 +104,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
         /// </summary>
         public static bool IsHealItemCard(string cardId)
         {
-            return cardId == "6569d382-07ef-4db5-86ac-bac9eb249889" || // Inject Health Stim
-                   cardId == "90793211-9445-4ac1-9d06-fc94e547b416";   // Apply First Aid Kit
+            return ActionCardIds.IsHealItemCard(cardId);
         }
 
         /// <summary>
@@ -115,9 +112,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
         /// </summary>
         public static bool IsExplosiveCard(string cardId)
         {
-            return cardId == "bfb700d8-5fa2-4bd0-b1dd-94842f66c031" || // Frag Grenade
-                   cardId == "3b1ee954-9aec-45fe-afa0-46fbc9fc99a0" || // Flash Grenade
-                   cardId == "8daa3d58-73aa-4c26-a20f-954686777d1f";   // Setup Mine
+            return ActionCardIds.IsExplosiveCard(cardId);
         }
 
         /// <summary>
@@ -238,7 +233,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
         public static void Prefix(OverrideCommands_UnitAsTarget_Card __instance)
         {
             // Check if this is the First Aid Kit card
-            if (__instance?.Info?.Id != "90793211-9445-4ac1-9d06-fc94e547b416")
+            if (__instance?.Info?.Id != ActionCardIds.APPLY_FIRST_AID_KIT)
                 return;
 
             // The First Aid Kit card heals 40 HP in its ApplyCommand

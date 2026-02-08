@@ -49,6 +49,30 @@ namespace XenopurgeRougeLike
                         MelonLogger.Msg($"    - Skipped: already acquired {reinforcement.Name} stackable={reinforcement.stackable} {reinforcement.currentStacks}/{reinforcement.maxStacks}");
                         continue;
                     }
+
+                    // Skip Expert reinforcements if Affinity2 is not unlocked for this company
+                    if (reinforcement.rarity == Rarity.Expert)
+                    {
+                        bool affinity2Unlocked = false;
+                        if (company.Affinities != null)
+                        {
+                            foreach (var affinity in company.Affinities)
+                            {
+                                if (affinity.unlockLevel >= 2 && affinity.IsActive)
+                                {
+                                    affinity2Unlocked = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!affinity2Unlocked)
+                        {
+                            MelonLogger.Msg($"    - Skipped: {reinforcement.Name} is Expert rarity but Affinity2 not unlocked for {company.Name}");
+                            continue;
+                        }
+                    }
+
                     MelonLogger.Msg($"    - Added: {reinforcement.Name} stackable={reinforcement.stackable} {reinforcement.currentStacks}/{reinforcement.maxStacks}");
                     int weight = Reinforcement.RarityWeights[reinforcement.rarity];
                     weightedChoices.Add(new Tuple<int, Reinforcement>(weight, reinforcement));

@@ -1,5 +1,6 @@
 using HarmonyLib;
 using SpaceCommander.Weapons;
+using System.Collections.Generic;
 using System.Reflection;
 using static XenopurgeRougeLike.ModLocalization;
 
@@ -29,10 +30,18 @@ namespace XenopurgeRougeLike.ScavengerReinforcements
     [HarmonyPatch(typeof(RangedWeapon), "Shoot")]
     public static class DualPistols_DoubleShot_Patch
     {
-        private static readonly FieldInfo _weaponDataSO = AccessTools.Field(typeof(RangedWeapon), "_weaponDataSO");
+        private static readonly FieldInfo _weaponIdField = AccessTools.Field(typeof(RangedWeapon), "_weaponId");
         private static readonly MethodInfo _shootMethod = AccessTools.Method(typeof(RangedWeapon), "Shoot");
 
         private static bool _isRecursiveCall = false;
+
+        // Pistol IDs - same as in WeaponCategories
+        private static readonly HashSet<string> PistolIds = new()
+        {
+            WeaponCategories.MOP_PISTOL,
+            WeaponCategories.HEX_PISTOL,
+            WeaponCategories.BOLT_SMG,
+        };
 
         public static bool Prefix(RangedWeapon __instance)
         {
@@ -43,9 +52,9 @@ namespace XenopurgeRougeLike.ScavengerReinforcements
             if (!DualPistols.Instance.IsActive)
                 return true; // Run original method
 
-            // Check if this weapon is a pistol
-            RangedWeaponDataSO weaponData = _weaponDataSO.GetValue(__instance) as RangedWeaponDataSO;
-            if (weaponData == null || !WeaponCategories.IsPistol(weaponData))
+            // Check if this weapon is a pistol by ID
+            string weaponId = _weaponIdField?.GetValue(__instance) as string;
+            if (string.IsNullOrEmpty(weaponId) || !PistolIds.Contains(weaponId))
                 return true; // Not a pistol, run original method
 
             // Call Shoot twice

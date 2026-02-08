@@ -14,7 +14,7 @@ namespace XenopurgeRougeLike.SupportReinforcements
     public class HealthStim : Reinforcement
     {
         // Health Stim card ID
-        public const string HealthStimCardId = "6569d382-07ef-4db5-86ac-bac9eb249889";
+        public const string HealthStimCardId = ActionCardIds.INJECT_HEALTH_STIM;
 
         public HealthStim()
         {

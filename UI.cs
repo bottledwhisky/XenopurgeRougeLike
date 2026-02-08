@@ -385,6 +385,75 @@ namespace XenopurgeRougeLike
         {
             isGameContinue = endGameResultData.IsVictory;
             instance = __instance;
+
+            // Add loot and spending statistics as RewardDisplay elements
+            try
+            {
+                // Get the reward display template and parent transform
+                var rewardDisplayTemplateField = AccessTools.Field(typeof(EndGameWindowView), "_rewardDisplayTemplate");
+                var rewardDisplayTemplate = (RewardDisplay)rewardDisplayTemplateField.GetValue(__instance);
+
+                var collectibleRewardsParentField = AccessTools.Field(typeof(EndGameWindowView), "_collectibleRewardsParent");
+                var collectibleRewardsParent = (Transform)collectibleRewardsParentField.GetValue(__instance);
+
+                var missionCompletePanelField = AccessTools.Field(typeof(EndGameWindowView), "_missionCompletePanel");
+                var missionCompletePanel = (RectTransform)missionCompletePanelField.GetValue(__instance);
+
+                var totalCoinsTextField = AccessTools.Field(typeof(EndGameWindowView), "_totalCoinsText");
+                var totalCoinsText = (TextMeshProUGUI)totalCoinsTextField.GetValue(__instance);
+
+                bool hasCustomRewards = false;
+                int lootGained = 0;
+                int coinsSpent = 0;
+
+                if (rewardDisplayTemplate != null && collectibleRewardsParent != null)
+                {
+                    // Add loot information if active and there were coins gained
+                    if (ScavengerReinforcements.Loot.Instance.IsActive && ScavengerReinforcements.Loot.CoinsGainedThisMission > 0)
+                    {
+                        lootGained = ScavengerReinforcements.Loot.CoinsGainedThisMission;
+                        RewardDisplay lootDisplay = UnityEngine.Object.Instantiate(rewardDisplayTemplate, collectibleRewardsParent);
+                        lootDisplay.gameObject.SetActive(true);
+                        string lootDescription = L("ui.loot_gained", lootGained);
+                        lootDisplay.SetRewardText(lootGained, lootDescription);
+                        hasCustomRewards = true;
+                    }
+
+                    // Add spending information if there were coins spent
+                    if (ScavengerReinforcements.ScavengerSpendingTracker.CoinsSpentThisMission > 0)
+                    {
+                        coinsSpent = ScavengerReinforcements.ScavengerSpendingTracker.CoinsSpentThisMission;
+                        RewardDisplay spendingDisplay = UnityEngine.Object.Instantiate(rewardDisplayTemplate, collectibleRewardsParent);
+                        spendingDisplay.gameObject.SetActive(true);
+                        string spendingDescription = L("ui.coins_spent", coinsSpent);
+                        spendingDisplay.SetRewardText(-coinsSpent, spendingDescription);
+                        hasCustomRewards = true;
+                    }
+
+                    // Ensure the collectible rewards parent is active if we added custom rewards
+                    if (hasCustomRewards)
+                    {
+                        collectibleRewardsParent.gameObject.SetActive(true);
+                    }
+
+                    // Update total coins text to include loot gains and spending
+                    if (totalCoinsText != null && (lootGained > 0 || coinsSpent > 0))
+                    {
+                        int adjustedTotal = endGameResultData.TotalRewardCoins + lootGained - coinsSpent;
+                        totalCoinsText.SetText(adjustedTotal.ToString());
+                    }
+
+                    // Rebuild layout to properly position all elements
+                    if (missionCompletePanel != null && hasCustomRewards)
+                    {
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(missionCompletePanel);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Error adding loot/spending statistics to end game UI: {ex}");
+            }
         }
 
         public static void RenderUI()

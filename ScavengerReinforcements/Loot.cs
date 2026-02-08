@@ -12,6 +12,10 @@ namespace XenopurgeRougeLike.ScavengerReinforcements
     {
         public const float DropChance = 0.15f; // 15% chance
 
+        // Track coins gained during the current mission
+        private static int _coinsGainedThisMission = 0;
+        public static int CoinsGainedThisMission => _coinsGainedThisMission;
+
         public Loot()
         {
             company = Company.Scavenger;
@@ -34,6 +38,16 @@ namespace XenopurgeRougeLike.ScavengerReinforcements
         {
             // No cleanup needed
         }
+
+        public static void AddCoinDrop()
+        {
+            _coinsGainedThisMission++;
+        }
+
+        public static void ClearCoinDrops()
+        {
+            _coinsGainedThisMission = 0;
+        }
     }
 
     // Patch BattleUnit constructor to add OnDeath listener
@@ -53,13 +67,25 @@ namespace XenopurgeRougeLike.ScavengerReinforcements
                     if (UnityEngine.Random.value < Loot.DropChance)
                     {
                         PlayerWalletHelper.ChangeCoins(1);
-                        MelonLogger.Msg($"Loot: Xeno dropped 1 coin! Total coins: {PlayerWalletHelper.GetCoins()}");
+                        Loot.AddCoinDrop();
+                        MelonLogger.Msg($"Loot: Xeno dropped 1 coin! Total coins: {PlayerWalletHelper.GetCoins()}, gained this mission: {Loot.CoinsGainedThisMission}");
                     }
                     __instance.OnDeath -= action;
                 }
 
                 __instance.OnDeath += action;
             }
+        }
+    }
+
+    // Clear coin tracking when mission starts
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
+    public static class Loot_ClearTracking_StartGame_Patch
+    {
+        public static void Postfix()
+        {
+            Loot.ClearCoinDrops();
+            MelonLogger.Msg("Loot: Cleared coin drop tracking for new mission");
         }
     }
 }

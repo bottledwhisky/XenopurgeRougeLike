@@ -314,6 +314,38 @@ namespace XenopurgeRougeLike
                     ["ja"] = "効果：",
                     ["ko"] = "효과:",
                 },
+                ["ui.loot_gained"] = new Dictionary<string, string>
+                {
+                    ["en"] = "Looted: +{0} <sprite name=\"CoinIcon\">",
+                    ["el"] = "Λάφυρα: +{0} <sprite name=\"CoinIcon\">",
+                    ["fr"] = "Butin: +{0} <sprite name=\"CoinIcon\">",
+                    ["zh"] = "战利品：+{0} <sprite name=\"CoinIcon\">",
+                    ["zh-TW"] = "戰利品：+{0} <sprite name=\"CoinIcon\">",
+                    ["de"] = "Geplündert: +{0} <sprite name=\"CoinIcon\">",
+                    ["pl"] = "Zdobycz: +{0} <sprite name=\"CoinIcon\">",
+                    ["pt"] = "Saqueado: +{0} <sprite name=\"CoinIcon\">",
+                    ["ru"] = "Добыча: +{0} <sprite name=\"CoinIcon\">",
+                    ["es"] = "Botín: +{0} <sprite name=\"CoinIcon\">",
+                    ["uk"] = "Здобич: +{0} <sprite name=\"CoinIcon\">",
+                    ["ja"] = "戦利品：+{0} <sprite name=\"CoinIcon\">",
+                    ["ko"] = "전리품: +{0} <sprite name=\"CoinIcon\">",
+                },
+                ["ui.coins_spent"] = new Dictionary<string, string>
+                {
+                    ["en"] = "Spent: -{0} <sprite name=\"CoinIcon\">",
+                    ["el"] = "Ξοδεύτηκαν: -{0} <sprite name=\"CoinIcon\">",
+                    ["fr"] = "Dépensé: -{0} <sprite name=\"CoinIcon\">",
+                    ["zh"] = "花费：-{0} <sprite name=\"CoinIcon\">",
+                    ["zh-TW"] = "花費：-{0} <sprite name=\"CoinIcon\">",
+                    ["de"] = "Ausgegeben: -{0} <sprite name=\"CoinIcon\">",
+                    ["pl"] = "Wydano: -{0} <sprite name=\"CoinIcon\">",
+                    ["pt"] = "Gasto: -{0} <sprite name=\"CoinIcon\">",
+                    ["ru"] = "Потрачено: -{0} <sprite name=\"CoinIcon\">",
+                    ["es"] = "Gastado: -{0} <sprite name=\"CoinIcon\">",
+                    ["uk"] = "Витрачено: -{0} <sprite name=\"CoinIcon\">",
+                    ["ja"] = "使用：-{0} <sprite name=\"CoinIcon\">",
+                    ["ko"] = "사용: -{0} <sprite name=\"CoinIcon\">",
+                },
                 // Company affinity
             };
         }

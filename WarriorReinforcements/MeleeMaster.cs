@@ -9,7 +9,7 @@ namespace XenopurgeRougeLike.WarriorReinforcements
     // Melee Master: Gain a Kinetic Warhammer (stackable up to 3, each stack gives another Kinetic Warhammer)
     public class MeleeMaster : Reinforcement
     {
-        internal const string KINETIC_WARHAMMER_ID = "a5106524-66ab-4350-8c29-e98e2aaa1205";
+        internal const string KINETIC_WARHAMMER_ID = WeaponCategories.KINETIC_WARHAMMER;
 
         public MeleeMaster()
         {

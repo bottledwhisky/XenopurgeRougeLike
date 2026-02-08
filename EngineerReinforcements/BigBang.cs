@@ -41,9 +41,9 @@ namespace XenopurgeRougeLike.EngineerReinforcements
         // Action card IDs that should have extended range
         public static readonly HashSet<string> ExtendedRangeCards =
         [
-            "bfb700d8-5fa2-4bd0-b1dd-94842f66c031", // Frag Grenade
-            "3b1ee954-9aec-45fe-afa0-46fbc9fc99a0", // Flash Grenade
-            "8daa3d58-73aa-4c26-a20f-954686777d1f", // Setup Mine
+            ActionCardIds.FRAG_GRENADE,
+            ActionCardIds.FLASH_GRENADE,
+            ActionCardIds.SETUP_MINE,
         ];
 
         /// <summary>

@@ -13,12 +13,12 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
     public abstract class SmartWeaponReinforcementBase : Reinforcement
     {
         // Weapon IDs
-        internal const string HEMOGRIP_ID = "d4102bbe-ffc0-4607-867f-6879686da2e3";
-        internal const string BARK_ID = "a90e5abf-e0c6-4f33-bef6-863a0b03d8fb";
-        internal const string TRAC_ID = "4eb6f6c8-5070-4725-a1bc-0dd98fadeddf";
-        internal const string COMBAT_KNIFE_ID = "fe8dd9a1-d175-4cd8-8210-5b41d2571e35";
-        internal const string MOP_PISTOL_ID1 = "11e1f4a6-a123-43d5-bed6-d0f2c832d249";
-        internal const string MOP_PISTOL_ID2 = "e590044e-52a4-434c-9497-6af8d38f4292";
+        internal const string HEMOGRIP_ID = WeaponCategories.HEMOGRIP;
+        internal const string BARK_ID = WeaponCategories.BARK_SYSTEM;
+        internal const string TRAC_ID = WeaponCategories.TRAC_CARBINE;
+        internal const string COMBAT_KNIFE_ID = WeaponCategories.COMBAT_KNIFE;
+        internal const string MOP_PISTOL_ID1 = WeaponCategories.MOP_PISTOL;
+        internal const string MOP_PISTOL_ID2 = WeaponCategories.MOP_PISTOL_VARIANT;
 
         protected SmartWeaponReinforcementBase()
         {

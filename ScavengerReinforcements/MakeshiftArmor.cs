@@ -1,9 +1,7 @@
 using HarmonyLib;
 using MelonLoader;
 using SpaceCommander;
-using SpaceCommander.Area;
 using SpaceCommander.Commands;
-using System.Reflection;
 using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.ScavengerReinforcements

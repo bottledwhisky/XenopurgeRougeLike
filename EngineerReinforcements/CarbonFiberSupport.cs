@@ -13,8 +13,8 @@ namespace XenopurgeRougeLike.EngineerReinforcements
         // Turret action card IDs
         public static readonly List<string> TurretActionCards =
         [
-            "3e9b1bb6-b377-49cd-af43-9c10dee7e81c", // Setup Turret (RAT)
-            "8b9dc11f-7e75-4295-92b8-1eb9417896f6", // Setup Turret (BANG)
+            ActionCardIds.SETUP_TURRET_RAT,
+            ActionCardIds.SETUP_TURRET_BANG,
         ];
 
         public CarbonFiberSupport()
