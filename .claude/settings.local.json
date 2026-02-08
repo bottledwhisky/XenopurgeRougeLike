@@ -7,7 +7,8 @@
       "Bash(grep:*)",
       "Bash(git -C \"d:\\\\projects\\\\xenopurge\\\\XenopurgeRougeLike\" diff --stat)",
       "Bash(ls:*)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(findstr:*)"
     ]
   }
 }

@@ -259,56 +259,6 @@ namespace XenopurgeRougeLike
                     ["ko"] = "후회보다는 다시 생각하는 것이 낫다.",
                 },
 
-                // Dagger Specialist (匕首专家)
-                ["common.dagger_specialist.name"] = new Dictionary<string, string>
-                {
-                    ["en"] = "Dagger Specialist",
-                    ["el"] = "Ειδικός Εγχειριδίου",
-                    ["fr"] = "Spécialiste des Dagues",
-                    ["zh"] = "匕首专家",
-                    ["zh-TW"] = "匕首專家",
-                    ["de"] = "Dolchspezialist",
-                    ["pl"] = "Specjalista od Sztyletów",
-                    ["pt"] = "Especialista em Adagas",
-                    ["ru"] = "Специалист по Кинжалам",
-                    ["es"] = "Especialista en Dagas",
-                    ["uk"] = "Спеціаліст з Кинджалів",
-                    ["ja"] = "短剣の専門家",
-                    ["ko"] = "단검 전문가",
-                },
-                ["common.dagger_specialist.description"] = new Dictionary<string, string>
-                {
-                    ["en"] = "Units equipped with daggers gain +{0} <sprite name=\"Speedicon\"> and +{1} <sprite name=\"Powericon\">.",
-                    ["el"] = "Οι μονάδες με εγχειρίδια κερδίζουν +{0} <sprite name=\"Speedicon\"> και +{1} <sprite name=\"Powericon\">.",
-                    ["fr"] = "Les unités équipées de dagues gagnent +{0} <sprite name=\"Speedicon\"> et +{1} <sprite name=\"Powericon\">.",
-                    ["zh"] = "装备匕首的单位获得 +{0} <sprite name=\"Speedicon\"> 和 +{1} <sprite name=\"Powericon\">。",
-                    ["zh-TW"] = "裝備匕首的單位獲得 +{0} <sprite name=\"Speedicon\"> 和 +{1} <sprite name=\"Powericon\">。",
-                    ["de"] = "Einheiten mit Dolchen erhalten +{0} <sprite name=\"Speedicon\"> und +{1} <sprite name=\"Powericon\">.",
-                    ["pl"] = "Jednostki wyposażone w sztylety otrzymują +{0} <sprite name=\"Speedicon\"> i +{1} <sprite name=\"Powericon\">.",
-                    ["pt"] = "Unidades equipadas com adagas ganham +{0} <sprite name=\"Speedicon\"> e +{1} <sprite name=\"Powericon\">.",
-                    ["ru"] = "Юниты с кинжалами получают +{0} <sprite name=\"Speedicon\"> и +{1} <sprite name=\"Powericon\">.",
-                    ["es"] = "Las unidades equipadas con dagas ganan +{0} <sprite name=\"Speedicon\"> y +{1} <sprite name=\"Powericon\">.",
-                    ["uk"] = "Юніти з кинджалами отримують +{0} <sprite name=\"Speedicon\"> та +{1} <sprite name=\"Powericon\">.",
-                    ["ja"] = "短剣を装備したユニットは +{0} <sprite name=\"Speedicon\"> と +{1} <sprite name=\"Powericon\"> を獲得。",
-                    ["ko"] = "단검을 장착한 유닛은 +{0} <sprite name=\"Speedicon\"> 및 +{1} <sprite name=\"Powericon\"> 획득.",
-                },
-                ["common.dagger_specialist.flavour"] = new Dictionary<string, string>
-                {
-                    ["en"] = "Swift and deadly.",
-                    ["el"] = "Γρήγορος και θανατηφόρος.",
-                    ["fr"] = "Rapide et mortel.",
-                    ["zh"] = "迅捷致命。",
-                    ["zh-TW"] = "迅捷致命。",
-                    ["de"] = "Schnell und tödlich.",
-                    ["pl"] = "Szybki i śmiertelny.",
-                    ["pt"] = "Rápido e mortal.",
-                    ["ru"] = "Быстрый и смертельный.",
-                    ["es"] = "Rápido y mortal.",
-                    ["uk"] = "Швидкий і смертельний.",
-                    ["ja"] = "迅速かつ致命的。",
-                    ["ko"] = "신속하고 치명적.",
-                },
-
                 // Blunt Weapon Specialist (钝器专家)
                 ["common.blunt_weapon_specialist.name"] = new Dictionary<string, string>
                 {
@@ -428,19 +378,19 @@ namespace XenopurgeRougeLike
                 },
                 ["common.pistol_specialist.description"] = new Dictionary<string, string>
                 {
-                    ["en"] = "Units equipped with pistols gain +{0} <sprite name=\"Speedicon\"> and +{1} <sprite name=\"AccuracyIcon\">.",
-                    ["el"] = "Οι μονάδες με πιστόλια κερδίζουν +{0} <sprite name=\"Speedicon\"> και +{1} <sprite name=\"AccuracyIcon\">.",
-                    ["fr"] = "Les unités équipées de pistolets gagnent +{0} <sprite name=\"Speedicon\"> et +{1} <sprite name=\"AccuracyIcon\">.",
-                    ["zh"] = "装备手枪的单位获得 +{0} <sprite name=\"Speedicon\"> 和 +{1} <sprite name=\"AccuracyIcon\">。",
-                    ["zh-TW"] = "裝備手槍的單位獲得 +{0} <sprite name=\"Speedicon\"> 和 +{1} <sprite name=\"AccuracyIcon\">。",
-                    ["de"] = "Einheiten mit Pistolen erhalten +{0} <sprite name=\"Speedicon\"> und +{1} <sprite name=\"AccuracyIcon\">.",
-                    ["pl"] = "Jednostki wyposażone w pistolety otrzymują +{0} <sprite name=\"Speedicon\"> i +{1} <sprite name=\"AccuracyIcon\">.",
-                    ["pt"] = "Unidades equipadas com pistolas ganham +{0} <sprite name=\"Speedicon\"> e +{1} <sprite name=\"AccuracyIcon\">.",
-                    ["ru"] = "Юниты с пистолетами получают +{0} <sprite name=\"Speedicon\"> и +{1} <sprite name=\"AccuracyIcon\">.",
-                    ["es"] = "Las unidades equipadas con pistolas ganan +{0} <sprite name=\"Speedicon\"> y +{1} <sprite name=\"AccuracyIcon\">.",
-                    ["uk"] = "Юніти з пістолетами отримують +{0} <sprite name=\"Speedicon\"> та +{1} <sprite name=\"AccuracyIcon\">.",
-                    ["ja"] = "拳銃を装備したユニットは +{0} <sprite name=\"Speedicon\"> と +{1} <sprite name=\"AccuracyIcon\"> を獲得。",
-                    ["ko"] = "권총을 장착한 유닛은 +{0} <sprite name=\"Speedicon\"> 및 +{1} <sprite name=\"AccuracyIcon\"> 획득.",
+                    ["en"] = "Units equipped with pistols gain +{0} <sprite name=\"AccuracyIcon\">.",
+                    ["el"] = "Οι μονάδες με πιστόλια κερδίζουν +{0} <sprite name=\"AccuracyIcon\">.",
+                    ["fr"] = "Les unités équipées de pistolets gagnent +{0} <sprite name=\"AccuracyIcon\">.",
+                    ["zh"] = "装备手枪的单位获得 +{0} <sprite name=\"AccuracyIcon\">。",
+                    ["zh-TW"] = "裝備手槍的單位獲得 +{0} <sprite name=\"AccuracyIcon\">。",
+                    ["de"] = "Einheiten mit Pistolen erhalten +{0} <sprite name=\"AccuracyIcon\">.",
+                    ["pl"] = "Jednostki wyposażone w pistolety otrzymują +{0} <sprite name=\"AccuracyIcon\">.",
+                    ["pt"] = "Unidades equipadas com pistolas ganham +{0} <sprite name=\"AccuracyIcon\">.",
+                    ["ru"] = "Юниты с пистолетами получают +{0} <sprite name=\"AccuracyIcon\">.",
+                    ["es"] = "Las unidades equipadas con pistolas ganan +{0} <sprite name=\"AccuracyIcon\">.",
+                    ["uk"] = "Юніти з пістолетами отримують +{0} <sprite name=\"AccuracyIcon\">.",
+                    ["ja"] = "拳銃を装備したユニットは +{0} <sprite name=\"AccuracyIcon\"> を獲得。",
+                    ["ko"] = "권총을 장착한 유닛은 +{0} <sprite name=\"AccuracyIcon\"> 획득.",
                 },
                 ["common.pistol_specialist.flavour"] = new Dictionary<string, string>
                 {

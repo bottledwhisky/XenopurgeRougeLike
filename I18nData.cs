@@ -28,6 +28,7 @@ namespace XenopurgeRougeLike
                 .Concat(GetEngineerTranslations())
                 .Concat(GetGunslingerTranslations())
                 .Concat(GetRockstarTranslations())
+                .Concat(GetScavengerTranslations())
                 .Concat(GetSupportTranslations())
                 .Concat(GetSyntheticsTranslations())
                 .Concat(GetUiTranslations())

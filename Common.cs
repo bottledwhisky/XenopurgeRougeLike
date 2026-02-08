@@ -26,10 +26,8 @@ namespace XenopurgeRougeLike
             { typeof(Reconsider), Reconsider.Instance },
             { typeof(Solidarity), Solidarity.Instance },
             // Weapon Specialists
-            { typeof(DaggerSpecialist), DaggerSpecialist.Instance },
             { typeof(BluntWeaponSpecialist), BluntWeaponSpecialist.Instance },
             { typeof(BladeSpecialist), BladeSpecialist.Instance },
-            { typeof(PistolSpecialist), PistolSpecialist.Instance },
             { typeof(ShotgunSpecialist), ShotgunSpecialist.Instance },
             { typeof(RifleSpecialist), RifleSpecialist.Instance },
             { typeof(SniperRifleSpecialist), SniperRifleSpecialist.Instance },
