@@ -27,6 +27,7 @@ namespace XenopurgeRougeLike
         public LocalizedString ShortName { get; set; }
         public LocalizedString Slogan { get; set; }
         public LocalizedString Description { get; set; }
+        public LocalizedString PlayStyle { get; set; }
         public string IconPath { get; set; }
         public Sprite Sprite { get; set; }
         public Color BorderColor { get; set; } = Color.white;
@@ -66,6 +67,12 @@ namespace XenopurgeRougeLike
             }
         }
 
+        public string ToShortString()
+        {
+            string colorHex = ColorUtility.ToHtmlStringRGB(BorderColor);
+            return $"<color=#{colorHex}>{Name}</color>: {PlayStyle}";
+        }
+
         public override string ToString()
         {
             string colorHex = ColorUtility.ToHtmlStringRGB(BorderColor);
@@ -87,6 +94,7 @@ namespace XenopurgeRougeLike
             ShortName = L("company.synthetics.short_name"),
             Slogan = L("company.synthetics.slogan"),
             Description = L("company.synthetics.description"),
+            PlayStyle = L("company.synthetics.playstyle"),
             IconPath = "wayland-yutani.png",
             Sprite = null,
             BorderColor = new Color32(80, 130, 140, 255),
@@ -101,6 +109,7 @@ namespace XenopurgeRougeLike
             ShortName = L("company.xeno.short_name"),
             Slogan = L("company.xeno.slogan"),
             Description = L("company.xeno.description"),
+            PlayStyle = L("company.xeno.playstyle"),
             IconPath = "prometheus-institute.png",
             Sprite = null,
             BorderColor = new Color32(180, 220, 50, 255),
@@ -115,6 +124,7 @@ namespace XenopurgeRougeLike
             ShortName = L("company.rockstar.short_name"),
             Slogan = L("company.rockstar.slogan"),
             Description = L("company.rockstar.description"),
+            PlayStyle = L("company.rockstar.playstyle"),
             IconPath = "nova-entertainment.png",
             Sprite = null,
             BorderColor = new Color32(255, 80, 180, 255),
@@ -129,6 +139,7 @@ namespace XenopurgeRougeLike
             ShortName = L("company.engineer.short_name"),
             Slogan = L("company.engineer.slogan"),
             Description = L("company.engineer.description"),
+            PlayStyle = L("company.engineer.playstyle"),
             IconPath = "sevastopol-systems.png",
             Sprite = null,
             BorderColor = new Color32(120, 140, 160, 255),
@@ -143,6 +154,7 @@ namespace XenopurgeRougeLike
             ShortName = L("company.support.short_name"),
             Slogan = L("company.support.slogan"),
             Description = L("company.support.description"),
+            PlayStyle = L("company.support.playstyle"),
             IconPath = "gateway-medical.png",
             Sprite = null,
             BorderColor = new Color32(100, 180, 100, 255),
@@ -157,6 +169,7 @@ namespace XenopurgeRougeLike
             ShortName = L("company.warrior.short_name"),
             Slogan = L("company.warrior.slogan"),
             Description = L("company.warrior.description"),
+            PlayStyle = L("company.warrior.playstyle"),
             IconPath = "hadley-security.png",
             Sprite = null,
             BorderColor = new Color32(180, 60, 60, 255),
@@ -171,6 +184,7 @@ namespace XenopurgeRougeLike
             ShortName = L("company.gunslinger.short_name"),
             Slogan = L("company.gunslinger.slogan"),
             Description = L("company.gunslinger.description"),
+            PlayStyle = L("company.gunslinger.playstyle"),
             IconPath = "sulaco-arms.png",
             Sprite = null,
             BorderColor = new Color32(200, 120, 40, 255),
@@ -185,6 +199,7 @@ namespace XenopurgeRougeLike
             ShortName = L("company.scavenger.short_name"),
             Slogan = L("company.scavenger.slogan"),
             Description = L("company.scavenger.description"),
+            PlayStyle = L("company.scavenger.playstyle"),
             IconPath = "torrens-salvage.png",
             Sprite = null,
             BorderColor = new Color32(140, 120, 80, 255),
@@ -199,6 +214,7 @@ namespace XenopurgeRougeLike
             ShortName = L("company.clone.short_name"),
             Slogan = L("company.clone.slogan"),
             Description = L("company.clone.description"),
+            PlayStyle = L("company.clone.playstyle"),
             IconPath = "acheron-biogen.png",
             Sprite = null,
             BorderColor = new Color32(100, 100, 140, 255),
@@ -213,6 +229,7 @@ namespace XenopurgeRougeLike
             ShortName = L("company.common.short_name"),
             Slogan = L("company.common.slogan"),
             Description = L("company.common.description"),
+            PlayStyle = L("company.common.playstyle"),
             IconPath = "mace.png",
             Sprite = null,
             BorderColor = new Color32(100, 100, 100, 255),

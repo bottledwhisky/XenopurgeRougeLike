@@ -26,34 +26,64 @@ namespace XenopurgeRougeLike
                 MelonLogger.Msg($"InspectReinforcementDirectory.Initialize");
                 _directoryTextData.Reset();
                 _directoryId = Guid.NewGuid();
-                List<CompanyAffinity> enabledAffinities = [];
-                foreach (var company in Company.companies)
+
+                // Group reinforcements by company
+                var reinforcementsByCompany = AwardSystem.acquiredReinforcements
+                    .GroupBy(r => r.company.Type)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                // Sort companies by number of reinforcements (descending)
+                var sortedCompanies = Company.companies.Values
+                    .OrderByDescending(c => reinforcementsByCompany.ContainsKey(c.Type) ? reinforcementsByCompany[c.Type].Count : 0)
+                    .ToList();
+
+                List<ButtonData> allButtons = [];
+
+                foreach (var company in sortedCompanies)
                 {
-                    if (company.Value.Affinities == null)
+                    // Add affinities in order: level 2, 4, 6
+                    if (company.Affinities != null)
                     {
-                        MelonLogger.Msg($"InspectReinforcementDirectory.Initialize: {company.Value.Name} has null affinities");
-                        continue;
+                        var activeAffinities = company.Affinities
+                            .Where(aff => aff.IsActive)
+                            .OrderBy(aff => aff.unlockLevel)
+                            .ToList();
+
+                        foreach (var aff in activeAffinities)
+                        {
+                            allButtons.Add(new ButtonData()
+                            {
+                                MainText = aff.ToMenuItem(),
+                                Tooltip = aff.ToString(),
+                                onSelectCallback = new Action(() =>
+                                {
+                                    ShowDetails(aff);
+                                })
+                            });
+                        }
                     }
-                    enabledAffinities.AddRange(company.Value.Affinities.Where(aff => aff.IsActive));
+
+                    // Add reinforcements for this company
+                    if (reinforcementsByCompany.ContainsKey(company.Type))
+                    {
+                        foreach (var reinforcement in reinforcementsByCompany[company.Type])
+                        {
+                            allButtons.Add(new ButtonData()
+                            {
+                                MainText = reinforcement.ToMenuItem(),
+                                Tooltip = reinforcement.ToString(),
+                                onSelectCallback = new Action(() =>
+                                {
+                                    ShowDetails(reinforcement);
+                                })
+                            });
+                        }
+                    }
                 }
+
                 DirectoryData directoryData = new(_directoryId)
                 {
-                    ButtonData = [..enabledAffinities.Select(aff => new ButtonData(){
-                    MainText = aff.ToMenuItem(),
-                    Tooltip = aff.ToString(),
-                    onSelectCallback = new Action(() =>
-                    {
-                        ShowDetails(aff);
-                    })
-                }), ..AwardSystem.acquiredReinforcements.Select(x => new ButtonData()
-                {
-                    MainText = x.ToMenuItem(),
-                    Tooltip = x.ToString(),
-                    onSelectCallback = new Action(() =>
-                    {
-                        ShowDetails(x);
-                    })
-                })]
+                    ButtonData = allButtons
                 };
                 return directoryData;
             }

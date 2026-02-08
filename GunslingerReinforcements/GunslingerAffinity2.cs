@@ -49,7 +49,8 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
         /// <summary>
         /// Get the highest active crit chance from all Gunslinger affinities
         /// </summary>
-        public static float GetCritChance()
+        /// <param name="shootingUnit">The unit performing the attack (optional, needed for accuracy-to-crit conversion)</param>
+        public static float GetCritChance(BattleUnit shootingUnit = null)
         {
             float critChance = 0f;
 
@@ -66,6 +67,17 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
             // Add TargetingWeakspots bonus
             if (TargetingWeakspots.Instance.IsActive)
                 critChance += TargetingWeakspots.CritChanceBonus;
+
+            // Gunslinger Affinity 6: Convert accuracy above 120 to crit chance
+            if (GunslingerAffinity6.Instance.IsActive && shootingUnit != null && shootingUnit.Team == Enumerations.Team.Player)
+            {
+                float accuracy = shootingUnit.Accuracy * 100f; // Convert to x100 scale
+                if (accuracy > 120f)
+                {
+                    float excessAccuracy = accuracy - 120f;
+                    critChance += excessAccuracy / 100f; // Convert back to 0-1 scale for crit chance
+                }
+            }
 
             return critChance;
         }
@@ -93,9 +105,10 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
         /// <summary>
         /// Roll for critical hit
         /// </summary>
-        public static bool RollCrit()
+        /// <param name="shootingUnit">The unit performing the attack (optional, needed for accuracy-to-crit conversion)</param>
+        public static bool RollCrit(BattleUnit shootingUnit = null)
         {
-            float critChance = GetCritChance();
+            float critChance = GetCritChance(shootingUnit);
             if (critChance <= 0f)
                 return false;
 
@@ -116,17 +129,32 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
         [ThreadStatic]
         private static bool _shouldCrit = false;
 
-        public static void MarkRangedAttackStart()
+        // Track the shooting unit for accuracy-to-crit conversion
+        [ThreadStatic]
+        private static BattleUnit _shootingUnit = null;
+
+        public static void MarkRangedAttackStart(BattleUnit shootingUnit)
         {
             _isRangedAttack = true;
-            // Roll for crit at the start of each bullet
-            _shouldCrit = GunslingerAffinityHelpers.RollCrit();
+            _shootingUnit = shootingUnit;
+
+            // Check if Death's Eye is active - if so, guarantee crit
+            if (DeathsEye.Instance.IsActive && DeathsEye.IsBuffActive)
+            {
+                _shouldCrit = true;
+            }
+            else
+            {
+                // Roll for crit at the start of each bullet, passing the shooting unit for accuracy-to-crit conversion
+                _shouldCrit = GunslingerAffinityHelpers.RollCrit(shootingUnit);
+            }
         }
 
         public static void MarkRangedAttackEnd()
         {
             _isRangedAttack = false;
             _shouldCrit = false;
+            _shootingUnit = null;
         }
 
         public static bool IsRangedAttack()
@@ -146,7 +174,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
     [HarmonyPatch(typeof(RangedWeapon), "ShootOneBullet")]
     public static class GunslingerAffinity2_MarkRangedAttack_Prefix
     {
-        public static void Prefix()
+        public static void Prefix(RangedWeapon __instance)
         {
             // Check if any Gunslinger affinity is active
             if (!GunslingerAffinity2.Instance.IsActive &&
@@ -154,7 +182,12 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
                 !GunslingerAffinity6.Instance?.IsActive == true)
                 return;
 
-            GunslingerCritSystem.MarkRangedAttackStart();
+            // Get the shooting unit from the RangedWeapon instance
+            BattleUnit shootingUnit = __instance.GetType().GetField("_battleUnit",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                ?.GetValue(__instance) as BattleUnit;
+
+            GunslingerCritSystem.MarkRangedAttackStart(shootingUnit);
         }
     }
 

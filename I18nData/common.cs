@@ -9,6 +9,22 @@ namespace XenopurgeRougeLike
         {
             return new Dictionary<string, Dictionary<string, string>>
             {
+                ["common.affinity1.description"] = new Dictionary<string, string>
+                {
+                    ["en"] = "M.A.C.E. permanently provides standardized military training to improve unit survivability",
+                    ["el"] = "Το M.A.C.E. παρέχει μόνιμα τυποποιημένη στρατιωτική εκπαίδευση για τη βελτίωση της επιβίωσης των μονάδων",
+                    ["fr"] = "M.A.C.E. fournit en permanence une formation militaire standardisée pour améliorer la survie des unités",
+                    ["zh"] = "M.A.C.E.永久提供一些标准化的军事训练内容以提高单位的生存能力",
+                    ["zh-TW"] = "M.A.C.E.永久提供一些標準化的軍事訓練內容以提高單位的生存能力",
+                    ["de"] = "M.A.C.E. bietet dauerhaft standardisierte militärische Ausbildung zur Verbesserung der Überlebensfähigkeit der Einheiten",
+                    ["pl"] = "M.A.C.E. zapewnia na stałe standaryzowane szkolenie wojskowe, aby poprawić przetrwalność jednostek",
+                    ["pt"] = "M.A.C.E. fornece permanentemente treinamento militar padronizado para melhorar a sobrevivência das unidades",
+                    ["ru"] = "M.A.C.E. постоянно обеспечивает стандартизированную военную подготовку для повышения выживаемости подразделений",
+                    ["es"] = "M.A.C.E. proporciona permanentemente entrenamiento militar estandarizado para mejorar la supervivencia de las unidades",
+                    ["uk"] = "M.A.C.E. постійно забезпечує стандартизовану військову підготовку для підвищення виживання підрозділів",
+                    ["ja"] = "M.A.C.E.はユニットの生存能力を向上させるため、標準化された軍事訓練を恒久的に提供します",
+                    ["ko"] = "M.A.C.E.는 부대 생존율을 향상시키기 위해 표준화된 군사 훈련을 영구적으로 제공합니다",
+                },
                 // Marksman Training (射击训练)
                 ["common.marksman_training.name"] = new Dictionary<string, string>
                 {

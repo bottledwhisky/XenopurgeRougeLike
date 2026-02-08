@@ -9,8 +9,8 @@ using static XenopurgeRougeLike.ModLocalization;
 namespace XenopurgeRougeLike.GunslingerReinforcements
 {
     /// <summary>
-    /// 死神之眼：获得"死神之眼"指令，限一次，所有友方单位后在15秒内所有远程攻击必定命中
-    /// Death's Eye: Gain "Death's Eye" command, usable once, all friendly units' ranged attacks guaranteed to hit for 15 seconds
+    /// 死神之眼：获得"死神之眼"指令，限一次，所有友方单位后在15秒内所有远程攻击必定暴击
+    /// Death's Eye: Gain "Death's Eye" command, usable once, all friendly units' ranged attacks guaranteed to crit for 15 seconds
     /// </summary>
     public class DeathsEye : Reinforcement
     {
@@ -36,7 +36,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
         {
             IsBuffActive = true;
             RemainingTime = Duration;
-            MelonLogger.Msg($"DeathsEye: Activated! All ranged attacks will hit for {Duration} seconds.");
+            MelonLogger.Msg($"DeathsEye: Activated! All ranged attacks will crit for {Duration} seconds.");
         }
 
         public static void UpdateBuff(float deltaTime)
@@ -103,7 +103,7 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
     }
 
     /// <summary>
-    /// Death's Eye action card - makes all friendly ranged attacks guaranteed hits for 15 seconds
+    /// Death's Eye action card - makes all friendly ranged attacks guaranteed crits for 15 seconds
     /// Implements INoTargetable as it affects all units without targeting
     /// </summary>
     public class DeathsEyeActionCard : ActionCard, INoTargetable
@@ -199,27 +199,8 @@ namespace XenopurgeRougeLike.GunslingerReinforcements
         }
     }
 
-    /// <summary>
-    /// Patch BattleUnitStatsExpressions.IsRangedHitAccurate to guarantee hits when Death's Eye is active
-    /// </summary>
-    [HarmonyPatch(typeof(BattleUnitStatsExpressions), "IsRangedHitAccurate")]
-    public static class DeathsEye_IsRangedHitAccurate_Patch
-    {
-        public static bool Prefix(ref bool __result)
-        {
-            if (!DeathsEye.Instance.IsActive)
-                return true;
-
-            if (DeathsEye.IsBuffActive)
-            {
-                // Guarantee hit
-                __result = true;
-                return false; // Skip original method
-            }
-
-            return true; // Run original method
-        }
-    }
+    // Note: The crit guarantee is implemented in GunslingerAffinity2.cs GunslingerCritSystem.MarkRangedAttackStart()
+    // which checks for DeathsEye.IsBuffActive and forces _shouldCrit = true
 
     /// <summary>
     /// Patch TestGame.Update to update Death's Eye timer

@@ -293,7 +293,7 @@ namespace XenopurgeRougeLike
                 string progressLabel = "";
                 if (affinityToEnable != null)
                 {
-                    string nextUnlockAffinityText = affinityToEnable.ToString();
+                    string nextUnlockAffinityText = choice.company.ToShortString() + "\n" + affinityToEnable.ToString();
                     progressLabel = affinityToEnable.unlockLevel < nExistingCompanyReinforces
                         ? L("ui.max_level_reached")
                         : L("ui.next_unlock") + $": ({nExistingCompanyReinforces}/{affinityToEnable.unlockLevel}) " + nextUnlockAffinityText;
@@ -383,7 +383,8 @@ namespace XenopurgeRougeLike
         [HarmonyPostfix]
         public static void Postfix(EndGameWindowView __instance, EndGameResultData endGameResultData)
         {
-            isGameContinue = endGameResultData.IsVictory;
+            // Only show reinforcement selection if victory AND run is not over (not final boss victory)
+            isGameContinue = endGameResultData.IsVictory && !endGameResultData.IsGameOver;
             instance = __instance;
 
             // Add loot and spending statistics as RewardDisplay elements

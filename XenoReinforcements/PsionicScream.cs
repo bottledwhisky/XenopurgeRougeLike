@@ -135,6 +135,14 @@ namespace XenopurgeRougeLike.XenoReinforcements
 
         public string CustomCardDescription =>
             L("xeno.psionic_scream.card_description", PsionicScream.StunDuration);
+
+        public PsionicScreamActionCardInfo()
+        {
+            // Set uses based on current stacks
+            int uses = PsionicScream.UsesPerStack[PsionicScream.Instance.currentStacks - 1];
+            AccessTools.Field(typeof(ActionCardInfo), "_uses").SetValue(this, uses);
+            AccessTools.Field(typeof(ActionCardInfo), "canNotBeReplenished").SetValue(this, false);
+        }
     }
 
     /// <summary>

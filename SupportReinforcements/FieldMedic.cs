@@ -177,6 +177,54 @@ namespace XenopurgeRougeLike.SupportReinforcements
 
             return reasons;
         }
+
+        public IEnumerable<CommandsAvailabilityChecker.CardUnavailableReason> IsCardValid()
+        {
+            var reasons = new List<CommandsAvailabilityChecker.CardUnavailableReason>();
+
+            if (!FieldMedic.Instance.IsActive)
+            {
+                reasons.Add(CommandsAvailabilityChecker.CardUnavailableReason.ObjectiveNotFoundYet);
+                return reasons;
+            }
+
+            // Check if there are any valid units that can be healed
+            var gameManager = GameManager.Instance;
+            if (gameManager != null)
+            {
+                var pm = gameManager.GetTeamManager(Team.Player);
+                var playerUnits = pm.BattleUnits;
+
+                // Check if any unit is valid for healing
+                bool hasValidTarget = false;
+                foreach (var unit in playerUnits)
+                {
+                    if (unit.IsAlive &&
+                        unit.CurrentHealth < (float)_currentMaxHealthField.GetValue(unit) * FieldMedic.HealthThresholdPercent &&
+                        !unit.CommandsManager.IsEngagedInCloseCombat)
+                    {
+                        // Check if not already being healed
+                        if (unit.CommandsManager.CurrentCommand is DelayActionCardCommand delayCmd)
+                        {
+                            var cmdData = delayCmd.CommandData as DelayCardCommandDataSO;
+                            if (cmdData is FieldMedicDelayCommandDataSO)
+                            {
+                                continue; // Skip this unit, already being healed
+                            }
+                        }
+                        hasValidTarget = true;
+                        break;
+                    }
+                }
+
+                if (!hasValidTarget)
+                {
+                    reasons.Add(CommandsAvailabilityChecker.CardUnavailableReason.ObjectiveNotFoundYet);
+                }
+            }
+
+            return reasons;
+        }
     }
 
     /// <summary>

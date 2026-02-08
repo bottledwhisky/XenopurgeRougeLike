@@ -48,7 +48,7 @@ namespace XenopurgeRougeLike
 
         public static bool IsAvailable()
         {
-            return false;
+            return true;
         }
     }
 }

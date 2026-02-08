@@ -95,7 +95,7 @@
 
     专家：
         穿透弹：暴击时子弹穿透目标，对目标当前格及其后方的所有敌人造成等同于非暴击伤害的额外伤害
-        死神之眼：获得“死神之眼”指令，限一次，所有友方单位后在15秒内所有远程攻击必定命中
+        死神之眼：获得“死神之眼”指令，限一次，所有友方单位后在15秒内所有远程攻击必定暴击
         快速拔枪：所有远程武器会快速射出弹匣内的所有子弹
             * 实现细节：FiringMode有两种，一种是BurstShotsFiringModeDataSO，一种是DistributedShotsFiringModeDataSO。BurstShots例如TimeOfBurstsPercent: [0.3, 0.8]那么就会在整个射击时间段的第30%和80%时发射对应的子弹。DistributedShots则是等分射击时间段，例如 ShotsCount: 3 StartShootingPercent: 0.1 EndShootingPercent: 0.9 那么就会在射击时间段的10%到90%之间按照时间等分发射3发子弹。
             * 快速拔枪就是把BurstShots的TimeOfBurstsPercent全部压缩到0.2，比如TimeOfBurstsPercent: [0.3, 0.8] 就变成 [0.06, 0.16]。DistributedShots同理，StartShootingPercent改成0.0，EndShootingPercent改成0.2。
