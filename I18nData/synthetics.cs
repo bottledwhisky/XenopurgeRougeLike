@@ -558,19 +558,19 @@ namespace XenopurgeRougeLike
                 // SyntheticsAffinity2
                 ["synthetics.affinity2.description"] = new Dictionary<string, string>
                 {
-                    ["en"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} melee damage",
-                    ["el"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} ζημιά σώμα με σώμα",
-                    ["fr"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} dégâts de mêlée",
-                    ["zh"] = "+{0} <sprite name=\"Speedicon\">，+{1} <sprite name=\"AccuracyIcon\">，+{2} 近战伤害",
-                    ["zh-TW"] = "+{0} <sprite name=\"Speedicon\">，+{1} <sprite name=\"AccuracyIcon\">，+{2} 近戰傷害",
-                    ["de"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} Nahkampfschaden",
-                    ["pl"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} obrażeń w walce wręcz",
-                    ["pt"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} dano corpo a corpo",
-                    ["ru"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} урон в ближнем бою",
-                    ["es"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} daño cuerpo a cuerpo",
-                    ["uk"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} урон в ближньому бою",
-                    ["ja"] = "+{0} <sprite name=\"Speedicon\">、+{1} <sprite name=\"AccuracyIcon\">、+{2}近接ダメージ",
-                    ["ko"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} 근접 피해",
+                    ["en"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} melee damage. Unlock expert reinforcements.",
+                    ["el"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} ζημιά σώμα με σώμα. Ξεκλείδωμα ενισχύσεων εμπειρογνωμόνων.",
+                    ["fr"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} dégâts de mêlée. Déverrouille les renforts experts.",
+                    ["zh"] = "+{0} <sprite name=\"Speedicon\">，+{1} <sprite name=\"AccuracyIcon\">，+{2} 近战伤害。解锁专家增援。",
+                    ["zh-TW"] = "+{0} <sprite name=\"Speedicon\">，+{1} <sprite name=\"AccuracyIcon\">，+{2} 近戰傷害。解鎖專家增援。",
+                    ["de"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} Nahkampfschaden. Schalte Experten-Verstärkungen frei.",
+                    ["pl"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} obrażeń w walce wręcz. Odblokuj wzmocnienia eksperckie.",
+                    ["pt"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} dano corpo a corpo. Desbloqueia reforços especialistas.",
+                    ["ru"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} урон в ближнем бою. Разблокировка экспертных подкреплений.",
+                    ["es"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} daño cuerpo a cuerpo. Desbloquea refuerzos expertos.",
+                    ["uk"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} урон в ближньому бою. Розблокування експертних підкріплень.",
+                    ["ja"] = "+{0} <sprite name=\"Speedicon\">、+{1} <sprite name=\"AccuracyIcon\">、+{2}近接ダメージ。エキスパート増援を解除。",
+                    ["ko"] = "+{0} <sprite name=\"Speedicon\">, +{1} <sprite name=\"AccuracyIcon\">, +{2} 근접 피해. 전문가 지원 잠금 해제.",
                 },
 
                 // SyntheticsAffinity4

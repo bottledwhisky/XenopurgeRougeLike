@@ -41,6 +41,11 @@ namespace XenopurgeRougeLike
 
                 foreach (var company in sortedCompanies)
                 {
+                    // Get the count of reinforcements for this company
+                    int reinforcementCount = reinforcementsByCompany.ContainsKey(company.Type)
+                        ? reinforcementsByCompany[company.Type].Count
+                        : 0;
+
                     // Add affinities in order: level 2, 4, 6
                     if (company.Affinities != null)
                     {
@@ -53,13 +58,35 @@ namespace XenopurgeRougeLike
                         {
                             allButtons.Add(new ButtonData()
                             {
-                                MainText = aff.ToMenuItem(),
+                                MainText = $"{company.ShortName}({reinforcementCount}/{aff.unlockLevel})",
                                 Tooltip = aff.ToString(),
                                 onSelectCallback = new Action(() =>
                                 {
                                     ShowDetails(aff);
                                 })
                             });
+                        }
+
+                        // If no affinities are active but the company has reinforcements,
+                        // show the next to-be-unlocked affinity
+                        if (activeAffinities.Count == 0 && reinforcementCount > 0 && company.Affinities.Count > 0)
+                        {
+                            var nextAffinity = company.Affinities
+                                .OrderBy(aff => aff.unlockLevel)
+                                .FirstOrDefault();
+
+                            if (nextAffinity != null)
+                            {
+                                allButtons.Add(new ButtonData()
+                                {
+                                    MainText = $"{company.ShortName}({reinforcementCount}/{nextAffinity.unlockLevel})",
+                                    Tooltip = nextAffinity.ToString(),
+                                    onSelectCallback = new Action(() =>
+                                    {
+                                        ShowDetails(nextAffinity);
+                                    })
+                                });
+                            }
                         }
                     }
 

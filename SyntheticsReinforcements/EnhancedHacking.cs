@@ -2,13 +2,11 @@
 using SpaceCommander;
 using SpaceCommander.ActionCards;
 using SpaceCommander.Area;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using static XenopurgeRougeLike.ModLocalization;
+using XenopurgeRougeLike.XenoReinforcements;
 
 namespace XenopurgeRougeLike.SyntheticsReinforcements
 {
@@ -199,12 +197,10 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
 
     /// <summary>
     /// Lv2: Stun system for DelayEnemyWave_Card
-    /// Maintains a cache of stunned enemies
+    /// Now uses CentralizedStunController
     /// </summary>
     public static class EnhancedHacking_StunSystem
     {
-        private static Dictionary<BattleUnit, float> _stunnedEnemies = [];
-
         public static void StunAllEnemies()
         {
             var gameManager = GameManager.Instance;
@@ -216,7 +212,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
                 {
                     if (enemy.IsAlive)
                     {
-                        _stunnedEnemies[enemy] = EnhancedHacking.StunDuration;
+                        CentralizedStunController.StunUnit(enemy, EnhancedHacking.StunDuration, "EnhancedHacking");
                     }
                 }
             }
@@ -224,35 +220,12 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
 
         public static float GetRemainingStunTime(BattleUnit unit)
         {
-            if (_stunnedEnemies.TryGetValue(unit, out float remainingTime))
-            {
-                return remainingTime;
-            }
-            return 0f;
-        }
-
-        public static float UpdateStunTimers(BattleUnit unit, float deltaTime)
-        {
-            if (_stunnedEnemies.TryGetValue(unit, out var remainingTime))
-            {
-                remainingTime -= deltaTime;
-                if (remainingTime <= 0f)
-                {
-                    _stunnedEnemies.Remove(unit);
-                    return -remainingTime;
-                }
-                else
-                {
-                    _stunnedEnemies[unit] = remainingTime;
-                    return 0;
-                }
-            }
-            return 0f;
+            return CentralizedStunController.GetRemainingStunDuration(unit);
         }
 
         public static bool IsStunned(BattleUnit unit)
         {
-            return _stunnedEnemies.ContainsKey(unit) && unit.Team == Enumerations.Team.EnemyAI;
+            return CentralizedStunController.IsStunned(unit);
         }
     }
 
@@ -271,78 +244,7 @@ namespace XenopurgeRougeLike.SyntheticsReinforcements
         }
     }
 
-    /// <summary>
-    /// Lv2: Patch ICommand and ITimeUpdatedListener implementations to handle stunning
-    /// We need to patch the UpdateTime method to prevent execution when stunned
-    /// </summary>
-    [HarmonyPatch]
-    public static class EnhancedHacking_StunUpdateTime_Patch
-    {
-        // Dynamically find all types that implement both ICommand and ITimeUpdatedListener
-        public static IEnumerable<MethodBase> TargetMethods()
-        {
-            var commandInterfaceType = typeof(SpaceCommander.Commands.ICommand);
-            var timeListenerType = typeof(TimeSystem.ITimeUpdatedListener);
-
-            var implementers = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a =>
-                {
-                    try { return a.GetTypes(); }
-                    catch { return Type.EmptyTypes; }
-                })
-                .Where(t => t.IsClass && !t.IsAbstract &&
-                           commandInterfaceType.IsAssignableFrom(t) &&
-                           timeListenerType.IsAssignableFrom(t));
-
-            foreach (var implementer in implementers)
-            {
-                // Try to get the UpdateTime method
-                var method = implementer.GetMethod("UpdateTime",
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                    null,
-                    [typeof(float)],
-                    null);
-
-                if (method != null && method.DeclaringType == implementer)
-                {
-                    yield return method;
-                }
-            }
-        }
-
-        private static readonly ConditionalWeakTable<Type, FieldInfo> _fieldCache = [];
-
-        [HarmonyPrefix]
-        public static bool Prefix(object __instance, ref float __0)
-        {
-            if (EnhancedHacking.Instance.currentStacks < 2)
-                return true;
-
-            // Try to get the BattleUnit from the command
-            // Most commands have a _battleUnit field
-
-            var type = __instance.GetType();
-
-            if (!_fieldCache.TryGetValue(type, out var fieldInfo))
-            {
-                fieldInfo = type.GetField("_battleUnit", BindingFlags.Instance | BindingFlags.NonPublic);
-                _fieldCache.Add(type, fieldInfo);
-            }
-
-
-            if (fieldInfo != null)
-            {
-                var battleUnit = fieldInfo.GetValue(__instance) as BattleUnit;
-                if (battleUnit != null && EnhancedHacking_StunSystem.IsStunned(battleUnit))
-                {
-                    // Update the stun timer but don't execute the command
-                    var remainingTime = EnhancedHacking_StunSystem.UpdateStunTimers(battleUnit, __0);
-                    __0 = remainingTime;
-                    return true; // Skip the original method
-                }
-            }
-            return true; // Execute the original method
-        }
-    }
+    // Note: Stun timing is now handled by CentralizedStunController
+    // No need for individual UpdateTime patches per reinforcement
 }
 

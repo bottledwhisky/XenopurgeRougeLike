@@ -1,12 +1,8 @@
-using SpaceCommander;
-using System;
-using System.Collections.Generic;
 using static XenopurgeRougeLike.ModLocalization;
 
-namespace XenopurgeRougeLike.GunslingerReinforcements
+namespace XenopurgeRougeLike.CommonReinforcements
 {
-    // 枪手路径天赋6：+40瞄准，解锁暴击机制（30%基础概率，200%基础额外伤害）
-    // Gunslinger Affinity 6: +40 accuracy, unlock crit mechanic (30% base chance, 200% base extra damage)
+    // 通用路径分隔符，没有实际效果，只是为了显示
     public class CommonAffinity1 : CompanyAffinity
     {
         public CommonAffinity1()

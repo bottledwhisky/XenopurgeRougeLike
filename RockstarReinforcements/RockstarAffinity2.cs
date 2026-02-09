@@ -5,6 +5,7 @@ using SpaceCommander.Area;
 using SpaceCommander.Area.Drawers;
 using SpaceCommander.BattleManagement.UI;
 using SpaceCommander.Commands;
+using SpaceCommander.EndGame;
 using SpaceCommander.GameFlow;
 using SpaceCommander.Objectives;
 using System;
@@ -16,7 +17,7 @@ using static XenopurgeRougeLike.ModLocalization;
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
     // 战斗开始时自动部署一个"热情的粉丝"，他会自己找乐子。解锁粉丝数，每场战斗后，获得1k-2k粉丝。
-    public class RockstarAffinityBase: CompanyAffinity
+    public class RockstarAffinityBase : CompanyAffinity
     {
         public RockstarAffinityBase()
         {
@@ -70,23 +71,24 @@ namespace XenopurgeRougeLike.RockstarReinforcements
     [HarmonyPatch(typeof(BattleUnitGO), "BindCharacter")]
     public class BattleUnitGO_BindCharacterPatch
     {
-        public static bool Prefix(BattleUnit battleUnit)
+        public static bool Prefix(BattleUnit battleUnit, ref UnitTag __state)
         {
             if (!UnitsPlacementPhasePatch.IsFan(battleUnit))
             {
                 return true;
             }
+            __state = battleUnit.UnitTag;
             AccessTools.Field(typeof(BattleUnit), "_unitTag").SetValue(battleUnit, UnitTag.None);
             return true;
         }
 
-        public static void Postfix(BattleUnit battleUnit)
+        public static void Postfix(BattleUnit battleUnit, UnitTag __state)
         {
             if (!UnitsPlacementPhasePatch.IsFan(battleUnit))
             {
                 return;
             }
-            AccessTools.Field(typeof(BattleUnit), "_unitTag").SetValue(battleUnit, UnitTag.NPC);
+            AccessTools.Field(typeof(BattleUnit), "_unitTag").SetValue(battleUnit, __state);
         }
     }
 
@@ -133,11 +135,15 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         public static List<BattleUnit> fans = [];
 
+        // Track all fans ever created in this battle (including dead ones)
+        public static HashSet<BattleUnit> allFansEverCreated = [];
+
         public static bool IsFan(BattleUnit unit) => fans.Contains(unit);
 
         public static void ResetStates()
         {
             fans.Clear();
+            allFansEverCreated.Clear();
         }
 
         [HarmonyPatch("AddNPCsPhase")]
@@ -174,6 +180,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                 fan.AddCommands();
 
                 fans.Add(fan);
+                allFansEverCreated.Add(fan);
                 teamManager.AddBattleUnit(fan);
 
                 OnFanCreated?.Invoke(fan);
@@ -294,7 +301,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             var _teams = AccessTools.Field(typeof(GameManager), "_teams").GetValue(__instance) as Dictionary<Team, BattleUnitsManager>;
             var bum = _teams[Team.Player];
             var deadUnits = bum.DeadUnits as List<BattleUnit>;
-            foreach (var fan in UnitsPlacementPhasePatch.fans)
+            // Remove all fans ever created (both alive and dead) from dead units list
+            foreach (var fan in UnitsPlacementPhasePatch.allFansEverCreated)
             {
                 deadUnits.Remove(fan);
             }
@@ -364,6 +372,47 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public static bool DrawLine(int lineIndex, List<Tile> lineTiles, BattleUnit battleUnit)
         {
             return !UnitsPlacementPhasePatch.IsFan(battleUnit);
+        }
+    }
+
+    // Patch EndGameController to exclude fans from alive unit count
+    // Game should end when all non-fan units are dead
+    [HarmonyPatch(typeof(EndGameController), "CheckAllPlayerUnitsDied")]
+    public class EndGameController_CheckAllPlayerUnitsDiedPatch
+    {
+        public static bool Prefix(ref int alive, int extracted, bool areMainObjectivesCompleted)
+        {
+            if (!RockstarAffinity2.IsAnyRockstarAffinityActive)
+            {
+                return true;
+            }
+
+            // Count how many alive units are fans
+            var gameManager = GameManager.Instance;
+            if (gameManager == null)
+            {
+                return true;
+            }
+
+            var playerTeamManager = gameManager.GetTeamManager(Team.Player);
+            if (playerTeamManager == null)
+            {
+                return true;
+            }
+
+            int aliveFansCount = 0;
+            foreach (var unit in playerTeamManager.BattleUnits)
+            {
+                if (unit.IsAlive && UnitsPlacementPhasePatch.IsFan(unit))
+                {
+                    aliveFansCount++;
+                }
+            }
+
+            // Subtract fans from alive count so the game ends when only fans remain
+            alive -= aliveFansCount;
+
+            return true;
         }
     }
 }

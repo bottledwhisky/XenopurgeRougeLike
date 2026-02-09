@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static SpaceCommander.Enumerations;
+using static XenopurgeRougeLike.ModLocalization;
 
 namespace XenopurgeRougeLike.RockstarReinforcements
 {
@@ -52,7 +53,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
     internal static class RockstarAffinityHelpers
     {
-        public const string FAN_NAME = "Fan";
+        public static LocalizedString FAN_NAME => L("rockstar.fan_name");
         public static int fanCount = 0;
         public static int fanGainLow = 500;
         public static int fanGainHigh = 1500;

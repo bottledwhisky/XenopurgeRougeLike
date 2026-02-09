@@ -4,7 +4,9 @@ using SpaceCommander;
 using SpaceCommander.Area;
 using SpaceCommander.Tests;
 using System;
+using System.Collections;
 using System.Linq;
+using UnityEngine;
 using static SpaceCommander.Enumerations;
 using static XenopurgeRougeLike.ModLocalization;
 
@@ -20,11 +22,15 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             rarity = Rarity.Elite;
             company = Company.Rockstar;
             name = L("rockstar.fandom_rallies.name");
-            description = L("rockstar.fandom_rallies.description");
+            description = L("rockstar.fandom_rallies.description", (int)InitialDelay, (int)DelayIncrement);
         }
 
         private static FandomRallies _instance;
         public static FandomRallies Instance => _instance ??= new();
+
+        private static float s_currentDelay = 5f;
+        private const float DelayIncrement = 5f;
+        private const float InitialDelay = 5f;
 
         override public void OnActivate()
         {
@@ -34,11 +40,30 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         override public void OnDeactivate()
         {
             UnitsPlacementPhasePatch.OnFanCreated -= HandleFanCreated;
+            s_currentDelay = InitialDelay; // Reset delay when deactivated
         }
 
         public static void HandleFanCreated(BattleUnit fanUnit)
         {
-            fanUnit.OnDeath += () => SpawnNewFan(fanUnit);
+            fanUnit.OnDeath += () => ScheduleSpawnNewFan(fanUnit);
+        }
+
+        public static void ScheduleSpawnNewFan(BattleUnit deadFan)
+        {
+            // Start coroutine to delay the spawn
+            MelonCoroutines.Start(DelayedSpawnCoroutine(deadFan, s_currentDelay));
+
+            // Increase delay for next time
+            s_currentDelay += DelayIncrement;
+        }
+
+        private static IEnumerator DelayedSpawnCoroutine(BattleUnit deadFan, float delay)
+        {
+            MelonLogger.Msg($"FandomRallies: A Passionate Fan has died! Spawning a new one in {delay} seconds...");
+
+            yield return new WaitForSeconds(delay);
+
+            SpawnNewFan(deadFan);
         }
 
         public static BattleUnit LastSpawnedFan;
@@ -118,6 +143,8 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
                 // Add to the fans list so other systems recognize it as a fan
                 UnitsPlacementPhasePatch.fans.Add(fan);
+                // Track this fan for end game rewards
+                UnitsPlacementPhasePatch.allFansEverCreated.Add(fan);
 
                 // Add to team manager (this also enables inter-communications and registers death handler)
                 teamManager.AddBattleUnit(fan);
@@ -138,6 +165,20 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             {
                 MelonLogger.Error(ex);
                 MelonLogger.Error(ex.StackTrace);
+            }
+        }
+    }
+
+    // Reset delay at mission start
+    [HarmonyPatch(typeof(TestGame), "StartGame")]
+    public static class FandomRallies_ResetDelay_Patch
+    {
+        public static void Postfix()
+        {
+            if (FandomRallies.Instance.IsActive)
+            {
+                typeof(FandomRallies).GetField("s_currentDelay", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                    .SetValue(null, 5f);
             }
         }
     }

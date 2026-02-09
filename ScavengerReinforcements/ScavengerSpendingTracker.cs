@@ -1,6 +1,5 @@
 using HarmonyLib;
 using MelonLoader;
-using SpaceCommander;
 
 namespace XenopurgeRougeLike.ScavengerReinforcements
 {

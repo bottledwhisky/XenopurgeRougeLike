@@ -1,5 +1,4 @@
 using HarmonyLib;
-using SpaceCommander.Commands;
 using SpaceCommander.GameFlow;
 
 namespace XenopurgeRougeLike.ScavengerReinforcements

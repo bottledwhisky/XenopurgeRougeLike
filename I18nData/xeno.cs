@@ -526,19 +526,19 @@ namespace XenopurgeRougeLike
                 // Xeno Affinity 2
                 ["xeno.affinity2.description"] = new Dictionary<string, string>
                 {
-                    ["en"] = "+30% damage to xenos, control effects last longer.",
-                    ["el"] = "+30% ζημιά σε ξένους, οι επιδράσεις ελέγχου διαρκούν περισσότερο.",
-                    ["fr"] = "+30% de dégâts aux xénos, les effets de contrôle durent plus longtemps.",
-                    ["zh"] = "对异形伤害+30%，控制类效果持续时间增加。",
-                    ["zh-TW"] = "對異形傷害+30%，控制類效果持續時間增加。",
-                    ["de"] = "+30% Schaden gegen Xenos, Kontrolleffekte dauern länger.",
-                    ["pl"] = "+30% obrażeń ksenomorfom, efekty kontroli trwają dłużej.",
-                    ["pt"] = "+30% de dano a xenos, efeitos de controle duram mais tempo.",
-                    ["ru"] = "+30% урона по ксено, эффекты контроля длятся дольше.",
-                    ["es"] = "+30% de daño a xenos, los efectos de control duran más tiempo.",
-                    ["uk"] = "+30% пошкоджень по ксено, ефекти контролю тривають довше.",
-                    ["ja"] = "ゼノへのダメージ+30%、制御効果の持続時間が長くなります。",
-                    ["ko"] = "제노에게 +30% 피해, 제어 효과가 더 오래 지속됩니다.",
+                    ["en"] = "+30% damage to xenos, control effects last longer. Unlock expert reinforcements.",
+                    ["el"] = "+30% ζημιά σε ξένους, οι επιδράσεις ελέγχου διαρκούν περισσότερο. Ξεκλείδωμα ενισχύσεων εμπειρογνωμόνων.",
+                    ["fr"] = "+30% de dégâts aux xénos, les effets de contrôle durent plus longtemps. Déverrouille les renforts experts.",
+                    ["zh"] = "对异形伤害+30%，控制类效果持续时间增加。解锁专家增援。",
+                    ["zh-TW"] = "對異形傷害+30%，控制類效果持續時間增加。解鎖專家增援。",
+                    ["de"] = "+30% Schaden gegen Xenos, Kontrolleffekte dauern länger. Schalte Experten-Verstärkungen frei.",
+                    ["pl"] = "+30% obrażeń ksenomorfom, efekty kontroli trwają dłużej. Odblokuj wzmocnienia eksperckie.",
+                    ["pt"] = "+30% de dano a xenos, efeitos de controle duram mais tempo. Desbloqueia reforços especialistas.",
+                    ["ru"] = "+30% урона по ксено, эффекты контроля длятся дольше. Разблокировка экспертных подкреплений.",
+                    ["es"] = "+30% de daño a xenos, los efectos de control duran más tiempo. Desbloquea refuerzos expertos.",
+                    ["uk"] = "+30% пошкоджень по ксено, ефекти контролю тривають довше. Розблокування експертних підкріплень.",
+                    ["ja"] = "ゼノへのダメージ+30%、制御効果の持続時間が長くなります。エキスパート増援を解除。",
+                    ["ko"] = "제노에게 +30% 피해, 제어 효과가 더 오래 지속됩니다. 전문가 지원 잠금 해제.",
                 },
 
                 // Xeno Affinity 4

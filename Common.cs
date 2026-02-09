@@ -13,7 +13,7 @@ namespace XenopurgeRougeLike
         public static List<CompanyAffinity> _affinities;
         public static List<CompanyAffinity> Affinities => _affinities ??=
         [
-            // No affinities for Common path - only Standard quality reinforcements
+            CommonAffinity1.Instance
         ];
 
         public static Dictionary<Type, Reinforcement> _reinforcements;

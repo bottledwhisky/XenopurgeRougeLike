@@ -9,13 +9,14 @@ using static XenopurgeRougeLike.ModLocalization;
 namespace XenopurgeRougeLike.XenoReinforcements
 {
     /// <summary>
-    /// 灵能尖啸：眩晕所有异形5秒，可使用1/2次
+    /// 灵能尖啸：眩晕所有异形10秒，可使用1/2次
     /// Psionic Scream: Stun all xenos for 5 seconds, usable 1/2 times
     /// </summary>
     public class PsionicScream : Reinforcement
     {
         public static readonly int[] UsesPerStack = [1, 2];
-        public const float StunDuration = 5f;
+        public const float BaseStunDuration = 10f;
+        public static float StunDuration => 10f + 5 * Xeno.GetControlDurationBonusLevel();
 
         public PsionicScream()
         {
@@ -91,10 +92,10 @@ namespace XenopurgeRougeLike.XenoReinforcements
 
             var enemies = pm.BattleUnits.Where(u => u.IsAlive).ToList();
 
-            // Stun all enemies using the existing stun system from XenoAffinity6
+            // Stun all enemies using the centralized stun controller
             foreach (var enemy in enemies)
             {
-                PsionicScream_StunSystem.StunUnit(enemy, PsionicScream.StunDuration);
+                CentralizedStunController.StunUnit(enemy, PsionicScream.StunDuration, "PsionicScream");
             }
         }
 
@@ -179,143 +180,6 @@ namespace XenopurgeRougeLike.XenoReinforcements
         }
     }
 
-    /// <summary>
-    /// Stun system for PsionicScream - reuses the stun logic pattern from XenoAffinity6
-    /// </summary>
-    public static class PsionicScream_StunSystem
-    {
-        private static Dictionary<BattleUnit, float> _stunnedEnemies = [];
-
-        public static void StunUnit(BattleUnit unit, float duration)
-        {
-            if (unit == null || !unit.IsAlive || unit.Team != Team.EnemyAI)
-                return;
-
-            // If already stunned, extend the duration if the new one is longer
-            if (_stunnedEnemies.TryGetValue(unit, out var existingDuration))
-            {
-                if (duration > existingDuration)
-                {
-                    _stunnedEnemies[unit] = duration;
-                }
-            }
-            else
-            {
-                _stunnedEnemies[unit] = duration;
-            }
-
-            // Register with the unified tracker
-            XenoStunTracker.MarkAsStunned(unit);
-        }
-
-        public static bool IsStunned(BattleUnit unit)
-        {
-            return _stunnedEnemies.ContainsKey(unit) && unit.Team == Team.EnemyAI;
-        }
-
-        public static float UpdateStunTimers(BattleUnit unit, float deltaTime)
-        {
-            if (_stunnedEnemies.TryGetValue(unit, out var remainingTime))
-            {
-                remainingTime -= deltaTime;
-                if (remainingTime <= 0f)
-                {
-                    _stunnedEnemies.Remove(unit);
-                    XenoStunTracker.MarkAsNotStunned(unit);
-                    return -remainingTime;
-                }
-                else
-                {
-                    _stunnedEnemies[unit] = remainingTime;
-                    return 0;
-                }
-            }
-            return 0f;
-        }
-
-        public static void ClearAllStuns()
-        {
-            _stunnedEnemies.Clear();
-        }
-    }
-
-    /// <summary>
-    /// Patch ICommand UpdateTime to prevent stunned xenos from acting (for PsionicScream)
-    /// This uses the same pattern as XenoAffinity6 but with its own stun system
-    /// </summary>
-    [HarmonyPatch]
-    public static class PsionicScream_StunUpdateTime_Patch
-    {
-        public static IEnumerable<System.Reflection.MethodBase> TargetMethods()
-        {
-            var commandInterfaceType = typeof(SpaceCommander.Commands.ICommand);
-            var timeListenerType = typeof(TimeSystem.ITimeUpdatedListener);
-
-            var implementers = System.AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a =>
-                {
-                    try { return a.GetTypes(); }
-                    catch { return System.Type.EmptyTypes; }
-                })
-                .Where(t => t.IsClass && !t.IsAbstract &&
-                           commandInterfaceType.IsAssignableFrom(t) &&
-                           timeListenerType.IsAssignableFrom(t));
-
-            foreach (var implementer in implementers)
-            {
-                var method = implementer.GetMethod("UpdateTime",
-                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic,
-                    null,
-                    new System.Type[] { typeof(float) },
-                    null);
-
-                if (method != null && method.DeclaringType == implementer)
-                {
-                    yield return method;
-                }
-            }
-        }
-
-        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<System.Type, System.Reflection.FieldInfo> _fieldCache = [];
-
-        [HarmonyPrefix]
-        public static bool Prefix(object __instance, ref float __0)
-        {
-            if (!PsionicScream.Instance.IsActive)
-                return true;
-
-            var type = __instance.GetType();
-
-            if (!_fieldCache.TryGetValue(type, out var fieldInfo))
-            {
-                fieldInfo = type.GetField("_battleUnit", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                _fieldCache.Add(type, fieldInfo);
-            }
-
-            if (fieldInfo != null)
-            {
-                var battleUnit = fieldInfo.GetValue(__instance) as BattleUnit;
-                if (battleUnit != null && PsionicScream_StunSystem.IsStunned(battleUnit))
-                {
-                    var remainingTime = PsionicScream_StunSystem.UpdateStunTimers(battleUnit, __0);
-                    __0 = remainingTime;
-                    return true;
-                }
-            }
-            return true;
-        }
-    }
-
-    /// <summary>
-    /// Clear stuns when game ends
-    /// </summary>
-    [HarmonyPatch(typeof(TestGame), "EndGame")]
-    public static class PsionicScream_ClearStuns_Patch
-    {
-        public static void Postfix()
-        {
-            PsionicScream_StunSystem.ClearAllStuns();
-            XenoStunTracker.ClearAll();
-        }
-    }
+    // Note: Stun system is now handled by CentralizedStunController
+    // No need for individual stun patches per reinforcement
 }

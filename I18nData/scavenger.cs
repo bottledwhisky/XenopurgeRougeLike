@@ -590,19 +590,19 @@ namespace XenopurgeRougeLike
                 // Scavenger Affinity Level 2
                 ["scavenger.affinity2.description"] = new Dictionary<string, string>
                 {
-                    ["en"] = "+{0}% more collectibles spawn.",
-                    ["el"] = "+{0}% περισσότερα συλλέξιμα εμφανίζονται.",
-                    ["fr"] = "+{0}% d'objets à collecter en plus apparaissent.",
-                    ["zh"] = "可收集物品刷新数量 +{0}%。",
-                    ["zh-TW"] = "可收集物品刷新數量 +{0}%。",
-                    ["de"] = "+{0}% mehr Sammelobjekte erscheinen.",
-                    ["pl"] = "+{0}% więcej zbieralnych przedmiotów pojawia się.",
-                    ["pt"] = "+{0}% mais colecionáveis aparecem.",
-                    ["ru"] = "+{0}% больше предметов для сбора появляется.",
-                    ["es"] = "+{0}% más coleccionables aparecen.",
-                    ["uk"] = "+{0}% більше предметів для збору з'являється.",
-                    ["ja"] = "収集可能アイテムの出現率 +{0}%。",
-                    ["ko"] = "수집품 생성 +{0}%.",
+                    ["en"] = "+{0}% more collectibles spawn. Unlock expert reinforcements.",
+                    ["el"] = "+{0}% περισσότερα συλλέξιμα εμφανίζονται. Ξεκλείδωμα ενισχύσεων εμπειρογνωμόνων.",
+                    ["fr"] = "+{0}% d'objets à collecter en plus apparaissent. Déverrouille les renforts experts.",
+                    ["zh"] = "可收集物品刷新数量 +{0}%。解锁专家增援。",
+                    ["zh-TW"] = "可收集物品刷新數量 +{0}%。解鎖專家增援。",
+                    ["de"] = "+{0}% mehr Sammelobjekte erscheinen. Schalte Experten-Verstärkungen frei.",
+                    ["pl"] = "+{0}% więcej zbieralnych przedmiotów pojawia się. Odblokuj wzmocnienia eksperckie.",
+                    ["pt"] = "+{0}% mais colecionáveis aparecem. Desbloqueia reforços especialistas.",
+                    ["ru"] = "+{0}% больше предметов для сбора появляется. Разблокировка экспертных подкреплений.",
+                    ["es"] = "+{0}% más coleccionables aparecen. Desbloquea refuerzos expertos.",
+                    ["uk"] = "+{0}% більше предметів для збору з'являється. Розблокування експертних підкріплень.",
+                    ["ja"] = "収集可能アイテムの出現率 +{0}%。エキスパート増援を解除。",
+                    ["ko"] = "수집품 생성 +{0}%. 전문가 지원 잠금 해제.",
                 },
 
                 // Scavenger Affinity Level 4

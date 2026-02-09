@@ -12,19 +12,19 @@ namespace XenopurgeRougeLike
                 // Gunslinger Affinity 2
                 ["gunslinger.affinity2.description"] = new Dictionary<string, string>
                 {
-                    ["en"] = "+{0} <sprite name=\"AccuracyIcon\">. Unlock critical hit mechanic: {1}% base chance, +{2}% base extra damage.",
-                    ["el"] = "+{0} <sprite name=\"AccuracyIcon\">. Ξεκλείδωμα μηχανισμού κρίσιμου χτυπήματος: {1}% βασική πιθανότητα, +{2}% βασική επιπλέον ζημιά.",
-                    ["fr"] = "+{0} <sprite name=\"AccuracyIcon\">. Déverrouille le mécanisme de coup critique : {1}% de chance de base, +{2}% de dégâts supplémentaires de base.",
-                    ["zh"] = "+{0} <sprite name=\"AccuracyIcon\">。解锁暴击机制：{1}%基础概率，+{2}%基础额外伤害。",
-                    ["zh-TW"] = "+{0} <sprite name=\"AccuracyIcon\">。解鎖暴擊機制：{1}%基礎機率，+{2}%基礎額外傷害。",
-                    ["de"] = "+{0} <sprite name=\"AccuracyIcon\">. Kritischer Treffer-Mechanismus freigeschaltet: {1}% Basiswahrscheinlichkeit, +{2}% Basis-Zusatzschaden.",
-                    ["pl"] = "+{0} <sprite name=\"AccuracyIcon\">. Odblokuj mechanikę trafienia krytycznego: {1}% bazowa szansa, +{2}% bazowe dodatkowe obrażenia.",
-                    ["pt"] = "+{0} <sprite name=\"AccuracyIcon\">. Desbloqueia mecânica de acerto crítico: {1}% de chance base, +{2}% de dano extra base.",
-                    ["ru"] = "+{0} <sprite name=\"AccuracyIcon\">. Разблокировка механики критического удара: {1}% базовый шанс, +{2}% базовый дополнительный урон.",
-                    ["es"] = "+{0} <sprite name=\"AccuracyIcon\">. Desbloquea mecánica de golpe crítico: {1}% de probabilidad base, +{2}% de daño extra base.",
-                    ["uk"] = "+{0} <sprite name=\"AccuracyIcon\">. Розблокування механіки критичного удару: {1}% базовий шанс, +{2}% базовий додатковий урон.",
-                    ["ja"] = "+{0} <sprite name=\"AccuracyIcon\">。クリティカルヒットメカニズムをアンロック：基本確率{1}%、基本追加ダメージ+{2}%。",
-                    ["ko"] = "+{0} <sprite name=\"AccuracyIcon\">. 치명타 메커니즘 잠금 해제: 기본 확률 {1}%, 기본 추가 피해 +{2}%.",
+                    ["en"] = "+{0} <sprite name=\"AccuracyIcon\">. Unlock critical hit mechanic: {1}% base chance, +{2}% base extra damage. Unlock expert reinforcements.",
+                    ["el"] = "+{0} <sprite name=\"AccuracyIcon\">. Ξεκλείδωμα μηχανισμού κρίσιμου χτυπήματος: {1}% βασική πιθανότητα, +{2}% βασική επιπλέον ζημιά. Ξεκλείδωμα ενισχύσεων εμπειρογνωμόνων.",
+                    ["fr"] = "+{0} <sprite name=\"AccuracyIcon\">. Déverrouille le mécanisme de coup critique : {1}% de chance de base, +{2}% de dégâts supplémentaires de base. Déverrouille les renforts experts.",
+                    ["zh"] = "+{0} <sprite name=\"AccuracyIcon\">。解锁暴击机制：{1}%基础概率，+{2}%基础额外伤害。解锁专家增援。",
+                    ["zh-TW"] = "+{0} <sprite name=\"AccuracyIcon\">。解鎖暴擊機制：{1}%基礎機率，+{2}%基礎額外傷害。解鎖專家增援。",
+                    ["de"] = "+{0} <sprite name=\"AccuracyIcon\">. Kritischer Treffer-Mechanismus freigeschaltet: {1}% Basiswahrscheinlichkeit, +{2}% Basis-Zusatzschaden. Schalte Experten-Verstärkungen frei.",
+                    ["pl"] = "+{0} <sprite name=\"AccuracyIcon\">. Odblokuj mechanikę trafienia krytycznego: {1}% bazowa szansa, +{2}% bazowe dodatkowe obrażenia. Odblokuj wzmocnienia eksperckie.",
+                    ["pt"] = "+{0} <sprite name=\"AccuracyIcon\">. Desbloqueia mecânica de acerto crítico: {1}% de chance base, +{2}% de dano extra base. Desbloqueia reforços especialistas.",
+                    ["ru"] = "+{0} <sprite name=\"AccuracyIcon\">. Разблокировка механики критического удара: {1}% базовый шанс, +{2}% базовый дополнительный урон. Разблокировка экспертных подкреплений.",
+                    ["es"] = "+{0} <sprite name=\"AccuracyIcon\">. Desbloquea mecánica de golpe crítico: {1}% de probabilidad base, +{2}% de daño extra base. Desbloquea refuerzos expertos.",
+                    ["uk"] = "+{0} <sprite name=\"AccuracyIcon\">. Розблокування механіки критичного удару: {1}% базовий шанс, +{2}% базовий додатковий урон. Розблокування експертних підкріплень.",
+                    ["ja"] = "+{0} <sprite name=\"AccuracyIcon\">。クリティカルヒットメカニズムをアンロック：基本確率{1}%、基本追加ダメージ+{2}%。エキスパート増援を解除。",
+                    ["ko"] = "+{0} <sprite name=\"AccuracyIcon\">. 치명타 메커니즘 잠금 해제: 기본 확률 {1}%, 기본 추가 피해 +{2}%. 전문가 지원 잠금 해제.",
                 },
 
                 // Gunslinger Affinity 4

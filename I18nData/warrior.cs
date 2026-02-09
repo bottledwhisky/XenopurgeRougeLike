@@ -12,19 +12,19 @@ namespace XenopurgeRougeLike
                 // Warrior Affinity 2
                 ["warrior.affinity2.description"] = new Dictionary<string, string>
                 {
-                    ["en"] = "Melee damage +{0}. Shotguns fire +{1} projectile per shot.",
-                    ["el"] = "Ζημιά σώμα με σώμα +{0}. Τα καραμπίνες εκτοξεύουν +{1} βλήμα ανά πυροβολισμό.",
-                    ["fr"] = "Dégâts de mêlée +{0}. Les fusils à pompe tirent +{1} projectile par tir.",
-                    ["zh"] = "近战伤害 +{0}。霰弹枪每次射击 +{1} 投射物。",
-                    ["zh-TW"] = "近戰傷害 +{0}。霰彈槍每次射擊 +{1} 投射物。",
-                    ["de"] = "Nahkampfschaden +{0}. Schrotflinten feuern +{1} Projektil pro Schuss.",
-                    ["pl"] = "Obrażenia wręcz +{0}. Strzelby wystrzeliwują +{1} pocisk na strzał.",
-                    ["pt"] = "Dano corpo a corpo +{0}. Espingardas disparam +{1} projétil por tiro.",
-                    ["ru"] = "Урон в ближнем бою +{0}. Дробовики выпускают +{1} снаряд за выстрел.",
-                    ["es"] = "Daño cuerpo a cuerpo +{0}. Las escopetas disparan +{1} proyectil por disparo.",
-                    ["uk"] = "Урон в ближньому бою +{0}. Дробовики випускають +{1} снаряд за постріл.",
-                    ["ja"] = "近接ダメージ +{0}。ショットガンは1発につき +{1} 発の弾丸を発射。",
-                    ["ko"] = "근접 피해 +{0}. 산탄총은 사격당 +{1} 발사체 발사.",
+                    ["en"] = "Melee damage +{0}. Shotguns fire +{1} projectile per shot. Unlock expert reinforcements.",
+                    ["el"] = "Ζημιά σώμα με σώμα +{0}. Τα καραμπίνες εκτοξεύουν +{1} βλήμα ανά πυροβολισμό. Ξεκλείδωμα ενισχύσεων εμπειρογνωμόνων.",
+                    ["fr"] = "Dégâts de mêlée +{0}. Les fusils à pompe tirent +{1} projectile par tir. Déverrouille les renforts experts.",
+                    ["zh"] = "近战伤害 +{0}。霰弹枪每次射击 +{1} 投射物。解锁专家增援。",
+                    ["zh-TW"] = "近戰傷害 +{0}。霰彈槍每次射擊 +{1} 投射物。解鎖專家增援。",
+                    ["de"] = "Nahkampfschaden +{0}. Schrotflinten feuern +{1} Projektil pro Schuss. Schalte Experten-Verstärkungen frei.",
+                    ["pl"] = "Obrażenia wręcz +{0}. Strzelby wystrzeliwują +{1} pocisk na strzał. Odblokuj wzmocnienia eksperckie.",
+                    ["pt"] = "Dano corpo a corpo +{0}. Espingardas disparam +{1} projétil por tiro. Desbloqueia reforços especialistas.",
+                    ["ru"] = "Урон в ближнем бою +{0}. Дробовики выпускают +{1} снаряд за выстрел. Разблокировка экспертных подкреплений.",
+                    ["es"] = "Daño cuerpo a cuerpo +{0}. Las escopetas disparan +{1} proyectil por disparo. Desbloquea refuerzos expertos.",
+                    ["uk"] = "Урон в ближньому бою +{0}. Дробовики випускають +{1} снаряд за постріл. Розблокування експертних підкріплень.",
+                    ["ja"] = "近接ダメージ +{0}。ショットガンは1発につき +{1} 発の弾丸を発射。エキスパート増援を解除。",
+                    ["ko"] = "근접 피해 +{0}. 산탄총은 사격당 +{1} 발사체 발사. 전문가 지원 잠금 해제.",
                 },
 
                 // Warrior Affinity 4

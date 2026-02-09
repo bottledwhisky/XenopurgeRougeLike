@@ -11,19 +11,19 @@ namespace XenopurgeRougeLike
             {
                 ["support.affinity2.description"] = new Dictionary<string, string>
                 {
-                    ["en"] = "Injections last +{0}% longer, increased shop probability for injections and heal items.",
-                    ["el"] = "Οι ενέσεις διαρκούν +{0}% περισσότερο, αυξημένη πιθανότητα καταστήματος για ενέσεις και αντικείμενα θεραπείας.",
-                    ["fr"] = "Les injections durent +{0}% plus longtemps, probabilité de magasin accrue pour les injections et les objets de soin.",
-                    ["zh"] = "药剂持续时间 +{0}%，指令商店出现药剂和回复品的概率提升。",
-                    ["zh-TW"] = "藥劑持續時間 +{0}%，指令商店出現藥劑和回復品的機率提升。",
-                    ["de"] = "Injektionen dauern +{0}% länger, erhöhte Shop-Wahrscheinlichkeit für Injektionen und Heilgegenstände.",
-                    ["pl"] = "Iniekcje trwają +{0}% dłużej, zwiększone prawdopodobieństwo sklepu dla iniekcji i przedmiotów leczniczych.",
-                    ["pt"] = "Injeções duram +{0}% mais tempo, probabilidade aumentada de loja para injeções e itens de cura.",
-                    ["ru"] = "Инъекции длятся на +{0}% дольше, увеличенная вероятность магазина для инъекций и предметов лечения.",
-                    ["es"] = "Las inyecciones duran +{0}% más, probabilidad de tienda aumentada para inyecciones e ítems de curación.",
-                    ["uk"] = "Ін'єкції тривають на +{0}% довше, збільшена ймовірність магазину для ін'єкцій та предметів лікування.",
-                    ["ja"] = "注射の持続時間が +{0}%、注射と回復アイテムのショップ確率が増加。",
-                    ["ko"] = "주사 지속 시간 +{0}%, 주사 및 치료 아이템의 상점 확률 증가.",
+                    ["en"] = "Injections last +{0}% longer, increased shop probability for injections and heal items. Unlock expert reinforcements.",
+                    ["el"] = "Οι ενέσεις διαρκούν +{0}% περισσότερο, αυξημένη πιθανότητα καταστήματος για ενέσεις και αντικείμενα θεραπείας. Ξεκλείδωμα ενισχύσεων εμπειρογνωμόνων.",
+                    ["fr"] = "Les injections durent +{0}% plus longtemps, probabilité de magasin accrue pour les injections et les objets de soin. Déverrouille les renforts experts.",
+                    ["zh"] = "药剂持续时间 +{0}%，指令商店出现药剂和回复品的概率提升。解锁专家增援。",
+                    ["zh-TW"] = "藥劑持續時間 +{0}%，指令商店出現藥劑和回復品的機率提升。解鎖專家增援。",
+                    ["de"] = "Injektionen dauern +{0}% länger, erhöhte Shop-Wahrscheinlichkeit für Injektionen und Heilgegenstände. Schalte Experten-Verstärkungen frei.",
+                    ["pl"] = "Iniekcje trwają +{0}% dłużej, zwiększone prawdopodobieństwo sklepu dla iniekcji i przedmiotów leczniczych. Odblokuj wzmocnienia eksperckie.",
+                    ["pt"] = "Injeções duram +{0}% mais tempo, probabilidade aumentada de loja para injeções e itens de cura. Desbloqueia reforços especialistas.",
+                    ["ru"] = "Инъекции длятся на +{0}% дольше, увеличенная вероятность магазина для инъекций и предметов лечения. Разблокировка экспертных подкреплений.",
+                    ["es"] = "Las inyecciones duran +{0}% más, probabilidad de tienda aumentada para inyecciones e ítems de curación. Desbloquea refuerzos expertos.",
+                    ["uk"] = "Ін'єкції тривають на +{0}% довше, збільшена ймовірність магазину для ін'єкцій та предметів лікування. Розблокування експертних підкріплень.",
+                    ["ja"] = "注射の持続時間が +{0}%、注射と回復アイテムのショップ確率が増加。エキスパート増援を解除。",
+                    ["ko"] = "주사 지속 시간 +{0}%, 주사 및 치료 아이템의 상점 확률 증가. 전문가 지원 잠금 해제.",
                 },
                 ["support.affinity4.description"] = new Dictionary<string, string>
                 {

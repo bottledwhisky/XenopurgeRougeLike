@@ -1,6 +1,5 @@
 using HarmonyLib;
 using MelonLoader;
-using SpaceCommander;
 using SpaceCommander.ActionCards;
 using System.Collections.Generic;
 using UnityEngine;

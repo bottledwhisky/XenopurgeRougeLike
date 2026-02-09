@@ -274,7 +274,14 @@ namespace XenopurgeRougeLike
                 var choice = AwardSystem.choices[choiceIndex];
                 var preview = choice.GetNextLevelPreview();
                 var company = choice.company.Type;
-                var nExistingCompanyReinforces = AwardSystem.acquiredReinforcements.Where(r => r.company.Type == company).Count() + 1;
+
+                // Count existing reinforcements of this company
+                // If the choice is already acquired (stackable upgrade), don't add 1
+                var nExistingCompanyReinforces = AwardSystem.acquiredReinforcements.Count(r => r.company.Type == company);
+                if (!AwardSystem.acquiredReinforcements.Contains(choice))
+                {
+                    nExistingCompanyReinforces += 1;
+                }
 
                 CompanyAffinity affinityToEnable = null;
                 foreach (var affinity in choice.company.Affinities)

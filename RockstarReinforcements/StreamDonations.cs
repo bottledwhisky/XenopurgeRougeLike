@@ -24,17 +24,17 @@ namespace XenopurgeRougeLike.RockstarReinforcements
     {
         public static Dictionary<UnitTag, float> chanceMinDonations = new()
         {
-            { UnitTag.Scout, 0.1f },
-            { UnitTag.Sleeper, 0.1f },
-            { UnitTag.Mauler, 0.1f },
-            { UnitTag.Lord, 0.1f },
-            { UnitTag.Hive, 0.1f },
+            { UnitTag.Scout, .0f },
+            { UnitTag.Sleeper, .0f },
+            { UnitTag.Mauler, .0f },
+            { UnitTag.Lord, .0f },
+            { UnitTag.Hive, .0f },
         };
 
         public static Dictionary<UnitTag, float> chanceDonations = new()
         {
-            { UnitTag.Scout, 0.1f },
-            { UnitTag.Sleeper, 0.1f },
+            { UnitTag.Scout, 0.15f },
+            { UnitTag.Sleeper, 0.25f },
             { UnitTag.Mauler, 0.5f },
             { UnitTag.Lord, 0.5f },
             { UnitTag.Hive, 0.5f },
