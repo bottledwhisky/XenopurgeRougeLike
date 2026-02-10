@@ -4,6 +4,8 @@ A rogue-like mod that adds a reinforcement system with unique company paths, mak
 
 A MelonLoader mod for Xenopurge.
 
+![Screenshot](screenshots\1.png)
+
 Source code is available on [GitHub](https://github.com/bottledwhisky/XenopurgeRougeLike).
 
 ## Features
