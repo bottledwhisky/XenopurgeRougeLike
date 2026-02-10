@@ -31,8 +31,13 @@ Skip to step 2 if you already have MelonLoader installed.
 
 1. Install MelonLoader
     a. `<game_directory>` is the directory where the game executable is located. For example, `C:\Program Files (x86)\Steam\steamapps\common\Xenopurge`. If you still cannot find it, right-click the game in your Steam library, select "Manage", then "Browse local files".
-2. Place the mod DLL in `<game_directory>/Mods/`
+2. Unzip XenopurgeRougeLike-x.x.zip in `<game_directory>`
 3. Restart the game
+
+## Uninstall
+
+1. Delete the mod DLL XenopurgeRougeLike.dll from `<game_directory>/Mods/`
+2. Delete `<game_directory>/UserData/XenopurgeRougeLike`
 
 ## How It Works
 
