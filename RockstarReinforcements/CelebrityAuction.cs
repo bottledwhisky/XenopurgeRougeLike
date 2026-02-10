@@ -247,8 +247,12 @@ namespace XenopurgeRougeLike.RockstarReinforcements
             }
             CelebrityAuction.IsSellMode = false;
 
-            // Get initial equipment that cannot be sold
-            var initialEquipmentIds = CelebrityAuction.GetInitialEquipmentIds();
+            try
+            {
+                MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Initializing sell equipment screen");
+
+                // Get initial equipment that cannot be sold
+                var initialEquipmentIds = CelebrityAuction.GetInitialEquipmentIds();
 
             // Get all equipment from squad members
             var playerData = Singleton<Player>.Instance.PlayerData;
@@ -293,71 +297,106 @@ namespace XenopurgeRougeLike.RockstarReinforcements
                     Tooltip = $"Sell this equipment for {sellPrice} coins",
                     onClickCallback = () =>
                     {
-                        // Sell the equipment
-                        playerData.PlayerWallet.ChangeCoinsByValue(sellPrice);
-
-                        // Find and unequip from all units that have this equipment
-                        // Note: We need to replace it with initial equipment of the same type
-                        var hireUnitGeneratorSettingsSO = Singleton<AssetsDatabase>.Instance.HireUnitGeneratorSettingsSO;
-
-                        if (unit.GetCurrentEquipmentOfUnit(EquipmentType.Ranged) == equipment)
+                        try
                         {
-                            var defaultRanged = (AccessTools.Field(typeof(HireUnitGeneratorSettingsSO), "_rangedWeaponsDataSOs").GetValue(hireUnitGeneratorSettingsSO) as List<RangedWeaponDataSO>)?[0];
-                            if (defaultRanged != null)
-                            {
-                                unit.ReplaceEquipment(defaultRanged);
-                            }
-                            else
-                            {
-                                var _unitData = AccessTools.Field(typeof(UpgradableUnit), "_unitData").GetValue(unit) as UnitData;
-                                _unitData.UnitEquipmentManager.RangedWeaponDataSO = null;
-                            }
-                        }
-                        else if (unit.GetCurrentEquipmentOfUnit(EquipmentType.Melee) == equipment)
-                        {
-                            var defaultMelee = (AccessTools.Field(typeof(HireUnitGeneratorSettingsSO), "_meleeWeaponDataSOs").GetValue(hireUnitGeneratorSettingsSO) as List<MeleeWeaponDataSO>)?[0];
-                            if (defaultMelee != null)
-                            {
-                                unit.ReplaceEquipment(defaultMelee);
-                            }
-                            else
-                            {
-                                var _unitData = AccessTools.Field(typeof(UpgradableUnit), "_unitData").GetValue(unit) as UnitData;
-                                _unitData.UnitEquipmentManager.MeleeWeaponDataSO = null;
-                            }
-                        }
-                        else if (unit.GetCurrentEquipmentOfUnit(EquipmentType.Gear) == equipment)
-                        {
-                            var defaultGear = (AccessTools.Field(typeof(HireUnitGeneratorSettingsSO), "_gearDataSOs").GetValue(hireUnitGeneratorSettingsSO) as List<GearDataSO>)?[0];
-                            if (defaultGear != null)
-                            {
-                                unit.ReplaceEquipment(defaultGear);
-                            }
-                            else
-                            {
-                                var _unitData = AccessTools.Field(typeof(UpgradableUnit), "_unitData").GetValue(unit) as UnitData;
-                                _unitData.UnitEquipmentManager.GearDataSO = null;
-                            }
-                        }
+                            MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Starting sell operation for {equipment.EquipmentName}");
 
-                        // Disable sell mode and go back
-                        directoriesFlowController?.GoBack();
+                            // Sell the equipment
+                            playerData.PlayerWallet.ChangeCoinsByValue(sellPrice);
+                            MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Added {sellPrice} coins");
+
+                            // Find and unequip from all units that have this equipment
+                            // Note: We need to replace it with initial equipment of the same type
+                            var hireUnitGeneratorSettingsSO = Singleton<AssetsDatabase>.Instance.HireUnitGeneratorSettingsSO;
+
+                            if (unit.GetCurrentEquipmentOfUnit(EquipmentType.Ranged) == equipment)
+                            {
+                                MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Replacing ranged weapon");
+                                var rangedWeaponsList = AccessTools.Field(typeof(HireUnitGeneratorSettingsSO), "_rangedWeaponsDataSOs").GetValue(hireUnitGeneratorSettingsSO) as List<RangedWeaponDataSO>;
+                                MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Ranged weapons list count: {rangedWeaponsList?.Count ?? 0}");
+                                var defaultRanged = (rangedWeaponsList != null && rangedWeaponsList.Count > 0) ? rangedWeaponsList[0] : null;
+                                if (defaultRanged != null)
+                                {
+                                    unit.ReplaceEquipment(defaultRanged);
+                                    MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Replaced with default ranged weapon");
+                                }
+                                else
+                                {
+                                    var _unitData = AccessTools.Field(typeof(UpgradableUnit), "_unitData").GetValue(unit) as UnitData;
+                                    _unitData.UnitEquipmentManager.RangedWeaponDataSO = null;
+                                    MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Set ranged weapon to null");
+                                }
+                            }
+                            else if (unit.GetCurrentEquipmentOfUnit(EquipmentType.Melee) == equipment)
+                            {
+                                MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Replacing melee weapon");
+                                var meleeWeaponsList = AccessTools.Field(typeof(HireUnitGeneratorSettingsSO), "_meleeWeaponDataSOs").GetValue(hireUnitGeneratorSettingsSO) as List<MeleeWeaponDataSO>;
+                                MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Melee weapons list count: {meleeWeaponsList?.Count ?? 0}");
+                                var defaultMelee = (meleeWeaponsList != null && meleeWeaponsList.Count > 0) ? meleeWeaponsList[0] : null;
+                                if (defaultMelee != null)
+                                {
+                                    unit.ReplaceEquipment(defaultMelee);
+                                    MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Replaced with default melee weapon");
+                                }
+                                else
+                                {
+                                    var _unitData = AccessTools.Field(typeof(UpgradableUnit), "_unitData").GetValue(unit) as UnitData;
+                                    _unitData.UnitEquipmentManager.MeleeWeaponDataSO = null;
+                                    MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Set melee weapon to null");
+                                }
+                            }
+                            else if (unit.GetCurrentEquipmentOfUnit(EquipmentType.Gear) == equipment)
+                            {
+                                MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Replacing gear");
+                                var gearsList = AccessTools.Field(typeof(HireUnitGeneratorSettingsSO), "_gearDataSOs").GetValue(hireUnitGeneratorSettingsSO) as List<GearDataSO>;
+                                MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Gears list count: {gearsList?.Count ?? 0}");
+                                var defaultGear = (gearsList != null && gearsList.Count > 0) ? gearsList[0] : null;
+                                if (defaultGear != null)
+                                {
+                                    unit.ReplaceEquipment(defaultGear);
+                                    MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Replaced with default gear");
+                                }
+                                else
+                                {
+                                    var _unitData = AccessTools.Field(typeof(UpgradableUnit), "_unitData").GetValue(unit) as UnitData;
+                                    _unitData.UnitEquipmentManager.GearDataSO = null;
+                                    MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Set gear to null");
+                                }
+                            }
+
+                            MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Going back to previous screen");
+                            // Disable sell mode and go back
+                            directoriesFlowController?.GoBack();
+                            MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Sell operation completed successfully");
+                        }
+                        catch (Exception ex)
+                        {
+                            MelonLoader.MelonLogger.Error($"[CelebrityAuction] Error during sell operation: {ex.Message}");
+                            MelonLoader.MelonLogger.Error($"[CelebrityAuction] Stack trace: {ex.StackTrace}");
+                        }
                     }
                 });
             }
 
-            // Add a back button
-            buttons.Add(new ButtonData
-            {
-                MainText = "Back",
-                Tooltip = "Return to squad management",
-                onClickCallback = () =>
+                // Add a back button
+                buttons.Add(new ButtonData
                 {
-                    directoriesFlowController?.GoBack();
-                }
-            });
+                    MainText = L("rockstar.celebrity_auction.back"),
+                    Tooltip = L("rockstar.celebrity_auction.back_tooltip"),
+                    onClickCallback = () =>
+                    {
+                        directoriesFlowController?.GoBack();
+                    }
+                });
 
-            __result.ButtonData = buttons;
+                __result.ButtonData = buttons;
+                MelonLoader.MelonLogger.Msg($"[CelebrityAuction] Sell equipment screen initialized with {buttons.Count} buttons");
+            }
+            catch (Exception ex)
+            {
+                MelonLoader.MelonLogger.Error($"[CelebrityAuction] Error initializing sell equipment screen: {ex.Message}");
+                MelonLoader.MelonLogger.Error($"[CelebrityAuction] Stack trace: {ex.StackTrace}");
+            }
         }
     }
 

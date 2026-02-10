@@ -377,6 +377,38 @@ namespace XenopurgeRougeLike
                     ["ja"] = "装備をコインで売却します。",
                     ["ko"] = "코인을 위해 장비를 판매하세요.",
                 },
+                ["rockstar.celebrity_auction.back"] = new Dictionary<string, string>
+                {
+                    ["en"] = "Back",
+                    ["el"] = "Πίσω",
+                    ["fr"] = "Retour",
+                    ["zh"] = "返回",
+                    ["zh-TW"] = "返回",
+                    ["de"] = "Zurück",
+                    ["pl"] = "Wstecz",
+                    ["pt"] = "Voltar",
+                    ["ru"] = "Назад",
+                    ["es"] = "Atrás",
+                    ["uk"] = "Назад",
+                    ["ja"] = "戻る",
+                    ["ko"] = "뒤로",
+                },
+                ["rockstar.celebrity_auction.back_tooltip"] = new Dictionary<string, string>
+                {
+                    ["en"] = "Return to squad management",
+                    ["el"] = "Επιστροφή στη διαχείριση ομάδας",
+                    ["fr"] = "Retour à la gestion de l'équipe",
+                    ["zh"] = "返回小队管理",
+                    ["zh-TW"] = "返回小隊管理",
+                    ["de"] = "Zurück zur Truppenverwaltung",
+                    ["pl"] = "Powrót do zarządzania drużyną",
+                    ["pt"] = "Retornar ao gerenciamento de esquadrão",
+                    ["ru"] = "Вернуться к управлению отрядом",
+                    ["es"] = "Volver a la gestión de escuadrón",
+                    ["uk"] = "Повернутися до управління загоном",
+                    ["ja"] = "分隊管理に戻る",
+                    ["ko"] = "분대 관리로 돌아가기",
+                },
                 ["rockstar.whale_patron.name"] = new Dictionary<string, string>
                 {
                     ["en"] = "Whale Patron",

@@ -26,8 +26,7 @@ namespace XenopurgeRougeLike.RockstarReinforcements
 
         public override void OnDeactivate()
         {
-            RockstarAffinityHelpers.ResetStates();
-            UnitsPlacementPhasePatch.ResetStates();
+            // Don't reset fan count on deactivate - we want to preserve it when advancing to Affinity4/6
         }
 
         public override Dictionary<string, object> SaveState()
@@ -59,6 +58,13 @@ namespace XenopurgeRougeLike.RockstarReinforcements
         public static RockstarAffinity2 _instance;
 
         public static RockstarAffinity2 Instance => _instance ??= new();
+
+        public override void OnActivate()
+        {
+            // Reset fan count only when first entering Rockstar path (Affinity2 activation)
+            RockstarAffinityHelpers.ResetStates();
+            UnitsPlacementPhasePatch.ResetStates();
+        }
 
         public override string ToFullDescription()
         {
