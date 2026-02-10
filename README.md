@@ -1,6 +1,6 @@
 # XenopurgeRougelike
 
-A rogue-like mod that adds a reinforcement system with unique company paths, making each playthrough different.
+A rogue-like mod that adds a reinforcement system with unique company playstyles, making each playthrough different.
 
 A MelonLoader mod for Xenopurge.
 
@@ -10,7 +10,7 @@ Source code is available on [GitHub](https://github.com/bottledwhisky/XenopurgeR
 
 ## Features
 
-- **7 Company Paths**: Choose reinforcements from specialized companies, each with distinct playstyles:
+- **8 Company Playstyles**: Choose reinforcements from specialized companies, each with distinct playstyles:
   - **Engineer**: Mines, grenades, turrets, and explosives specialization
   - **Support**: Medical supplies, buffs, healing, and scavenging
   - **Warrior**: Melee combat, shotguns, armor, and close-range dominance
@@ -21,7 +21,7 @@ Source code is available on [GitHub](https://github.com/bottledwhisky/XenopurgeR
   - **Xeno**: Mind control, stun abilities, and anti-xeno damage bonuses
 - **Progressive Affinity System**: Unlock stronger bonuses as you collect 2/4/6 reinforcements from the same company
 - **Diverse Reinforcements**: 80+ unique reinforcements with varying rarities (Common/Elite/Expert) that modify gameplay mechanics
-- **Universal Reinforcements**: Generic stat boosts and weapon specializations available to all paths
+- **Universal Reinforcements**: Generic stat boosts and weapon specializations available to all playstyles
 
 ## Requirements
 
